@@ -43,7 +43,8 @@ job "transmission" {
         volumes = [
           "/mnt/apps/transmission/:/config",
           "/home/nahsi/watch:/watch",
-          "/home/nahsi/downloads:/downloads"
+          "/home/nahsi/downloads:/downloads",
+          "/home/nahsi/media:/media"
         ]
       }
 
