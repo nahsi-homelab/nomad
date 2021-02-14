@@ -38,11 +38,12 @@ job "jellyfin" {
         ]
 
         volumes = [
-          "/usr/bin/ffmpeg:/bin/ffmpeg",
+          "/usr/bin/ffmpeg:/local/bin/ffmpeg",
           "/mnt/apps/jellyfin/config:/config",
           "/mnt/apps/jellyfin/cache:/cache",
           "/home/nahsi/media/video:/video",
-          "/home/nahsi/media/music:/music"
+          "/home/nahsi/media/music:/music",
+          "/home/nahsi/media/books:/books"
         ]
       }
 
