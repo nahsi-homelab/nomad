@@ -37,13 +37,16 @@ job "jellyfin" {
           "http"
         ]
 
+        tmpfs = [
+          "/config/transcodes:size=4G"
+        ]
+
         volumes = [
-          "/usr/bin/ffmpeg:/local/bin/ffmpeg",
           "/mnt/apps/jellyfin/config:/config",
           "/mnt/apps/jellyfin/cache:/cache",
-          "/home/nahsi/media/video:/video",
-          "/home/nahsi/media/music:/music",
-          "/home/nahsi/media/books:/books"
+          "/home/nahsi/media/video:/video:ro",
+          "/home/nahsi/media/music:/music:ro",
+          "/home/nahsi/media/books:/books:ro"
         ]
       }
 
