@@ -34,11 +34,6 @@ job "unifi-controller" {
       port = "web-ui"
     }
 
-    volume "unifi-data" {
-      type = "host"
-      source = "unifi"
-    }
-
     task "unifi" {
       driver = "podman"
 
