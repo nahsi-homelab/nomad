@@ -39,7 +39,7 @@ job "telegraf" {
         data =<<EOH
 [agent]
   interval = "15s"
-  ommit_hostname = true
+  omit_hostname = true
 
 [[outputs.prometheus_client]]
   listen = ":9271"
