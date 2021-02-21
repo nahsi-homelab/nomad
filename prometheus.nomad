@@ -33,6 +33,10 @@ job "prometheus" {
           "web_ui"
         ]
 
+        dns = [
+          "10.88.0.1"
+        ]
+
         args = [
           "--config.file=/etc/prometheus/config/prometheus.yml",
           "--storage.tsdb.path=/prometheus",
@@ -52,6 +56,31 @@ job "prometheus" {
 global:
   scrape_interval:     15s
   evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: "prometheus"
+    consul_sd_configs:
+      - server: "https://consul.service.consul:8501"
+        datacenter: "syria"
+        services:
+          - "prometheus"
+    relabel_configs:
+      - source_labels: ["__meta_consul_service"]
+        target_label: "job"
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
+
+  - job_name: "telegraf"
+    consul_sd_configs:
+      - server: "https://consul.service.consul:8501"
+        datacenter: "syria"
+        services:
+          - "telegraf"
+    relabel_configs:
+      - source_labels: ["__meta_consul_service"]
+        target_label: "job"
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
 EOH
 
         change_mode   = "signal"
