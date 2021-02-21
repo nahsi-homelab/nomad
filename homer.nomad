@@ -6,9 +6,10 @@ job "homer" {
   type        = "service"
 
   group "homer" {
+    count = 2
+
     network {
       port "http" {
-        static = 8081
         to = 8080
       }
     }
