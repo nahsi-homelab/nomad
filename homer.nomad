@@ -72,6 +72,11 @@ services:
   - name: "Monitoring"
     icon: "fas fa-cloud"
     items:
+      - name: "Grafana"
+        url: |
+          {{ with service "grafana" -}}
+          {{ with index . 0 -}}
+          http://{{ .Name }}.service.consul:{{ .Port }}{{ end }}{{ end }}
       - name: "Prometheus"
         url: |
           {{ with service "prometheus" -}}
