@@ -71,7 +71,7 @@ scrape_configs:
       - server: "https://consul.service.consul:8501"
         datacenter: "syria"
         tls_config:
-          ca_file: "secrets/ca.crt"
+          ca_file: "/secrets/ca.crt"
         services:
           - "prometheus"
     relabel_configs:
@@ -85,7 +85,7 @@ scrape_configs:
       - server: "https://consul.service.consul:8501"
         datacenter: "syria"
         tls_config:
-          ca_file: "secrets/ca.crt"
+          ca_file: "/secrets/ca.crt"
         services:
           - "telegraf"
     relabel_configs:
