@@ -67,6 +67,15 @@ services:
         url: "https://consul.service.consul:8501"
       - name: "Vault"
         url: "https://vault.service.consul:8200"
+
+  - name: "Monitoring"
+    icon: "fas fa-cloud"
+    items:
+      - name: "Prometheus"
+        url: |
+          {{ with service "prometheus" -}}
+          {{ with index . 0 -}}
+          http://{{ .Name }}.service.consul:{{ .Port }}{{ end }}{{ end }}
 EOH
       }
     }
