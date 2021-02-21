@@ -38,16 +38,24 @@ job "prometheus" {
         ]
 
         args = [
-          "--config.file=/etc/prometheus/config/prometheus.yml",
+          "--config.file=/local/prometheus.yml",
           "--storage.tsdb.path=/prometheus",
           "--web.console.libraries=/usr/share/prometheus/console_libraries",
           "--web.console.templates=/usr/share/prometheus/consoles",
         ]
 
         volumes = [
-          "local/config:/etc/prometheus/config",
           "/mnt/apps/prometheus:/prometheus"
         ]
+      }
+
+      template {
+        data = <<EOH
+{{ with secret "pki/internal/cert/ca" }}
+{{- .Data.certificate }}{{ end }}
+EOH
+
+        destination = "secrets/ca.crt"
       }
 
       template {
@@ -62,6 +70,8 @@ scrape_configs:
     consul_sd_configs:
       - server: "https://consul.service.consul:8501"
         datacenter: "syria"
+        tls_config:
+          ca_file: "secrets/ca.crt"
         services:
           - "prometheus"
     relabel_configs:
@@ -74,6 +84,8 @@ scrape_configs:
     consul_sd_configs:
       - server: "https://consul.service.consul:8501"
         datacenter: "syria"
+        tls_config:
+          ca_file: "secrets/ca.crt"
         services:
           - "telegraf"
     relabel_configs:
@@ -85,7 +97,7 @@ EOH
 
         change_mode   = "signal"
         change_signal = "SIGHUP"
-        destination   = "local/config/prometheus.yml"
+        destination   = "local/prometheus.yml"
       }
 
       resources {
