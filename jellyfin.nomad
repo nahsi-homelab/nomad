@@ -44,9 +44,7 @@ job "jellyfin" {
         volumes = [
           "/mnt/apps/jellyfin/config:/config",
           "/mnt/apps/jellyfin/cache:/cache",
-          "/home/nahsi/media/video:/video:ro",
-          "/home/nahsi/media/music:/music:ro",
-          "/home/nahsi/media/books:/books:ro"
+          "/home/nahsi/media/video:/video:ro"
         ]
       }
 
