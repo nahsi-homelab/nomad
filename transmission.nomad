@@ -33,7 +33,7 @@ job "transmission" {
       }
 
       config {
-        image = "docker://linuxserver/transmission:version-3.00-r2"
+        image = "docker://linuxserver/transmission:version-3.00-r0-ls68"
 
         ports = [
           "web-ui",
