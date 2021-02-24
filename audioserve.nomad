@@ -23,7 +23,11 @@ job "audioserve" {
       config {
         image = "docker://izderadicka/audioserve"
 
-        args = ["--no-authentication", "/audiobooks", "/podcasts"]
+        args = [
+          "--no-authentication",
+          "/audiobooks",
+          "/podcasts"
+        ]
 
         ports = [
           "http"

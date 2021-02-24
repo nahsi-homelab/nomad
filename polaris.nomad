@@ -8,6 +8,7 @@ job "polaris" {
   group "polaris" {
     network {
       port "http" {
+        static = 5050
         to = 5050
       }
     }

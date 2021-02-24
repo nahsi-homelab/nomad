@@ -5,6 +5,10 @@ job "homer" {
 
   type        = "service"
 
+  update {
+    max_parallel = 1
+  }
+
   group "homer" {
     count = 2
 
@@ -53,7 +57,11 @@ services:
     icon: "fas fa-code-branch"
     items:
       - name: "Jellyfin"
-        url: "http://jellyfin.service.consul:8096"
+        url: "https://home.service.consul/jellyfin"
+      - name: "Polaris"
+        url: "http://polaris.service.consul:5050"
+      - name: "Audioserve"
+        url: "https://home.service.consul/audioserve"
       - name: "Transmission"
         url: "http://transmission.service.consul:9091"
 
@@ -73,15 +81,9 @@ services:
     icon: "fas fa-cloud"
     items:
       - name: "Grafana"
-        url: |
-          {{ with service "grafana" -}}
-          {{ with index . 0 -}}
-          http://{{ .Name }}.service.consul:{{ .Port }}{{ end }}{{ end }}
+        url: "https://home.service.consul/grafana"
       - name: "Prometheus"
-        url: |
-          {{ with service "prometheus" -}}
-          {{ with index . 0 -}}
-          http://{{ .Name }}.service.consul:{{ .Port }}{{ end }}{{ end }}
+        url: "https://home.service.consul/prometheus"
 EOH
       }
     }

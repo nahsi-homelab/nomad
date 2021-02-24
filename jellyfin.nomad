@@ -6,6 +6,7 @@ job "jellyfin" {
   type        = "service"
 
   group "jellyfin" {
+
     network {
       port "http" {
         static = 8096
@@ -20,7 +21,7 @@ job "jellyfin" {
       check {
         type = "http"
         protocol = "http"
-        path = "/health"
+        path = "/jellyfin/health"
         port = "http"
         interval = "10s"
         timeout = "2s"
@@ -49,7 +50,7 @@ job "jellyfin" {
       }
 
       resources {
-        cpu = 60000
+        cpu = 30000
         memory = 4096
       }
     }

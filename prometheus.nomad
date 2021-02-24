@@ -38,6 +38,8 @@ job "prometheus" {
         ]
 
         args = [
+          "--web.external-url=https://home.service.consul/prometheus",
+          "--web.route-prefix=/",
           "--config.file=/local/prometheus.yml",
           "--storage.tsdb.path=/prometheus",
           "--web.console.libraries=/usr/share/prometheus/console_libraries",

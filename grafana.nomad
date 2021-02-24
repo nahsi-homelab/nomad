@@ -45,7 +45,7 @@ app_mode = development
 # HTTP options
 [server]
 # The public facing domain name used to access grafana from a browser
-domain =
+domain = home.serivce.consul
 
 # Redirect to correct domain if host header does not match domain
 # Prevents DNS rebinding attacks
@@ -53,7 +53,8 @@ enforce_domain = false
 
 # # The full public facing url you use in browser, used for redirects and emails
 # If you use reverse proxy and sub path specify full url (with sub path)
-root_url = http://grafana.service.consul
+root_url = https://home.service.consul/grafana
+serve_from_sub_path = true
 
 # Security
 [security]
