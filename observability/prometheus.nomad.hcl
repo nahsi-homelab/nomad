@@ -55,6 +55,11 @@ global:
   external_labels:
     dc: "${node.datacenter}"
 
+remote_write:
+  - url: "https://home.service.consul/victoriametrics/api/v1/write"
+    tls_config:
+      ca_file: "/secrets/ca.crt"
+
 scrape_configs:
   - job_name: "prometheus"
     metrics_path: "/prometheus/metrics"

@@ -65,6 +65,12 @@ home.service.consul:443 {
     {{- end }}
   }
 
+  handle_path /victoriametrics* {
+    {{ range service "victoria-metrics" }}
+    reverse_proxy {{ .Address }}:{{ .Port }}
+    {{- end }}
+  }
+
   route /jellyfin* {
     {{ range service "jellyfin" }}
     reverse_proxy {{ .Address }}:{{ .Port }}
