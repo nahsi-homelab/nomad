@@ -3,29 +3,31 @@ job "grafana" {
   type        = "service"
 
   group "grafana" {
+    count = 1
+
     network {
+      dns {
+        servers = [
+          "10.88.0.1",
+          "1.1.1.1"
+        ]
+      }
       port "http" {
         to = 3000
       }
     }
 
-    service {
-      name = "grafana"
-      port = "http"
-
-      check {
-        type     = "http"
-        path     = "/health"
-        interval = "10s"
-        timeout  = "2s"
-      }
+    restart {
+      attempts = 3
+      delay = "20s"
+      mode = "delay"
     }
 
     task "grafana" {
       driver = "podman"
 
       config {
-        image = "docker://grafana/grafana:7.4.2"
+        image = "docker://grafana/grafana:7.4.3"
 
         ports = [
           "http"
@@ -109,9 +111,30 @@ EOH
         destination = "local/provisioning/datasources/datasources.yml"
       }
 
+      service {
+        name = "grafana"
+        tags = ["monitoring"]
+
+        port = "http"
+
+        check {
+          name = "Grafana HTTP"
+          type     = "http"
+          path     = "/api/health"
+          interval = "5s"
+          timeout  = "2s"
+
+          check_restart {
+            limit = 2
+            grace = "60s"
+            ignore_warnings = false
+          }
+        }
+      }
+
       resources {
         cpu    = 100
-        memory = 150
+        memory = 100
       }
     }
   }
