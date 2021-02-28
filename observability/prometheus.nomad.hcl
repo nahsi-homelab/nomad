@@ -75,7 +75,7 @@ remote_write:
 
 scrape_configs:
   - job_name: "prometheus"
-    metrics_path: "/prmetheus/metrics"
+    metrics_path: "/prometheus/metrics"
     static_configs:
     - targets:
         - "localhost:{{ env "NOMAD_PORT_http" }}"
