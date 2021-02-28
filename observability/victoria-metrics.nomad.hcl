@@ -32,6 +32,7 @@ job "victoria-metrics" {
 
       service {
         name = "victoria-metrics"
+        tags = ["observability"]
         port = "http"
 
         check {

@@ -89,6 +89,7 @@ EOH
 
       service {
         name = "prometheus"
+        tags = ["observability"]
         port = "http"
 
         check {

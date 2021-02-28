@@ -126,6 +126,13 @@ datasources:
     isDefault: true
     jsonData:
       timeInterval: 15s
+    name: VictoriaMetrics
+    type: prometheus
+    url: https://home.service.consul/victoria-metrics
+  - basicAuth: false
+    isDefault: false
+    jsonData:
+      timeInterval: 15s
     name: Prometheus
     type: prometheus
     url: https://home.service.consul/prometheus
@@ -136,8 +143,7 @@ EOH
 
       service {
         name = "grafana"
-        tags = ["monitoring"]
-
+        tags = ["observability"]
         port = "http"
 
         check {
