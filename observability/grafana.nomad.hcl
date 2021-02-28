@@ -6,13 +6,6 @@ job "grafana" {
     count = 1
 
     network {
-      dns {
-        servers = [
-          "10.88.0.1",
-          "1.1.1.1"
-        ]
-      }
-
       port "http" {
         to = 3000
       }
@@ -33,6 +26,8 @@ job "grafana" {
 
       config {
         image = "docker://grafana/grafana:7.4.3"
+
+        dns = ["10.88.0.1"]
 
         ports = [
           "http"
