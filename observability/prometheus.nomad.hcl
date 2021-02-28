@@ -95,6 +95,27 @@ scrape_configs:
         target_label: "job"
       - source_labels: ["__meta_consul_node"]
         target_label: "instance"
+
+  - job_name: "consul"
+    metrics_path: "/v1/agent/metrics"
+    params:
+      format: ["prometheus"]
+    consul_sd_configs:
+      - server: "https://consul.service.consul:8501"
+        datacenter: "syria"
+        tls_config:
+          ca_file: "/secrets/ca.crt"
+        services:
+          - "consul"
+    relabel_configs:
+      - source_labels: ["__address__"]
+        target_label: "__address__"
+        regex: "(.*):.*"
+        replacement: "$1:8500"
+      - source_labels: ["__meta_consul_service"]
+        target_label: "job"
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
 EOH
 
         change_mode   = "signal"
