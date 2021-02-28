@@ -12,6 +12,7 @@ job "grafana" {
           "1.1.1.1"
         ]
       }
+
       port "http" {
         to = 3000
       }
@@ -19,12 +20,16 @@ job "grafana" {
 
     restart {
       attempts = 3
-      delay = "20s"
-      mode = "delay"
+      delay    = "20s"
+      mode     = "delay"
     }
 
     task "grafana" {
       driver = "podman"
+
+      vault {
+        policies = ["grafana"]
+      }
 
       config {
         image = "docker://grafana/grafana:7.4.3"
@@ -42,12 +47,10 @@ job "grafana" {
 
       template {
         data = <<EOH
-app_mode = development
-
 # HTTP options
 [server]
 # The public facing domain name used to access grafana from a browser
-domain = home.serivce.consul
+domain = home.service.consul
 
 # Redirect to correct domain if host header does not match domain
 # Prevents DNS rebinding attacks
@@ -58,28 +61,32 @@ enforce_domain = false
 root_url = https://home.service.consul/grafana
 serve_from_sub_path = true
 
-# Security
-[security]
-admin_user = admin
-admin_password = foobar
-
 # Users management and registration
 [users]
-allow_sign_up = False
-allow_org_create = False
+allow_sign_up = false
+allow_org_create = false
 auto_assign_org_role = Viewer
 default_theme = dark
 
+[security]
+admin_password = $__file{/secrets/admin_password}
+
 # Authentication
 [auth]
-disable_login_form = False
-oauth_auto_login = False
-disable_signout_menu = False
-signout_redirect_url =
+disable_login_form = false
+oauth_auto_login = false
+disable_signout_menu = false
 
-# Dashboards
-[dashboards]
-versions_to_keep = 10
+[auth.github]
+enabled = true
+allow_sign_up = true
+client_id = $__file{/secrets/github/client_id}
+client_secret = $__file{/secrets/github/secret_id}
+scopes = user:email,read:org
+auth_url = https://github.com/login/oauth/authorize
+token_url = https://github.com/login/oauth/access_token
+api_url = https://api.github.com/user
+allowed_organizations = nahsi-homelab
 
 # Logging
 [log]
@@ -87,7 +94,31 @@ mode = console
 level = info
 EOH
 
-        destination   = "local/grafana.ini"
+        destination = "local/grafana.ini"
+      }
+
+      template {
+        data = <<EOH
+{{ with secret "secret/grafana/github" }}{{ .Data.data.client_id }}{{ end }}
+EOH
+
+        destination = "secrets/github/client_id"
+      }
+
+      template {
+        data = <<EOH
+{{ with secret "secret/grafana/github" }}{{ .Data.data.secret_id }}{{ end }}
+EOH
+
+        destination = "secrets/github/secret_id"
+      }
+
+      template {
+        data = <<EOH
+{{ with secret "secret/grafana/users/admin" }}{{ .Data.data.password }}{{ end }}
+EOH
+
+        destination = "secrets/admin_password"
       }
 
       template {
@@ -102,10 +133,7 @@ datasources:
       timeInterval: 15s
     name: Prometheus
     type: prometheus
-    url: >-
-      {{ with service "prometheus" -}}
-      {{ with index . 0 -}}
-      http://{{ .Address }}:{{ .Port }}{{ end }}{{ end }}
+    url: https://home.service.consul/prometheus
 EOH
 
         destination = "local/provisioning/datasources/datasources.yml"
@@ -125,8 +153,8 @@ EOH
           timeout  = "2s"
 
           check_restart {
-            limit = 2
-            grace = "60s"
+            limit           = 2
+            grace           = "60s"
             ignore_warnings = false
           }
         }
