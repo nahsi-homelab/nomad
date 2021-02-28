@@ -4,21 +4,7 @@ job "prometheus" {
   group "prometheus" {
 
     network {
-      port "web_ui" {
-        to = 9090
-      }
-    }
-
-    service {
-      name = "prometheus"
-      port = "web_ui"
-
-      check {
-        type     = "http"
-        path     = "/-/healthy"
-        interval = "10s"
-        timeout  = "2s"
-      }
+      port "http" {}
     }
 
     task "prometheus" {
@@ -30,20 +16,21 @@ job "prometheus" {
         image = "docker://prom/prometheus:v2.25.0"
 
         ports = [
-          "web_ui"
+          "http"
         ]
 
-        dns = [
-          "10.88.0.1"
-        ]
+        dns = ["10.88.0.1"]
 
         args = [
+          "--web.listen-address=:${NOMAD_PORT_http}",
           "--web.external-url=https://home.service.consul/prometheus",
           "--web.route-prefix=/",
           "--config.file=/local/prometheus.yml",
           "--storage.tsdb.path=/prometheus",
+          "--storage.tsdb.retention.time=5d",
+          "--web.enable-lifecycle",
           "--web.console.libraries=/usr/share/prometheus/console_libraries",
-          "--web.console.templates=/usr/share/prometheus/consoles",
+          "--web.console.templates=/usr/share/prometheus/consoles"
         ]
 
         volumes = [
@@ -53,8 +40,7 @@ job "prometheus" {
 
       template {
         data = <<EOH
-{{ with secret "pki/internal/cert/ca" }}
-{{- .Data.certificate }}{{ end }}
+{{ with secret "pki/internal/cert/ca" }}{{- .Data.certificate }}{{ end }}
 EOH
 
         destination = "secrets/ca.crt"
@@ -66,21 +52,15 @@ EOH
 global:
   scrape_interval:     15s
   evaluation_interval: 15s
+  external_labels:
+    dc: "${node.datacenter}"
 
 scrape_configs:
   - job_name: "prometheus"
-    consul_sd_configs:
-      - server: "https://consul.service.consul:8501"
-        datacenter: "syria"
-        tls_config:
-          ca_file: "/secrets/ca.crt"
-        services:
-          - "prometheus"
-    relabel_configs:
-      - source_labels: ["__meta_consul_service"]
-        target_label: "job"
-      - source_labels: ["__meta_consul_node"]
-        target_label: "instance"
+    metrics_path: "/prometheus/metrics"
+    static_configs:
+    - targets:
+        - "localhost:${NOMAD_PORT_http}"
 
   - job_name: "telegraf"
     consul_sd_configs:
@@ -102,9 +82,22 @@ EOH
         destination   = "local/prometheus.yml"
       }
 
+      service {
+        name = "prometheus"
+        port = "http"
+
+        check {
+          name     = "Prometheus HTTP"
+          type     = "http"
+          path     = "/-/healthy"
+          interval = "10s"
+          timeout  = "2s"
+        }
+      }
+
       resources {
-        cpu    = 1000
-        memory = 4096
+        cpu    = 300
+        memory = 512
       }
     }
   }
