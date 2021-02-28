@@ -54,38 +54,38 @@ home.service.consul:443 {
   tls /secrets/cert.pem /secrets/key.pem
 
   route /grafana* {
-    {{ range service "grafana" }}
+    {{- range service "grafana" }}
     reverse_proxy {{ .Address }}:{{ .Port }}
     {{- end }}
   }
 
-  handle_path /prometheus* {
-    {{ range service "prometheus" }}
+  route /prometheus* {
+    {{- range service "prometheus" }}
     reverse_proxy {{ .Address }}:{{ .Port }}
     {{- end }}
   }
 
-  handle_path /victoriametrics* {
-    {{ range service "victoria-metrics" }}
+  handle_path /victoria-metrics* {
+    {{- range service "victoria-metrics" }}
     reverse_proxy {{ .Address }}:{{ .Port }}
     {{- end }}
   }
 
   route /jellyfin* {
-    {{ range service "jellyfin" }}
+    {{- range service "jellyfin" }}
     reverse_proxy {{ .Address }}:{{ .Port }}
     {{- end }}
   }
 
   handle_path /audioserve* {
-    {{ range service "audioserve" }}
+    {{- range service "audioserve" }}
     reverse_proxy {{ .Address }}:{{ .Port }}
     {{- end }}
   }
 
   route /* {
    reverse_proxy {
-      {{ range service "homer" }}
+      {{- range service "homer" }}
       to {{ .Address }}:{{ .Port }}
       {{- end }}
     }

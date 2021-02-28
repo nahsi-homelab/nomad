@@ -8,6 +8,20 @@ job "victoria-metrics" {
       port "http" {}
     }
 
+    service {
+      name = "victoria-metrics"
+      tags = ["observability"]
+      port = "http"
+
+      check {
+        name     = "VictoriaMetrics HTTP"
+        type     = "http"
+        path     = "/health"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+
     task "victoria-metrics" {
       driver = "podman"
 
@@ -28,20 +42,6 @@ job "victoria-metrics" {
         volumes = [
           "/mnt/apps/victoria-metrics:/data"
         ]
-      }
-
-      service {
-        name = "victoria-metrics"
-        tags = ["observability"]
-        port = "http"
-
-        check {
-          name     = "VictoriaMetrics HTTP"
-          type     = "http"
-          path     = "/health"
-          interval = "10s"
-          timeout  = "2s"
-        }
       }
 
       resources {

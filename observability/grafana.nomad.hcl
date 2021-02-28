@@ -11,6 +11,26 @@ job "grafana" {
       }
     }
 
+    service {
+      name = "grafana"
+      tags = ["observability"]
+      port = "http"
+
+      check {
+        name = "Grafana HTTP"
+        type     = "http"
+        path     = "/api/health"
+        interval = "5s"
+        timeout  = "2s"
+
+        check_restart {
+          limit           = 2
+          grace           = "60s"
+          ignore_warnings = false
+        }
+      }
+    }
+
     restart {
       attempts = 3
       delay    = "20s"
@@ -126,39 +146,21 @@ datasources:
     isDefault: true
     jsonData:
       timeInterval: 15s
+      tlsSkipVerify: true
     name: VictoriaMetrics
     type: prometheus
-    url: https://home.service.consul/victoria-metrics
+    url: "https://home.service.consul/victoria-metrics"
   - basicAuth: false
     isDefault: false
     jsonData:
       timeInterval: 15s
+      tlsSkipVerify: true
     name: Prometheus
     type: prometheus
-    url: https://home.service.consul/prometheus
+    url: "https://home.service.consul/prometheus"
 EOH
 
         destination = "local/provisioning/datasources/datasources.yml"
-      }
-
-      service {
-        name = "grafana"
-        tags = ["observability"]
-        port = "http"
-
-        check {
-          name = "Grafana HTTP"
-          type     = "http"
-          path     = "/api/health"
-          interval = "5s"
-          timeout  = "2s"
-
-          check_restart {
-            limit           = 2
-            grace           = "60s"
-            ignore_warnings = false
-          }
-        }
       }
 
       resources {
