@@ -1,5 +1,5 @@
 # vim: set ft=hcl sw=2 ts=2 :
-job "unifi-controller" {
+job "unifi" {
 
   datacenters = ["syria"]
 
