@@ -46,7 +46,8 @@ job "jellyfin" {
           "/mnt/apps/jellyfin/config:/config",
           "/mnt/apps/jellyfin/cache:/cache",
           "/home/nahsi/media/video:/video:ro",
-          "/home/nahsi/media/audio/audiobooks:/audiobooks:ro"
+          "/home/nahsi/media/audio/audiobooks:/audiobooks:ro",
+          "/home/nahsi/media/audio/podcasts:/podcasts:ro"
         ]
       }
 
