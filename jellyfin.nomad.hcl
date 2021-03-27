@@ -32,7 +32,7 @@ job "jellyfin" {
       driver = "podman"
 
       config {
-        image = "docker://jellyfin/jellyfin:10.7.0-rc3-amd64"
+        image = "docker://jellyfin/jellyfin:10.7.1-amd64"
 
         ports = [
           "http"
