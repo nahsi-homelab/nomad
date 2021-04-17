@@ -23,7 +23,7 @@ job "homer" {
       driver = "podman"
 
       config {
-        image = "docker://b4bz/homer:21.03.02-amd64"
+        image = "docker://b4bz/homer:21.03.2-amd64"
 
         ports = [
           "http"
