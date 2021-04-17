@@ -23,7 +23,7 @@ job "homer" {
       driver = "podman"
 
       config {
-        image = "docker://b4bz/homer:20.12.19-amd64"
+        image = "docker://b4bz/homer:21.03.02-amd64"
 
         ports = [
           "http"
@@ -41,7 +41,7 @@ job "homer" {
 title: "Dashboard"
 subtitle: "Syria"
 columns: "auto"
-connectivityCheck: fasle
+connectivityCheck: false
 
 links:
   - name: "Homelab Github"
