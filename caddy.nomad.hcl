@@ -93,8 +93,9 @@ home.service.consul:443 {
 }
 EOH
 
-        change_mode   = "restart"
         destination   = "local/Caddyfile"
+        change_mode   = "signal"
+        change_signal = "SIGINT"
       }
 
       template {
