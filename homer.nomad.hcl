@@ -56,8 +56,6 @@ services:
         url: "https://home.service.consul/jellyfin"
       - name: "Polaris"
         url: "http://polaris.service.consul:5050"
-      - name: "Podgrab"
-        url: "http://podgrab.service.consul:8081"
       - name: "Audioserve"
         url: "https://home.service.consul/audioserve"
       - name: "Transmission"

@@ -43,7 +43,7 @@ job "unifi" {
       }
 
       config {
-        image = "docker://linuxserver/unifi-controller:version-6.0.45"
+        image = "docker://linuxserver/unifi-controller:version-6.1.71"
 
         ports = [
           "web-ui",
