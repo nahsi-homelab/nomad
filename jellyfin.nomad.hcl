@@ -29,18 +29,23 @@ job "jellyfin" {
     }
 
     task "jellyfin" {
-      driver = "podman"
+      driver = "docker"
 
       config {
-        image = "docker://jellyfin/jellyfin:10.7.2-amd64"
+        image = "jellyfin/jellyfin:10.7.2-amd64"
 
         ports = [
           "http"
         ]
 
-        tmpfs = [
-          "/config/transcodes:size=4G"
-        ]
+        mount {
+          type = "tmpfs"
+          target = "/config/transcodes"
+          readonly = false
+          tmpfs_options {
+            size = 4000000
+          }
+        }
 
         volumes = [
           "/mnt/apps/jellyfin/config:/config",

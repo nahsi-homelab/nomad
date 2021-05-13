@@ -24,22 +24,18 @@ job "caddy" {
     }
 
     task "caddy" {
-      driver = "podman"
+      driver = "docker"
 
       vault {
         policies = ["internal-certs"]
       }
 
       config {
-        image = "docker://caddy:2.3.0-alpine"
+        image = "caddy:2.3.0-alpine"
 
         ports = [
           "http",
           "https"
-        ]
-
-        dns = [
-          "10.88.0.1"
         ]
 
         volumes = [

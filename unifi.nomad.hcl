@@ -35,7 +35,7 @@ job "unifi" {
     }
 
     task "unifi" {
-      driver = "podman"
+      driver = "docker"
 
       env {
         PUID = "1000"
@@ -43,7 +43,7 @@ job "unifi" {
       }
 
       config {
-        image = "docker://linuxserver/unifi-controller:version-6.1.71"
+        image = "linuxserver/unifi-controller:version-6.1.71"
 
         ports = [
           "web-ui",

@@ -18,10 +18,10 @@ job "audioserve" {
     }
 
     task "audioserve" {
-      driver = "podman"
+      driver = "docker"
 
       config {
-        image = "docker://izderadicka/audioserve"
+        image = "izderadicka/audioserve"
 
         args = [
           "--no-authentication",

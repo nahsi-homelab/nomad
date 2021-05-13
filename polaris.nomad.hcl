@@ -19,10 +19,10 @@ job "polaris" {
     }
 
     task "polaris" {
-      driver = "podman"
+      driver = "docker"
 
       config {
-        image = "docker://ogarcia/polaris:0.13.4"
+        image = "ogarcia/polaris:0.13.4"
 
         ports = [
           "http"
