@@ -32,7 +32,7 @@ job "jellyfin" {
       driver = "docker"
 
       config {
-        image = "jellyfin/jellyfin:10.7.2-amd64"
+        image = "jellyfin/jellyfin:10.7.5-amd64"
 
         ports = [
           "http"
