@@ -1,11 +1,11 @@
 # vim: set ft=hcl sw=2 ts=2 :
-job "caddy" {
+job "dashboard" {
 
   datacenters = ["syria"]
 
   type        = "service"
 
-  group "caddy" {
+  group "dashboard" {
     network {
       port "http" {
         static = 80
@@ -23,7 +23,12 @@ job "caddy" {
       port = "https"
     }
 
-    task "caddy" {
+    service {
+      name = "polaris"
+      port = "https"
+    }
+
+    task "dashboard" {
       driver = "docker"
 
       vault {
@@ -47,7 +52,7 @@ job "caddy" {
       template {
         data = <<EOH
 home.service.{{ env "NOMAD_DC" }}.consul:443 {
-  tls /secrets/cert.pem /secrets/key.pem
+  tls /secrets/home-cert.pem /secrets/home-key.pem
 
   route /grafana* {
     {{- range service "grafana" }}
@@ -87,11 +92,21 @@ home.service.{{ env "NOMAD_DC" }}.consul:443 {
     }
   }
 }
+polaris.service.{{ env "NOMAD_DC" }}.consul:443 {
+  tls /secrets/polaris-cert.pem /secrets/polaris-key.pem
+
+  route /* {
+   reverse_proxy {
+      {{- range service "polaris-app" }}
+      to {{ .Address }}:{{ .Port }}
+      {{- end }}
+    }
+  }
+}
 EOH
 
         destination   = "local/Caddyfile"
-        change_mode   = "signal"
-        change_signal = "SIGINT"
+        change_mode   = "restart"
       }
 
       template {
@@ -112,7 +127,7 @@ EOH
 EOH
 
         change_mode   = "restart"
-        destination   = "secrets/cert.pem"
+        destination   = "secrets/home-cert.pem"
       }
 
       template {
@@ -124,7 +139,31 @@ EOH
 EOH
 
         change_mode   = "restart"
-        destination   = "secrets/key.pem"
+        destination   = "secrets/home-key.pem"
+      }
+
+      template {
+        data = <<EOH
+{{- with node }}
+{{- $CN := printf "common_name=polaris.service.%s.consul" .Node.Datacenter }}
+{{- with secret "pki/internal/issue/consul" $CN "alt_names=polaris.service.consul" }}
+{{- .Data.certificate }}{{ end }}{{ end }}
+EOH
+
+        change_mode   = "restart"
+        destination   = "secrets/polaris-cert.pem"
+      }
+
+      template {
+        data = <<EOH
+{{- with node }}
+{{- $CN := printf "common_name=polaris.service.%s.consul" .Node.Datacenter }}
+{{- with secret "pki/internal/issue/consul" $CN "alt_names=polaris.service.consul" }}
+{{- .Data.private_key }}{{ end }}{{ end }}
+EOH
+
+        change_mode   = "restart"
+        destination   = "secrets/polaris-key.pem"
       }
 
       resources {
