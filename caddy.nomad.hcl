@@ -46,7 +46,7 @@ job "caddy" {
 
       template {
         data = <<EOH
-home.service.consul:443 {
+home.service.{{ env "NOMAD_DC" }}.consul:443 {
   tls /secrets/cert.pem /secrets/key.pem
 
   route /grafana* {
@@ -105,8 +105,10 @@ EOH
 
       template {
         data = <<EOH
-{{ with secret "pki/internal/issue/consul" "common_name=home.service.consul" }}
-{{- .Data.certificate }}{{ end }}
+{{- with node }}
+{{- $CN := printf "common_name=home.service.%s.consul" .Node.Datacenter }}
+{{- with secret "pki/internal/issue/consul" $CN "alt_names=home.service.consul" }}
+{{- .Data.certificate }}{{ end }}{{ end }}
 EOH
 
         change_mode   = "restart"
@@ -115,8 +117,10 @@ EOH
 
       template {
         data = <<EOH
-{{ with secret "pki/internal/issue/consul" "common_name=home.service.consul" }}
-{{- .Data.private_key }}{{ end }}
+{{- with node }}
+{{- $CN := printf "common_name=home.service.%s.consul" .Node.Datacenter }}
+{{- with secret "pki/internal/issue/consul" $CN "alt_names=home.service.consul" }}
+{{- .Data.private_key }}{{ end }}{{ end }}
 EOH
 
         change_mode   = "restart"
