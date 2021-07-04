@@ -32,7 +32,7 @@ job "jellyfin" {
       driver = "docker"
 
       config {
-        image = "jellyfin/jellyfin:10.7.5-amd64"
+        image = "jellyfin/jellyfin:10.7.6-amd64"
 
         ports = [
           "http"
@@ -43,7 +43,7 @@ job "jellyfin" {
           target = "/config/transcodes"
           readonly = false
           tmpfs_options {
-            size = 4000000
+            size = 4000000000
           }
         }
 
