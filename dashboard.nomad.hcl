@@ -2,7 +2,6 @@
 job "dashboard" {
 
   datacenters = ["syria"]
-
   type        = "service"
 
   group "dashboard" {
@@ -25,6 +24,11 @@ job "dashboard" {
 
     service {
       name = "polaris"
+      port = "https"
+    }
+
+    service {
+      name = "unifi"
       port = "https"
     }
 
@@ -53,6 +57,11 @@ job "dashboard" {
         data = <<EOH
 home.service.{{ env "NOMAD_DC" }}.consul:443 {
   tls /secrets/home-cert.pem /secrets/home-key.pem
+
+  @websockets {
+    header Connection *Upgrade*
+    header Upgrade websocket
+  }
 
   route /grafana* {
     {{- range service "grafana" }}
@@ -92,6 +101,7 @@ home.service.{{ env "NOMAD_DC" }}.consul:443 {
     }
   }
 }
+
 polaris.service.{{ env "NOMAD_DC" }}.consul:443 {
   tls /secrets/polaris-cert.pem /secrets/polaris-key.pem
 
@@ -100,6 +110,23 @@ polaris.service.{{ env "NOMAD_DC" }}.consul:443 {
       {{- range service "polaris-app" }}
       to {{ .Address }}:{{ .Port }}
       {{- end }}
+    }
+  }
+}
+
+unifi.service.{{ env "NOMAD_DC" }}.consul:443 {
+  tls /secrets/unifi-cert.pem /secrets/unifi-key.pem
+
+  route /* {
+   reverse_proxy {
+      {{- range service "unifi-controller" }}
+      to https://{{ .Address }}:{{ .Port }}
+      {{- end }}
+
+      transport http {
+        tls
+        tls_insecure_skip_verify
+      }
     }
   }
 }
@@ -166,9 +193,32 @@ EOH
         destination   = "secrets/polaris-key.pem"
       }
 
+      template {
+        data = <<EOH
+{{- with node }}
+{{- $CN := printf "common_name=unifi.service.%s.consul" .Node.Datacenter }}
+{{- with secret "pki/internal/issue/consul" $CN "alt_names=unifi.service.consul" }}
+{{- .Data.certificate }}{{ end }}{{ end }}
+EOH
+
+        change_mode   = "restart"
+        destination   = "secrets/unifi-cert.pem"
+      }
+
+      template {
+        data = <<EOH
+{{- with node }}
+{{- $CN := printf "common_name=unifi.service.%s.consul" .Node.Datacenter }}
+{{- with secret "pki/internal/issue/consul" $CN "alt_names=unifi.service.consul" }}
+{{- .Data.private_key }}{{ end }}{{ end }}
+EOH
+
+        change_mode   = "restart"
+        destination   = "secrets/unifi-key.pem"
+      }
+
       resources {
-        cpu = 100
-        memory = 300
+        memory = 128
       }
     }
   }
