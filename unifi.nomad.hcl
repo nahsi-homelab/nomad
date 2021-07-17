@@ -34,15 +34,18 @@ job "unifi" {
     }
 
     service {
-      name = "unifi"
+      name = "unifi-controller"
       port = "web-ui"
 
       check {
         type     = "http"
+        protocol = "https"
         path     = "/status"
-        port     = "http"
+        port     = "web-ui"
         interval = "30s"
         timeout  = "2s"
+
+        tls_skip_verify = true
       }
     }
 
