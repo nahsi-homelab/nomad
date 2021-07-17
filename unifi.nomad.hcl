@@ -2,7 +2,6 @@
 job "unifi" {
 
   datacenters = ["syria"]
-
   type        = "service"
 
   group "unifi" {
@@ -27,11 +26,24 @@ job "unifi" {
         to = 10001
       }
 
+      port "l2-discovery" {
+        static = 1900
+        to = 1900
+      }
+
     }
 
     service {
       name = "unifi"
       port = "web-ui"
+
+      check {
+        type     = "http"
+        path     = "/status"
+        port     = "http"
+        interval = "30s"
+        timeout  = "2s"
+      }
     }
 
     task "unifi" {
@@ -43,13 +55,14 @@ job "unifi" {
       }
 
       config {
-        image = "linuxserver/unifi-controller:version-6.1.71"
+        image = "linuxserver/unifi-controller:version-6.2.26"
 
         ports = [
           "web-ui",
           "inform",
           "stun",
-          "device-discovery"
+          "device-discovery",
+          "l2-discovery"
         ]
 
         volumes = [
