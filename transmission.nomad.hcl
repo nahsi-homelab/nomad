@@ -2,7 +2,6 @@
 job "transmission" {
 
   datacenters = ["syria"]
-
   type        = "service"
 
   group "transmission" {
@@ -12,7 +11,7 @@ job "transmission" {
         to = 9091
       }
 
-      port "peer" {
+      port "torrent" {
         static = 51413
         to = 51413
       }
@@ -30,14 +29,15 @@ job "transmission" {
         PUID = "1000"
         PGID = "1000"
         TZ = "Europe/Moscow"
+        TRANSMISSION_WEB_HOME="/flood-for-transmission"
       }
 
       config {
-        image = "linuxserver/transmission:3.00-r0-ls68"
+        image = "linuxserver/transmission:latest"
 
         ports = [
           "web-ui",
-          "peer"
+          "torrent"
         ]
 
         volumes = [
@@ -49,8 +49,8 @@ job "transmission" {
       }
 
       resources {
-        cpu = "1000"
-        memory = 512
+        memory = 64
+        memory_max = 128
       }
     }
   }

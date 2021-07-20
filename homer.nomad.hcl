@@ -62,7 +62,7 @@ services:
         url: "audioserve"
       - name: "Transmission"
         icon: "fas fa-download"
-        url: "http://transmission.service.{{ env "NOMAD_DC" }}.consul:9091"
+        url: "transmission"
 
   - name: "Operations"
     icon: "fas fa-server"

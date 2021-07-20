@@ -93,6 +93,12 @@ home.service.{{ env "NOMAD_DC" }}.consul:443 {
     {{- end }}
   }
 
+  route /transmission* {
+    {{- range service "transmission" }}
+    reverse_proxy {{ .Address }}:{{ .Port }}
+    {{- end }}
+  }
+
   route /* {
    reverse_proxy {
       {{- range service "homer" }}
