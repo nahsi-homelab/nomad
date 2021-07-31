@@ -1,22 +1,8 @@
 job "unifi" {
-  datacenters = ["syria", "asia"]
+  datacenters = ["syria"]
   type        = "service"
 
-  spread {
-    attribute = "${node.dataceneter}"
-
-    target "syria" {
-      percent = 50
-    }
-
-    target "asia" {
-      percent = 50
-    }
-  }
-
   group "unifi" {
-    count = 2
-
     network {
       port "web-ui" {
         static = 8443

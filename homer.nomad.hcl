@@ -63,17 +63,11 @@ services:
         icon: "fas fa-download"
         url: "transmission"
 
-  - name: "Unifi"
-    icon: "fas fa-network-wired"
-    items:
-      - name: "Syria"
-        url: "https://unifi.service.syria.consul"
-      - name: "Asia"
-        url: "https://unifi.service.asia.consul"
-
   - name: "Operations"
     icon: "fas fa-server"
     items:
+      - name: "Unifi"
+        url: "https://unifi.service.syria.consul"
       - name: "Grafana"
         url: "https://home.service.consul/grafana"
       - name: "Prometheus"
