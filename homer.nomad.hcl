@@ -1,4 +1,3 @@
-# vim: set ft=hcl sw=2 ts=2 :
 job "homer" {
 
   datacenters = ["syria"]
@@ -56,7 +55,7 @@ services:
         url: "jellyfin"
       - name: "Polaris"
         icon: "fas fa-music"
-        url: "https://polaris.service.{{ env "NOMAD_DC" }}.consul"
+        url: "https://polaris.service.syria.consul"
       - name: "Audioserve"
         icon: "fas fa-book"
         url: "audioserve"
@@ -64,11 +63,17 @@ services:
         icon: "fas fa-download"
         url: "transmission"
 
+  - name: "Unifi"
+    icon: "fas fa-network-wired"
+    items:
+      - name: "Syria"
+        url: "https://unifi.service.syria.consul"
+      - name: "Asia"
+        url: "https://unifi.service.asia.consul"
+
   - name: "Operations"
     icon: "fas fa-server"
     items:
-      - name: "Unifi"
-        url: "https://unifi.service.{{ env "NOMAD_DC" }}.consul"
       - name: "Grafana"
         url: "https://home.service.consul/grafana"
       - name: "Prometheus"
@@ -78,11 +83,11 @@ services:
     icon: "fas fa-cloud"
     items:
       - name: "Nomad"
-        url: "https://nomad.service.{{ env "NOMAD_DC" }}.consul:4646"
+        url: "http://nomad.service.syria.consul:4646"
       - name: "Consul"
-        url: "https://consul.service.{{ env "NOMAD_DC" }}.consul:8501"
+        url: "https://consul.service.syria.consul:8501"
       - name: "Vault"
-        url: "https://vault.service.{{ env "NOMAD_DC" }}.consul:8200"
+        url: "https://vault.service.syria.consul:8200"
 EOH
       }
 

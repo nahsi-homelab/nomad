@@ -1,10 +1,9 @@
-# vim: set ft=hcl sw=2 ts=2 :
-job "dashboard" {
+job "syria-internal" {
 
   datacenters = ["syria"]
   type        = "service"
 
-  group "dashboard" {
+  group "syria-internal" {
     network {
       port "http" {
         static = 80
@@ -32,7 +31,7 @@ job "dashboard" {
       port = "https"
     }
 
-    task "dashboard" {
+    task "syria-internal" {
       driver = "docker"
 
       vault {
@@ -55,8 +54,8 @@ job "dashboard" {
 
       template {
         data = <<EOH
-home.service.{{ env "NOMAD_DC" }}.consul:443 {
-  tls /secrets/home-cert.pem /secrets/home-key.pem
+home.service.syria.consul:443 {
+  tls /secrets/cert.pem /secrets/key.pem
 
   @websockets {
     header Connection *Upgrade*
@@ -108,8 +107,8 @@ home.service.{{ env "NOMAD_DC" }}.consul:443 {
   }
 }
 
-polaris.service.{{ env "NOMAD_DC" }}.consul:443 {
-  tls /secrets/polaris-cert.pem /secrets/polaris-key.pem
+polaris.service.syria.consul:443 {
+  tls /secrets/cert.pem /secrets/key.pem
 
   route /* {
    reverse_proxy {
@@ -120,8 +119,13 @@ polaris.service.{{ env "NOMAD_DC" }}.consul:443 {
   }
 }
 
-unifi.service.{{ env "NOMAD_DC" }}.consul:443 {
-  tls /secrets/unifi-cert.pem /secrets/unifi-key.pem
+unifi.service.syria.consul:443 {
+  tls /secrets/cert.pem /secrets/key.pem
+
+  @websockets {
+    header Connection *Upgrade*
+    header Upgrade websocket
+  }
 
   route /* {
    reverse_proxy {
@@ -153,74 +157,22 @@ EOH
 
       template {
         data = <<EOH
-{{- with node }}
-{{- $CN := printf "common_name=home.service.%s.consul" .Node.Datacenter }}
-{{- with secret "pki/internal/issue/consul" $CN "alt_names=home.service.consul" }}
-{{- .Data.certificate }}{{ end }}{{ end }}
+{{- with secret "pki/internal/issue/consul" "common_name=home.service.syria.consul" "alt_names=polaris.service.syria.consul,unifi.service.syria.consul" }}
+{{- .Data.certificate }}{{ end }}
 EOH
 
         change_mode   = "restart"
-        destination   = "secrets/home-cert.pem"
+        destination   = "secrets/cert.pem"
       }
 
       template {
         data = <<EOH
-{{- with node }}
-{{- $CN := printf "common_name=home.service.%s.consul" .Node.Datacenter }}
-{{- with secret "pki/internal/issue/consul" $CN "alt_names=home.service.consul" }}
-{{- .Data.private_key }}{{ end }}{{ end }}
+{{- with secret "pki/internal/issue/consul" "common_name=home.service.syria.consul" "alt_names=polaris.service.syria.consul,unifi.service.syria.consul" }}
+{{- .Data.private_key }}{{ end }}
 EOH
 
         change_mode   = "restart"
-        destination   = "secrets/home-key.pem"
-      }
-
-      template {
-        data = <<EOH
-{{- with node }}
-{{- $CN := printf "common_name=polaris.service.%s.consul" .Node.Datacenter }}
-{{- with secret "pki/internal/issue/consul" $CN "alt_names=polaris.service.consul" }}
-{{- .Data.certificate }}{{ end }}{{ end }}
-EOH
-
-        change_mode   = "restart"
-        destination   = "secrets/polaris-cert.pem"
-      }
-
-      template {
-        data = <<EOH
-{{- with node }}
-{{- $CN := printf "common_name=polaris.service.%s.consul" .Node.Datacenter }}
-{{- with secret "pki/internal/issue/consul" $CN "alt_names=polaris.service.consul" }}
-{{- .Data.private_key }}{{ end }}{{ end }}
-EOH
-
-        change_mode   = "restart"
-        destination   = "secrets/polaris-key.pem"
-      }
-
-      template {
-        data = <<EOH
-{{- with node }}
-{{- $CN := printf "common_name=unifi.service.%s.consul" .Node.Datacenter }}
-{{- with secret "pki/internal/issue/consul" $CN "alt_names=unifi.service.consul" }}
-{{- .Data.certificate }}{{ end }}{{ end }}
-EOH
-
-        change_mode   = "restart"
-        destination   = "secrets/unifi-cert.pem"
-      }
-
-      template {
-        data = <<EOH
-{{- with node }}
-{{- $CN := printf "common_name=unifi.service.%s.consul" .Node.Datacenter }}
-{{- with secret "pki/internal/issue/consul" $CN "alt_names=unifi.service.consul" }}
-{{- .Data.private_key }}{{ end }}{{ end }}
-EOH
-
-        change_mode   = "restart"
-        destination   = "secrets/unifi-key.pem"
+        destination   = "secrets/key.pem"
       }
 
       resources {

@@ -1,10 +1,22 @@
-# vim: set ft=hcl sw=2 ts=2 :
 job "unifi" {
-
-  datacenters = ["syria"]
+  datacenters = ["syria", "asia"]
   type        = "service"
 
+  spread {
+    attribute = "${node.dataceneter}"
+
+    target "syria" {
+      percent = 50
+    }
+
+    target "asia" {
+      percent = 50
+    }
+  }
+
   group "unifi" {
+    count = 2
+
     network {
       port "web-ui" {
         static = 8443
@@ -67,6 +79,8 @@ job "unifi" {
           "device-discovery",
           "l2-discovery"
         ]
+
+        network_mode = "host"
 
         volumes = [
           "/mnt/apps/unifi:/config"
