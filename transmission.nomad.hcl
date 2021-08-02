@@ -1,4 +1,3 @@
-# vim: set ft=hcl sw=2 ts=2 :
 job "transmission" {
 
   datacenters = ["syria"]
@@ -49,8 +48,7 @@ job "transmission" {
       }
 
       resources {
-        memory = 64
-        memory_max = 128
+        memory = 128
       }
     }
   }
