@@ -37,7 +37,7 @@ job "homer" {
         data = <<EOH
 ---
 title: "Dashboard"
-subtitle: "Syria"
+subtitle: "Homelab"
 columns: "auto"
 connectivityCheck: false
 
@@ -55,7 +55,7 @@ services:
         url: "jellyfin"
       - name: "Polaris"
         icon: "fas fa-music"
-        url: "https://polaris.service.syria.consul"
+        url: "https://polaris.service.consul"
       - name: "Audioserve"
         icon: "fas fa-book"
         url: "audioserve"
@@ -67,7 +67,7 @@ services:
     icon: "fas fa-server"
     items:
       - name: "Unifi"
-        url: "https://unifi.service.syria.consul"
+        url: "https://unifi.service.consul"
       - name: "Grafana"
         url: "https://home.service.consul/grafana"
       - name: "Prometheus"
@@ -77,11 +77,11 @@ services:
     icon: "fas fa-cloud"
     items:
       - name: "Nomad"
-        url: "http://nomad.service.syria.consul:4646"
+        url: "http://nomad.service.consul:4646"
       - name: "Consul"
-        url: "https://consul.service.syria.consul:8501"
+        url: "http://consul.service.consul:8500"
       - name: "Vault"
-        url: "https://vault.service.syria.consul:8200"
+        url: "http://vault.service.consul:8200"
 EOH
       }
 

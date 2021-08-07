@@ -54,7 +54,7 @@ job "syria-internal" {
 
       template {
         data = <<EOH
-home.service.syria.consul:443 {
+home.service.consul:443 {
   tls /secrets/cert.pem /secrets/key.pem
 
   @websockets {
@@ -107,7 +107,7 @@ home.service.syria.consul:443 {
   }
 }
 
-polaris.service.syria.consul:443 {
+polaris.service.consul:443 {
   tls /secrets/cert.pem /secrets/key.pem
 
   route /* {
@@ -119,7 +119,7 @@ polaris.service.syria.consul:443 {
   }
 }
 
-unifi.service.syria.consul:443 {
+unifi.service.consul:443 {
   tls /secrets/cert.pem /secrets/key.pem
 
   @websockets {
@@ -157,7 +157,7 @@ EOH
 
       template {
         data = <<EOH
-{{- with secret "pki/internal/issue/consul" "common_name=home.service.syria.consul" "alt_names=polaris.service.syria.consul,unifi.service.syria.consul" }}
+{{- with secret "pki/internal/issue/consul" "common_name=home.service.consul" "alt_names=polaris.service.consul,unifi.service.consul" }}
 {{- .Data.certificate }}{{ end }}
 EOH
 
@@ -167,7 +167,7 @@ EOH
 
       template {
         data = <<EOH
-{{- with secret "pki/internal/issue/consul" "common_name=home.service.syria.consul" "alt_names=polaris.service.syria.consul,unifi.service.syria.consul" }}
+{{- with secret "pki/internal/issue/consul" "common_name=home.service.consul" "alt_names=polaris.service.consul,unifi.service.consul" }}
 {{- .Data.private_key }}{{ end }}
 EOH
 
