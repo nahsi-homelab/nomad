@@ -39,7 +39,7 @@ job "website" {
 
       template {
         data = <<EOH
-test.nahsi.dev:443 {
+nahsi.dev:443 {
   tls /secrets/cert.pem /secrets/key.pem
   respond "nothing here yet"
 }
