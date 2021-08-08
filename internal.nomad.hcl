@@ -1,9 +1,9 @@
-job "syria-internal" {
+job "internal" {
 
   datacenters = ["syria"]
   type        = "service"
 
-  group "syria-internal" {
+  group "internal" {
     network {
       port "http" {
         static = 80
@@ -31,7 +31,7 @@ job "syria-internal" {
       port = "https"
     }
 
-    task "syria-internal" {
+    task "internal" {
       driver = "docker"
 
       vault {
@@ -47,8 +47,7 @@ job "syria-internal" {
         ]
 
         volumes = [
-          "local/Caddyfile:/etc/caddy/Caddyfile",
-          "/mnt/apps/caddy/:/data"
+          "local/Caddyfile:/etc/caddy/Caddyfile"
         ]
       }
 
@@ -148,17 +147,9 @@ EOH
 
       template {
         data = <<EOH
-{{ with secret "pki/internal/cert/ca" }}
-{{- .Data.certificate }}{{ end }}
-EOH
-
-        destination = "secrets/ca.crt"
-      }
-
-      template {
-        data = <<EOH
-{{- with secret "pki/internal/issue/consul" "common_name=home.service.consul" "alt_names=polaris.service.consul,unifi.service.consul" }}
-{{- .Data.certificate }}{{ end }}
+{{- with secret "pki/issue/consul" "common_name=home.service.consul" "alt_names=polaris.service.consul,unifi.service.consul" -}}
+{{ .Data.certificate }}
+{{ .Data.issuing_ca }}{{ end }}
 EOH
 
         change_mode   = "restart"
@@ -167,8 +158,8 @@ EOH
 
       template {
         data = <<EOH
-{{- with secret "pki/internal/issue/consul" "common_name=home.service.consul" "alt_names=polaris.service.consul,unifi.service.consul" }}
-{{- .Data.private_key }}{{ end }}
+{{- with secret "pki/issue/consul" "common_name=home.service.consul" "alt_names=polaris.service.consul,unifi.service.consul" -}}
+{{ .Data.private_key }}{{ end }}
 EOH
 
         change_mode   = "restart"
