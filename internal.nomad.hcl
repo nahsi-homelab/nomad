@@ -79,12 +79,6 @@ home.service.consul:443 {
     {{- end }}
   }
 
-  route /jellyfin* {
-    {{- range service "jellyfin" }}
-    reverse_proxy {{ .Address }}:{{ .Port }}
-    {{- end }}
-  }
-
   handle_path /audioserve* {
     {{- range service "audioserve" }}
     reverse_proxy {{ .Address }}:{{ .Port }}
@@ -100,6 +94,23 @@ home.service.consul:443 {
   route /* {
    reverse_proxy {
       {{- range service "homer" }}
+      to {{ .Address }}:{{ .Port }}
+      {{- end }}
+    }
+  }
+}
+
+jellyfin.service.consul:443 {
+  tls /secrets/cert.pem /secrets/key.pem
+
+  @websockets {
+    header Connection *Upgrade*
+    header Upgrade websocket
+  }
+
+  route /* {
+   reverse_proxy {
+      {{- range service "jellyfin" }}
       to {{ .Address }}:{{ .Port }}
       {{- end }}
     }

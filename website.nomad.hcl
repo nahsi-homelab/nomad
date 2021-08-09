@@ -5,6 +5,12 @@ job "website" {
 
   group "website" {
     network {
+      port "http" {
+        static = 80
+        to = 80
+        host_network = "public"
+      }
+
       port "https" {
         static = 443
         to = 443
@@ -28,6 +34,7 @@ job "website" {
         image = "caddy:2.3.0-alpine"
 
         ports = [
+          "http",
           "https"
         ]
 
@@ -42,6 +49,23 @@ job "website" {
 nahsi.dev:443 {
   tls /secrets/cert.pem /secrets/key.pem
   respond "nothing here yet"
+}
+
+jellyfin.nahsi.dev:443 {
+  tls /secrets/cert.pem /secrets/key.pem
+
+  @websockets {
+    header Connection *Upgrade*
+    header Upgrade websocket
+  }
+
+  route /* {
+   reverse_proxy {
+      {{- range service "jellyfin" }}
+      to {{ .Address }}:{{ .Port }}
+      {{- end }}
+    }
+  }
 }
 EOH
 

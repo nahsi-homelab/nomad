@@ -52,7 +52,7 @@ services:
     items:
       - name: "Jellyfin"
         icon: "fas fa-film"
-        url: "jellyfin"
+        url: "https://jellyfin.service.consul"
       - name: "Polaris"
         icon: "fas fa-music"
         url: "https://polaris.service.consul"

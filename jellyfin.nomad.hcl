@@ -1,15 +1,12 @@
-# vim: set ft=hcl sw=2 ts=2 :
 job "jellyfin" {
 
   datacenters = ["syria"]
-
   type        = "service"
 
   group "jellyfin" {
 
     network {
       port "http" {
-        static = 8096
         to = 8096
       }
     }
@@ -21,7 +18,7 @@ job "jellyfin" {
       check {
         type = "http"
         protocol = "http"
-        path = "/jellyfin/health"
+        path = "/health"
         port = "http"
         interval = "10s"
         timeout = "2s"
@@ -32,7 +29,7 @@ job "jellyfin" {
       driver = "docker"
 
       config {
-        image = "jellyfin/jellyfin:10.7.6-amd64"
+        image = "jellyfin/jellyfin:10.7.6-${attr.cpu.arch}"
 
         ports = [
           "http"
