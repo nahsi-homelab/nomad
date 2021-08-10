@@ -68,10 +68,8 @@ services:
     items:
       - name: "Unifi"
         url: "https://unifi.service.consul"
-      - name: "Grafana"
-        url: "https://home.service.consul/grafana"
       - name: "Prometheus"
-        url: "https://home.service.consul/prometheus"
+        url: "http://prometheus.service.consul:9090"
 
   - name: "HashiStack"
     icon: "fas fa-cloud"
