@@ -41,7 +41,7 @@ job "speedtest-exporter" {
       driver = "docker"
 
       config {
-        image = "ghcr.io/caarlos0/speedtest-exporter:v1.1.2"
+        image = "ghcr.io/caarlos0/speedtest-exporter:v1.1.4"
 
         ports = [
           "http"
