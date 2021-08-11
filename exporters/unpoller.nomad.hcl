@@ -42,7 +42,7 @@ job "unpoller" {
           user = "{{ with secret "secret/unifi/unpoller" }}{{ .Data.data.username }}{{ end }}"
           pass = "{{ with secret "secret/unifi/unpoller" }}{{ .Data.data.password }}{{ end }}"
 
-          save_sites = true
+          save_sites = false
           save_ids = false
           save_events = false
           save_alarms = false
