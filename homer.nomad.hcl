@@ -68,6 +68,8 @@ services:
     items:
       - name: "Unifi"
         url: "https://unifi.service.consul"
+      - name: "Grafana"
+        url: "https://home.service.consul/grafana"
       - name: "Prometheus"
         url: "http://prometheus.service.consul:9090"
 

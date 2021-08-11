@@ -67,18 +67,6 @@ home.service.consul:443 {
     {{- end }}
   }
 
-  route /prometheus* {
-    {{- range service "prometheus" }}
-    reverse_proxy {{ .Address }}:{{ .Port }}
-    {{- end }}
-  }
-
-  handle_path /victoria-metrics* {
-    {{- range service "victoria-metrics" }}
-    reverse_proxy {{ .Address }}:{{ .Port }}
-    {{- end }}
-  }
-
   handle_path /audioserve* {
     {{- range service "audioserve" }}
     reverse_proxy {{ .Address }}:{{ .Port }}
