@@ -66,7 +66,6 @@ global:
 
 scrape_configs:
   - job_name: "prometheus"
-    metrics_path: "/metrics"
     static_configs:
     - targets:
         - "localhost:{{ env "NOMAD_PORT_http" }}"
@@ -99,6 +98,22 @@ scrape_configs:
         replacement: "$1:8500"
       - source_labels: ["__meta_consul_node"]
         target_label: "instance"
+
+  - job_name: "speedtest"
+    scrape_interval: 1h
+    scrape_timeout: 1m
+    consul_sd_configs:
+      - server: "http://host.docker.internal:8500"
+        datacenter: "oikumene"
+        services:
+          - "speedtest"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
+      - source_labels: ["__meta_consul_node"]
+        target_label: "dc"
+        regex: ".*,dc=([a-z0-9_]+),.+"
+        replacement: "$1"
 EOH
 
         change_mode   = "signal"
