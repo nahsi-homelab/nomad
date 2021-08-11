@@ -100,13 +100,13 @@ scrape_configs:
         target_label: "instance"
 
   - job_name: "speedtest"
-    scrape_interval: 1h
+    scrape_interval: 3m
     scrape_timeout: 1m
     consul_sd_configs:
       - server: "http://host.docker.internal:8500"
         datacenter: "oikumene"
         services:
-          - "speedtest"
+          - "speedtest-exporter"
     relabel_configs:
       - source_labels: ["__meta_consul_node"]
         target_label: "instance"

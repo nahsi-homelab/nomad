@@ -1,4 +1,4 @@
-job "speedtest" {
+job "speedtest-exporter" {
   datacenters = ["syria", "asia"]
   type        = "service"
 
@@ -14,22 +14,22 @@ job "speedtest" {
     }
   }
 
-  group "speedtest" {
+  group "speedtest-exporter" {
     count = 2
 
     network {
       port "http" {
-        to = 9798
+        to = 9876
       }
     }
 
     service {
-      name = "speedtest"
+      name = "speedtest-exporter"
       tags = ["dc=${node.datacenter}"]
       port = "http"
 
       check {
-        name = "SpeedTest HTTP"
+        name = "speedtest-exporter HTTP"
         type     = "http"
         path     = "/"
         interval = "10s"
@@ -37,14 +37,18 @@ job "speedtest" {
       }
     }
 
-    task "speedtest" {
+    task "speedtest-exporter" {
       driver = "docker"
 
       config {
-        image = "miguelndecarvalho/speedtest-exporter:v3.3.2"
+        image = "ghcr.io/caarlos0/speedtest-exporter:v1.1.2"
 
         ports = [
           "http"
+        ]
+
+        args = [
+          "--refresh.interval=1h"
         ]
       }
 
