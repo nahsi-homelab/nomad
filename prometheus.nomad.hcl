@@ -23,10 +23,19 @@ job "prometheus" {
       }
     }
 
+    volume "prometheus" {
+      type = "host"
+      source = "prometheus"
+    }
+
     task "prometheus" {
       driver = "docker"
-
       user = "nobody"
+
+      volume_mount {
+        volume = "prometheus"
+        destination = "/var/lib/prometheus"
+      }
 
       config {
         image = "prom/prometheus:v2.28.1"
@@ -39,16 +48,11 @@ job "prometheus" {
           "host.docker.internal:host-gateway"
         ]
 
-        mount {
-          type = "volume"
-          target = "/data"
-          source = "prometheus"
-        }
-
         args = [
           "--web.listen-address=0.0.0.0:${NOMAD_PORT_http}",
           "--config.file=/local/prometheus.yml",
           "--storage.tsdb.retention.time=90d",
+          "--storage.tsdb.path=/var/lib/prometheus",
           "--web.enable-lifecycle"
         ]
       }
