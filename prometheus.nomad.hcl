@@ -114,6 +114,16 @@ scrape_configs:
         regex: ".*,([^=]+)=([^,]+),.*"
         replacement: "$2"
         target_label: "$1"
+
+  - job_name: "unpoller"
+    consul_sd_configs:
+      - server: "http://host.docker.internal:8500"
+        datacenter: "oikumene"
+        services:
+          - "unpoller"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
 EOH
 
         change_mode   = "signal"
