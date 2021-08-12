@@ -146,7 +146,7 @@ EOH
 
       template {
         data = <<EOH
-{{- with secret "pki/issue/consul" "common_name=home.service.consul" "alt_names=polaris.service.consul,unifi.service.consul" -}}
+{{- with secret "pki/issue/internal" "common_name=*.service.consul" -}}
 {{ .Data.certificate }}
 {{ .Data.issuing_ca }}{{ end }}
 EOH
@@ -157,7 +157,7 @@ EOH
 
       template {
         data = <<EOH
-{{- with secret "pki/issue/consul" "common_name=home.service.consul" "alt_names=polaris.service.consul,unifi.service.consul" -}}
+{{- with secret "pki/issue/internal" "common_name=*.service.consul" -}}
 {{ .Data.private_key }}{{ end }}
 EOH
 
