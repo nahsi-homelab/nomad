@@ -128,6 +128,16 @@ scrape_configs:
     relabel_configs:
       - source_labels: ["__meta_consul_node"]
         target_label: "instance"
+
+  - job_name: "jellyfin"
+    consul_sd_configs:
+      - server: "http://host.docker.internal:8500"
+        datacenter: "oikumene"
+        services:
+          - "jellyfin"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
 EOH
 
         change_mode   = "signal"
