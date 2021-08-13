@@ -31,7 +31,7 @@ job "website" {
       }
 
       config {
-        image = "caddy:2.3.0-alpine"
+        image = "caddy:2.4.3-alpine"
 
         ports = [
           "http",
@@ -59,8 +59,10 @@ jellyfin.nahsi.dev:443 {
     header Upgrade websocket
   }
 
+
   route /* {
-   reverse_proxy {
+    error /metrics* "Unauthorized" 403
+    reverse_proxy {
       {{- range service "jellyfin" }}
       to {{ .Address }}:{{ .Port }}
       {{- end }}
