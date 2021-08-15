@@ -48,7 +48,7 @@ job "speedtest-exporter" {
         ]
 
         args = [
-          "--refresh.interval=1h"
+          "--refresh.interval=3h"
         ]
       }
 
