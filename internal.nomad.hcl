@@ -61,6 +61,8 @@ home.service.consul:443 {
     header Upgrade websocket
   }
 
+  encode zstd gzip
+
   route /grafana* {
     {{- range service "grafana" }}
     reverse_proxy {{ .Address }}:{{ .Port }}
@@ -96,6 +98,8 @@ jellyfin.service.consul:443 {
     header Upgrade websocket
   }
 
+  encode zstd gzip
+
   route /* {
    reverse_proxy {
       {{- range service "jellyfin" }}
@@ -108,6 +112,8 @@ jellyfin.service.consul:443 {
 polaris.service.consul:443 {
   tls /secrets/cert.pem /secrets/key.pem
 
+  encode zstd gzip
+
   route /* {
    reverse_proxy {
       {{- range service "polaris-app" }}
@@ -119,6 +125,8 @@ polaris.service.consul:443 {
 
 unifi.service.consul:443 {
   tls /secrets/cert.pem /secrets/key.pem
+
+  encode zstd gzip
 
   @websockets {
     header Connection *Upgrade*

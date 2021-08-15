@@ -48,11 +48,14 @@ job "website" {
         data = <<EOH
 nahsi.dev:443 {
   tls /secrets/cert.pem /secrets/key.pem
+  encode zstd gzip
   respond "nothing here yet"
 }
 
 jellyfin.nahsi.dev:443 {
   tls /secrets/cert.pem /secrets/key.pem
+
+  encode zstd gzip
 
   @websockets {
     header Connection *Upgrade*
