@@ -20,13 +20,33 @@ job "jellyfin" {
         protocol = "http"
         path = "/health"
         port = "http"
-        interval = "10s"
+        interval = "20s"
         timeout = "2s"
       }
     }
 
+    volume "jellyfin" {
+      type = "host"
+      source = "jellyfin"
+    }
+
+    volume "jellyfin-cache" {
+      type = "host"
+      source = "jellyfin-cache"
+    }
+
     task "jellyfin" {
       driver = "docker"
+
+      volume_mount {
+        volume = "jellyfin"
+        destination = "/config"
+      }
+
+      volume_mount {
+        volume = "jellyfin-cache"
+        destination = "/cache"
+      }
 
       config {
         image = "jellyfin/jellyfin:10.7.6-${attr.cpu.arch}"
@@ -35,18 +55,7 @@ job "jellyfin" {
           "http"
         ]
 
-        mount {
-          type = "tmpfs"
-          target = "/config/transcodes"
-          readonly = false
-          tmpfs_options {
-            size = 4000000000
-          }
-        }
-
         volumes = [
-          "/mnt/apps/jellyfin/config:/config",
-          "/mnt/apps/jellyfin/cache:/cache",
           "/home/nahsi/media/video:/video:ro",
           "/home/nahsi/media/audio/audiobooks:/audiobooks:ro",
           "/home/nahsi/media/audio/podcasts:/podcasts:ro"
@@ -54,8 +63,8 @@ job "jellyfin" {
       }
 
       resources {
-        cpu = 30000
-        memory = 4096
+        cpu = 10000
+        memory = 256
       }
     }
   }

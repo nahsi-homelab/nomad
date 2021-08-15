@@ -47,12 +47,22 @@ job "unifi" {
       }
     }
 
+    volume "unifi" {
+      type = "host"
+      source = "unifi"
+    }
+
     task "unifi" {
       driver = "docker"
 
       env {
         PUID = "1000"
         PGID = "1000"
+      }
+
+      volume_mount {
+        volume = "unifi"
+        destination = "/config"
       }
 
       config {
@@ -67,10 +77,6 @@ job "unifi" {
         ]
 
         network_mode = "host"
-
-        volumes = [
-          "/mnt/apps/unifi:/config"
-        ]
       }
 
       resources {

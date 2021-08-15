@@ -21,6 +21,11 @@ job "transmission" {
       port = "web-ui"
     }
 
+    volume "transmission" {
+      type = "host"
+      source = "transmission"
+    }
+
     task "transmission" {
       driver = "docker"
 
@@ -29,6 +34,11 @@ job "transmission" {
         PGID = "1000"
         TZ = "Europe/Moscow"
         TRANSMISSION_WEB_HOME="/flood-for-transmission"
+      }
+
+      volume_mount {
+        volume = "transmission"
+        destination = "/config"
       }
 
       config {
@@ -40,8 +50,6 @@ job "transmission" {
         ]
 
         volumes = [
-          "/mnt/apps/transmission/:/config",
-          "/home/nahsi/watch:/watch",
           "/home/nahsi/downloads:/downloads",
           "/home/nahsi/media:/media"
         ]
