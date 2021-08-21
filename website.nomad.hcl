@@ -81,7 +81,7 @@ EOH
       template {
         data = <<EOH
 {{- with secret "secret/certificate" -}}
-{{ .Data.data.certificate }}{{ end }}
+{{ .Data.data.ca_bundle }}{{ end }}
 EOH
 
         change_mode   = "restart"
