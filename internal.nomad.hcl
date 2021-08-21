@@ -39,7 +39,7 @@ job "internal" {
       }
 
       config {
-        image = "caddy:2.3.0-alpine"
+        image = "caddy:2.4.3-alpine"
 
         ports = [
           "http",
@@ -69,12 +69,6 @@ home.service.consul:443 {
     {{- end }}
   }
 
-  handle_path /audioserve* {
-    {{- range service "audioserve" }}
-    reverse_proxy {{ .Address }}:{{ .Port }}
-    {{- end }}
-  }
-
   route /transmission* {
     {{- range service "transmission" }}
     reverse_proxy {{ .Address }}:{{ .Port }}
@@ -97,8 +91,6 @@ jellyfin.service.consul:443 {
     header Connection *Upgrade*
     header Upgrade websocket
   }
-
-  encode zstd gzip
 
   route /* {
    reverse_proxy {
