@@ -58,7 +58,7 @@ job "jellyfin" {
         volumes = [
           "/home/nahsi/media/video:/video:ro",
           "/home/nahsi/media/audio/audiobooks:/audiobooks:ro",
-          "/home/nahsi/media/audio/podcasts:/podcasts:ro"
+          "/home/nahsi/media/podcasts:/podcasts:ro"
         ]
       }
 
