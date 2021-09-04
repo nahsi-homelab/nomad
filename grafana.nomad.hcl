@@ -41,7 +41,7 @@ job "grafana" {
       }
 
       config {
-        image = "grafana/grafana:8.1.1"
+        image = "grafana/grafana:8.1.2"
 
         ports = [
           "http"
