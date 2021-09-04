@@ -86,6 +86,16 @@ scrape_configs:
         replacement: "$2"
         target_label: "$1"
 
+  - job_name: "promtail"
+    consul_sd_configs:
+      - server: "http://host.docker.internal:8500"
+        datacenter: "oikumene"
+        services:
+          - "promtail"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
+
   - job_name: "consul"
     metrics_path: "/v1/agent/metrics"
     params:
@@ -102,22 +112,6 @@ scrape_configs:
         replacement: "$1:8500"
       - source_labels: ["__meta_consul_node"]
         target_label: "instance"
-
-  - job_name: "speedtest"
-    scrape_interval: 3m
-    scrape_timeout: 1m
-    consul_sd_configs:
-      - server: "http://host.docker.internal:8500"
-        datacenter: "oikumene"
-        services:
-          - "speedtest-exporter"
-    relabel_configs:
-      - source_labels: ["__meta_consul_node"]
-        target_label: "instance"
-      - source_labels: ["__meta_consul_tags"]
-        regex: ".*,([^=]+)=([^,]+),.*"
-        replacement: "$2"
-        target_label: "$1"
 
   - job_name: "unpoller"
     consul_sd_configs:
