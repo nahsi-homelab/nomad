@@ -14,7 +14,7 @@ job "grafana" {
       port = "http"
 
       check {
-        name = "Grafana HTTP"
+        name     = "Grafana HTTP"
         type     = "http"
         path     = "/api/health"
         interval = "10s"
@@ -139,10 +139,16 @@ datasources:
     isDefault: true
     jsonData:
       timeInterval: 15s
-      tlsSkipVerify: true
     name: Prometheus
     type: prometheus
     url: "http://prometheus.service.consul:9090"
+  - basicAuth: false
+    isDefault: false
+    jsonData:
+      maxLines: 1000
+    name: Loki
+    type: loki
+    url: "http://loki.service.consul:3100"
 EOH
 
         destination = "local/provisioning/datasources/datasources.yml"
