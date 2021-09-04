@@ -96,6 +96,16 @@ scrape_configs:
       - source_labels: ["__meta_consul_node"]
         target_label: "instance"
 
+  - job_name: "loki"
+    consul_sd_configs:
+      - server: "http://host.docker.internal:8500"
+        datacenter: "oikumene"
+        services:
+          - "loki"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
+
   - job_name: "consul"
     metrics_path: "/v1/agent/metrics"
     params:
