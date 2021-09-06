@@ -1,3 +1,7 @@
+variables {
+  version = "10.7.7"
+}
+
 job "jellyfin" {
 
   datacenters = ["syria"]
@@ -49,7 +53,7 @@ job "jellyfin" {
       }
 
       config {
-        image = "jellyfin/jellyfin:10.7.6-${attr.cpu.arch}"
+        image = "jellyfin/jellyfin:${var.version}-${attr.cpu.arch}"
 
         ports = [
           "http"
