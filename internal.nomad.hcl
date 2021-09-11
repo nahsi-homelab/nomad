@@ -14,6 +14,14 @@ job "internal" {
         static = 443
         to = 443
       }
+
+      port "metrics" {}
+    }
+
+    service {
+      name = "internal"
+      port = "metrics"
+      tags = ["caddy"]
     }
 
     service {
@@ -39,11 +47,12 @@ job "internal" {
       }
 
       config {
-        image = "caddy:2.4.3-alpine"
+        image = "caddy:2.4.5-alpine"
 
         ports = [
           "http",
-          "https"
+          "https",
+          "metrics"
         ]
 
         volumes = [
@@ -53,6 +62,10 @@ job "internal" {
 
       template {
         data = <<EOH
+:{{ env "NOMAD_PORT_metrics" }} {
+  metrics /metrics
+}
+
 home.service.consul:443 {
   tls /secrets/cert.pem /secrets/key.pem
 

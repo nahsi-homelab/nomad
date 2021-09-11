@@ -16,6 +16,14 @@ job "website" {
         to = 443
         host_network = "public"
       }
+
+      port "metrics" {}
+    }
+
+    service {
+      name = "website"
+      port = "metrics"
+      tags = ["caddy"]
     }
 
     service {
@@ -31,11 +39,12 @@ job "website" {
       }
 
       config {
-        image = "caddy:2.4.3-alpine"
+        image = "caddy:2.4.5-alpine"
 
         ports = [
           "http",
-          "https"
+          "https",
+          "metrics"
         ]
 
         volumes = [
@@ -46,6 +55,10 @@ job "website" {
 
       template {
         data = <<EOH
+:{{ env "NOMAD_PORT_metrics" }} {
+  metrics /metrics
+}
+
 nahsi.dev:443 {
   tls /secrets/cert.pem /secrets/key.pem
   encode zstd gzip

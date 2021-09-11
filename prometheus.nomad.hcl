@@ -86,6 +86,16 @@ scrape_configs:
         replacement: "$2"
         target_label: "$1"
 
+  - job_name: "caddy"
+    consul_sd_configs:
+      - server: "http://host.docker.internal:8500"
+        datacenter: "oikumene"
+        tags:
+          - "caddy"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
+
   - job_name: "promtail"
     consul_sd_configs:
       - server: "http://host.docker.internal:8500"
