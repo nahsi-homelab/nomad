@@ -95,6 +95,10 @@ scrape_configs:
     relabel_configs:
       - source_labels: ["__meta_consul_node"]
         target_label: "instance"
+      - source_labels: ["__meta_consul_tags"]
+        regex: ".*,([^=]+)=([^,]+),.*"
+        replacement: "$2"
+        target_label: "$1"
 
   - job_name: "promtail"
     consul_sd_configs:

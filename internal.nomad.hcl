@@ -21,7 +21,10 @@ job "internal" {
     service {
       name = "internal"
       port = "metrics"
-      tags = ["caddy"]
+      tags = [
+        "caddy",
+        "name=internal"
+      ]
     }
 
     service {
