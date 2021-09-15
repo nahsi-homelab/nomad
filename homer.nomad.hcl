@@ -21,7 +21,7 @@ job "homer" {
       driver = "docker"
 
       config {
-        image = "b4bz/homer:21.07.1-amd64"
+        image = "b4bz/homer:21.09.2-amd64"
 
         ports = [
           "http"
