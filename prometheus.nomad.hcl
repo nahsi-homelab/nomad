@@ -38,7 +38,7 @@ job "prometheus" {
       }
 
       config {
-        image = "prom/prometheus:v2.29.2"
+        image = "prom/prometheus:v2.30.0"
 
         ports = [
           "http"
