@@ -1,3 +1,7 @@
+variables {
+  version = "8.1.4"
+}
+
 job "grafana" {
   datacenters = ["syria"]
   type        = "service"
@@ -41,7 +45,7 @@ job "grafana" {
       }
 
       config {
-        image = "grafana/grafana:8.1.3"
+        image = "grafana/grafana:${var.version}"
 
         ports = [
           "http"
