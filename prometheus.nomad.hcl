@@ -147,6 +147,16 @@ scrape_configs:
       - source_labels: ["__meta_consul_node"]
         target_label: "instance"
 
+  - job_name: "transmission-exporter"
+    consul_sd_configs:
+      - server: "http://host.docker.internal:8500"
+        datacenter: "oikumene"
+        services:
+          - "transmission-exporter"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
+
   - job_name: "jellyfin"
     consul_sd_configs:
       - server: "http://host.docker.internal:8500"

@@ -60,4 +60,37 @@ job "transmission" {
       }
     }
   }
+
+  group "transmission-exporter" {
+    network {
+      port "http" {}
+    }
+
+    service {
+      name = "transmission-exporter"
+      port = "http"
+    }
+
+    task "transmission-exporter" {
+      driver = "docker"
+
+      env {
+        WEB_ADDR=":${NOMAD_PORT_http}"
+        TRANSMISSION_ADDR="http://transmission.service.consul:9091"
+      }
+
+      config {
+        image = "metalmatze/transmission-exporter:master"
+        force_pull = true
+
+        ports = [
+          "http"
+        ]
+      }
+
+      resources {
+        memory = 128
+      }
+    }
+  }
 }
