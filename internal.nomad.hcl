@@ -80,23 +80,15 @@ home.service.consul:443 {
   encode zstd gzip
 
   route /grafana* {
-    {{- range service "grafana" }}
-    reverse_proxy {{ .Address }}:{{ .Port }}
-    {{- end }}
+    reverse_proxy srv+http://grafana.service.consul
   }
 
   route /transmission* {
-    {{- range service "transmission" }}
-    reverse_proxy {{ .Address }}:{{ .Port }}
-    {{- end }}
+    reverse_proxy srv+http://transmission.service.consul
   }
 
   route /* {
-   reverse_proxy {
-      {{- range service "homer" }}
-      to {{ .Address }}:{{ .Port }}
-      {{- end }}
-    }
+    reverse_proxy srv+http://homer.service.consul
   }
 }
 
@@ -109,11 +101,7 @@ jellyfin.service.consul:443 {
   }
 
   route /* {
-   reverse_proxy {
-      {{- range service "jellyfin" }}
-      to {{ .Address }}:{{ .Port }}
-      {{- end }}
-    }
+   reverse_proxy srv+http://jellyfin.service.consul
   }
 }
 
@@ -123,11 +111,7 @@ polaris.service.consul:443 {
   encode zstd gzip
 
   route /* {
-   reverse_proxy {
-      {{- range service "polaris-app" }}
-      to {{ .Address }}:{{ .Port }}
-      {{- end }}
-    }
+   reverse_proxy srv+http://polaris-app.service.consul
   }
 }
 
@@ -142,10 +126,8 @@ unifi.service.consul:443 {
   }
 
   route /* {
-   reverse_proxy {
-      {{- range service "unifi-controller" }}
-      to https://{{ .Address }}:{{ .Port }}
-      {{- end }}
+   reverse_proxy { 
+      to srv+https://unifi-controller.service.consul
 
       transport http {
         tls
