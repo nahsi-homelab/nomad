@@ -162,7 +162,7 @@ scrape_configs:
       - server: "http://host.docker.internal:8500"
         datacenter: "oikumene"
         services:
-          - "jellyfin"
+          - "jellyfin-app"
     relabel_configs:
       - source_labels: ["__meta_consul_node"]
         target_label: "instance"
