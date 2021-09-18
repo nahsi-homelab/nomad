@@ -16,7 +16,7 @@ job "jellyfin" {
     }
 
     service {
-      name = "jellyfin"
+      name = "jellyfin-app"
       port = "http"
 
       check {

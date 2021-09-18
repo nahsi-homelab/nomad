@@ -42,6 +42,11 @@ job "internal" {
       port = "https"
     }
 
+    service {
+      name = "jellyfin"
+      port = "https"
+    }
+
     task "internal" {
       driver = "docker"
 
@@ -101,7 +106,7 @@ jellyfin.service.consul:443 {
   }
 
   route /* {
-   reverse_proxy srv+http://jellyfin.service.consul
+   reverse_proxy srv+http://jellyfin-app.service.consul
   }
 }
 
