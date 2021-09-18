@@ -6,9 +6,6 @@ job "loki" {
   group "loki" {
 
     network {
-      dns {
-        servers = ["172.17.0.1"]
-      }
       port "http" {
         static = 3100
       }
