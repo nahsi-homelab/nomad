@@ -1,7 +1,8 @@
 variables {
   versions = {
-    postgres = "13-alpine"
+    postgres = "13.4-alpine"
     promtail = "2.3.0"
+    exporter = "0.10.0"
   }
 }
 
@@ -28,6 +29,7 @@ job "postgres" {
 
     task "postgres" {
       driver = "docker"
+      user = "70"
 
       vault {
         policies = ["postgres"]
@@ -53,7 +55,7 @@ job "postgres" {
 
       volume_mount {
         volume = "postgres"
-        destination = "/var/lib/postgres"
+        destination = "/var/lib/postgresql/data"
       }
 
       config {
@@ -64,8 +66,17 @@ job "postgres" {
         ]
 
         args = [
-          "-c", "full_page_writes=off"
+          "-c", "full_page_writes=off",
+          "-c", "shared_preload_libraries=pg_stat_statements",
+          "-c", "pg_stat_statements.max=10000",
+          "-c", "pg_stat_statements.track=all"
         ]
+
+        mount {
+          type = "bind"
+          source = "local/init"
+          target = "/docker-entrypoint-initdb.d"
+        }
       }
 
       template {
@@ -75,7 +86,22 @@ POSTGRES_PASSWORD={{ with secret "secret/postgres" }}{{ .Data.data.password }}{{
 EOF
 
         destination = "secrets/vars.env"
+        change_mode = "noop"
         env = true
+      }
+
+      template {
+        data = <<EOF
+#!/bin/sh
+set -e
+
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+  CREATE ROLE vault WITH LOGIN SUPERUSER PASSWORD 'vault'
+EOSQL
+EOF
+
+        destination = "/local/init/vault.sh"
+        perms = "777"
       }
     }
 
@@ -151,6 +177,62 @@ scrape_configs:
        format: 2006-01-02 15:04:05.999 UTC
 EOH
         destination = "local/config.yaml"
+      }
+    }
+  }
+
+  group "postgres-exporter" {
+    network {
+      port "exporter" {
+        to = 9187
+      }
+    }
+
+    task "postgres-exporter" {
+      driver = "docker"
+      user = "nobody"
+
+      vault {
+        policies = ["postgres-exporter"]
+      }
+
+      service {
+        name = "postgres-exporter"
+        port = "exporter"
+        address_mode = "host"
+
+        check {
+          name     = "postgres-exporter"
+          path     = "/"
+          type     = "http"
+          interval = "10s"
+          timeout  = "2s"
+        }
+      }
+
+      resources {
+        memory = 64
+      }
+
+      config {
+        image = "prometheuscommunity/postgres-exporter:v${var.versions.exporter}"
+
+        ports = [
+          "exporter"
+        ]
+      }
+
+      template {
+        data = <<EOF
+PG_EXPORTER_AUTO_DISCOVER_DATABASES=true
+DATA_SOURCE_URI=postgres.service.consul:5432/postgres?sslmode=disable
+DATA_SOURCE_USER=postgres_exporter
+DATA_SOURCE_PASS={{ with secret "database/static-creds/postgres-exporter" }}{{ .Data.password }}{{ end }}
+EOF
+
+        destination = "secrets/vars.env"
+        change_mode = "restart"
+        env = true
       }
     }
   }
