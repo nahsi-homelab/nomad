@@ -47,6 +47,11 @@ job "internal" {
       port = "https"
     }
 
+    service {
+      name = "links"
+      port = "https"
+    }
+
     task "internal" {
       driver = "docker"
 
@@ -107,6 +112,14 @@ jellyfin.service.consul:443 {
 
   route /* {
    reverse_proxy srv+http://jellyfin-app.service.consul
+  }
+}
+
+links.service.consul:443 {
+  tls /secrets/cert.pem /secrets/key.pem
+
+  route /* {
+   reverse_proxy srv+http://linkding.service.consul
   }
 }
 
