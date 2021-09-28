@@ -51,7 +51,7 @@ job "prometheus" {
         args = [
           "--web.listen-address=0.0.0.0:${NOMAD_PORT_http}",
           "--config.file=/local/prometheus.yml",
-          "--storage.tsdb.retention.time=90d",
+          "--storage.tsdb.retention.time=1y",
           "--storage.tsdb.path=/var/lib/prometheus",
           "--web.enable-lifecycle"
         ]
