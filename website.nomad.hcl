@@ -23,10 +23,6 @@ job "website" {
     service {
       name = "website"
       port = "metrics"
-      tags = [
-        "caddy",
-        "name=website"
-      ]
     }
 
     service {
