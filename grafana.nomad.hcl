@@ -1,5 +1,5 @@
 variables {
-  version = "8.1.4"
+  version = "8.1.7"
 }
 
 job "grafana" {

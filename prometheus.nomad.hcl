@@ -1,3 +1,7 @@
+variables {
+  version = "2.30.3"
+}
+
 job "prometheus" {
   datacenters = ["syria"]
   type        = "service"
@@ -38,7 +42,7 @@ job "prometheus" {
       }
 
       config {
-        image = "prom/prometheus:v2.30.0"
+        image = "prom/prometheus:v${var.version}"
 
         ports = [
           "http"
