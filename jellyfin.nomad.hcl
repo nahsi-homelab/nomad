@@ -41,6 +41,7 @@ job "jellyfin" {
 
     task "jellyfin" {
       driver = "docker"
+      user = "nobody"
 
       volume_mount {
         volume = "jellyfin"

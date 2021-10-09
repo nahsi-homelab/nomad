@@ -34,6 +34,11 @@ job "internal" {
     }
 
     service {
+      name = "podgrab"
+      port = "https"
+    }
+
+    service {
       name = "unifi"
       port = "https"
     }
@@ -126,6 +131,21 @@ polaris.service.consul:443 {
 
   route /* {
    reverse_proxy srv+http://polaris-app.service.consul
+  }
+}
+
+podgrab.service.consul:443 {
+  tls /secrets/cert.pem /secrets/key.pem
+
+  encode zstd gzip
+
+  @websockets {
+    header Connection *Upgrade*
+    header Upgrade websocket
+  }
+
+  route /* {
+   reverse_proxy srv+http://podgrab-app.service.consul
   }
 }
 
