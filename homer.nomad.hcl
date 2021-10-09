@@ -15,6 +15,11 @@ job "homer" {
     service {
       name = "homer"
       port = "http"
+      tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.homer.rule=Host(`homer.service.consul`)",
+        "traefik.http.routers.homer.tls=true"
+      ]
     }
 
     task "homer" {

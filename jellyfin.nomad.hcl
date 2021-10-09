@@ -19,6 +19,12 @@ job "jellyfin" {
       name = "jellyfin-app"
       port = "http"
 
+      tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.jellyfin.rule=Host(`jellyfin.service.consul`)",
+        "traefik.http.routers.jellyfin.tls=true"
+      ]
+
       check {
         type = "http"
         protocol = "http"
