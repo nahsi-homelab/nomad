@@ -21,7 +21,10 @@ job "jellyfin" {
       tags = [
         "traefik.enable=true",
         "traefik.http.routers.jellyfin.rule=Host(`jellyfin.service.consul`)",
-        "traefik.http.routers.jellyfin.tls=true"
+        "traefik.http.routers.jellyfin.tls=true",
+        "ingress.enable=true",
+        "ingress.http.routers.jellyfin.rule=Host(`jellyfin.nahsi.dev`)",
+        "ingress.http.routers.jellyfin.tls=true"
       ]
 
       check {

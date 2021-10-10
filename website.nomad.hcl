@@ -1,33 +1,27 @@
-job "website" {
+variables {
+  version = "2.4.5"
+}
 
+job "website" {
   datacenters = ["syria"]
   type        = "service"
 
   group "website" {
     network {
       port "http" {
-        static = 80
         to = 80
-        host_network = "public"
       }
-
-      port "https" {
-        static = 443
-        to = 443
-        host_network = "public"
-      }
-
-      port "metrics" {}
     }
 
     service {
       name = "website"
-      port = "metrics"
-    }
+      port = "http"
 
-    service {
-      name = "website"
-      port = "https"
+      tags = [
+        "ingress.enable=true",
+        "ingress.http.routers.website.rule=Host(`nahsi.dev`)",
+        "ingress.http.routers.website.tls=true"
+      ]
     }
 
     task "website" {
@@ -38,47 +32,22 @@ job "website" {
       }
 
       config {
-        image = "caddy:2.4.5-alpine"
+        image = "caddy:${var.version}-alpine"
 
         ports = [
-          "http",
-          "https",
-          "metrics"
+          "http"
         ]
 
         volumes = [
-          "local/Caddyfile:/etc/caddy/Caddyfile",
-          "/mnt/apps/caddy/:/data"
+          "local/Caddyfile:/etc/caddy/Caddyfile"
         ]
       }
 
       template {
         data = <<EOH
-:{{ env "NOMAD_PORT_metrics" }} {
-  metrics /metrics
-}
-
-nahsi.dev:443 {
-  tls /secrets/cert.pem /secrets/key.pem
+nahsi.dev:80 {
   encode zstd gzip
   respond "nothing here yet"
-}
-
-jellyfin.nahsi.dev:443 {
-  tls /secrets/cert.pem /secrets/key.pem
-
-  encode zstd gzip
-
-  @websockets {
-    header Connection *Upgrade*
-    header Upgrade websocket
-  }
-
-
-  route /* {
-    error /metrics* "Unauthorized" 403
-    reverse_proxy srv+http://jellyfin.service.consul
-  }
 }
 EOH
 

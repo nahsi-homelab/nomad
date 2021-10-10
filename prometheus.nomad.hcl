@@ -92,6 +92,16 @@ scrape_configs:
       - source_labels: ["__meta_consul_node"]
         target_label: "instance"
 
+  - job_name: "ingress"
+    consul_sd_configs:
+      - server: "http://host.docker.internal:8500"
+        datacenter: "oikumene"
+        services:
+          - "ingress"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
+
   - job_name: "telegraf"
     consul_sd_configs:
       - server: "http://host.docker.internal:8500"
