@@ -77,7 +77,7 @@ jellyfin.nahsi.dev:443 {
 
   route /* {
     error /metrics* "Unauthorized" 403
-    reverse_proxy srv+http://jellyfin-app.service.consul
+    reverse_proxy srv+http://jellyfin.service.consul
   }
 }
 EOH

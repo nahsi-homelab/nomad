@@ -32,8 +32,16 @@ job "unifi" {
     }
 
     service {
-      name = "unifi-controller"
+      name = "unifi"
       port = "web-ui"
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.unifi.tls=true",
+        "traefik.http.routers.unifi.rule=Host(`unifi.service.consul`)",
+        "traefik.http.services.unifi.loadbalancer.serverstransport=skipverify@file",
+        "traefik.http.services.unifi.loadbalancer.server.scheme=https"
+      ]
 
       check {
         type     = "http"
@@ -120,7 +128,7 @@ job "unifi" {
       template {
         data = <<EOH
         [unifi.defaults]
-          url = "https://unifi-controller.service.consul:8443"
+          url = "https://unifi.service.consul:8443"
           verify_ssl = false
           user = "{{ with secret "secret/unifi/unpoller" }}{{ .Data.data.username }}{{ end }}"
           pass = "{{ with secret "secret/unifi/unpoller" }}{{ .Data.data.password }}{{ end }}"

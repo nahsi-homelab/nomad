@@ -11,8 +11,14 @@ job "podgrab" {
     }
 
     service {
-      name = "podgrab-app"
+      name = "podgrab"
       port = "http"
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.podgrab.rule=Host(`podgrab.service.consul`)",
+        "traefik.http.routers.podgrab.tls=true"
+      ]
     }
 
     volume "podgrab" {

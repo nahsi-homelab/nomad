@@ -18,18 +18,18 @@ job "traefik" {
   group "traefik" {
     network {
       port "traefik" {
-        to = 8080
+        to = 8000
         static = 8000
       }
 
       port "http" {
-        static = 8088
-        to = 8088
+        static = 80
+        to = 80
       }
 
       port "https" {
-        static = 4443
-        to = 4443
+        static = 443
+        to = 443
       }
 
       port "metrics" {}
@@ -91,7 +91,7 @@ job "traefik" {
         data = <<EOH
 entryPoints:
   http:
-    address: ":8088"
+    address: ":80"
     transport:
       lifeCycle:
         requestAcceptGraceTimeout: 15
@@ -103,7 +103,7 @@ entryPoints:
           scheme: https
 
   https:
-    address: ":4443"
+    address: ":443"
     transport:
       lifeCycle:
         requestAcceptGraceTimeout: 15
@@ -116,7 +116,7 @@ entryPoints:
               - "*.service.consul"
 
   traefik:
-    address: ":8080"
+    address: ":8000"
 
 api:
   insecure: true
@@ -151,6 +151,11 @@ tls:
   certificates:
     - certFile: "secrets/cert.pem"
       keyFile: "secrets/key.pem"
+
+http:
+  serversTransports:
+    skipverify:
+      insecureSkipVerify: true
 EOH
 
         destination = "local/traefik/tls.yml"

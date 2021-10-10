@@ -13,6 +13,17 @@ job "linkding" {
       }
     }
 
+    service {
+      name = "links"
+      port = "http"
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.linkding.rule=Host(`links.service.consul`)",
+        "traefik.http.routers.linkding.tls=true"
+      ]
+    }
+
     volume "linkding" {
       type = "host"
       source = "linkding"
@@ -20,11 +31,6 @@ job "linkding" {
 
     task "linkding" {
       driver = "docker"
-
-      service {
-        name = "linkding"
-        port = "http"
-      }
 
       volume_mount {
         volume = "linkding"

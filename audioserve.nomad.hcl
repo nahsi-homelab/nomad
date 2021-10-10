@@ -1,8 +1,5 @@
-# vim: set ft=hcl sw=2 ts=2 :
 job "audioserve" {
-
   datacenters = ["syria"]
-
   type        = "service"
 
   group "audioserve" {
@@ -15,6 +12,11 @@ job "audioserve" {
     service {
       name = "audioserve"
       port = "http"
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.audioserve.tls=true"
+      ]
     }
 
     task "audioserve" {

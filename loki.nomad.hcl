@@ -15,6 +15,12 @@ job "loki" {
       name = "loki"
       port = "http"
 
+      tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.loki.rule=Host(`loki.service.consul`)",
+        "traefik.http.routers.loki.tls=true"
+      ]
+
       check {
         name     = "Loki HTTP"
         type     = "http"

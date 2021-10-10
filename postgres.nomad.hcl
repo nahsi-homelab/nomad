@@ -41,7 +41,7 @@ job "postgres" {
         address_mode = "host"
 
         check {
-          name     = "Postgres"
+          name     = "Postgres TCP"
           type     = "tcp"
           interval = "10s"
           timeout  = "2s"

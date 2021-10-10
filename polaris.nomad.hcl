@@ -1,8 +1,9 @@
-# vim: set ft=hcl sw=2 ts=2 :
+variables {
+  version = "0.13.5"
+}
+
 job "polaris" {
-
   datacenters = ["syria"]
-
   type        = "service"
 
   group "polaris" {
@@ -11,8 +12,14 @@ job "polaris" {
     }
 
     service {
-      name = "polaris-app"
+      name = "polaris"
       port = "http"
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.polaris.rule=Host(`polaris.service.consul`)",
+        "traefik.http.routers.polaris.tls=true"
+      ]
     }
 
     task "polaris" {
@@ -23,7 +30,7 @@ job "polaris" {
       }
 
       config {
-        image = "ogarcia/polaris:0.13.5"
+        image = "ogarcia/polaris:${var.version}"
 
         ports = [
           "http"

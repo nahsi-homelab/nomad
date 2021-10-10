@@ -19,6 +19,12 @@ job "transmission" {
     service {
       name = "transmission"
       port = "web-ui"
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.transmission.rule=Host(`transmission.service.consul`)",
+        "traefik.http.routers.transmission.tls=true"
+      ]
     }
 
     volume "transmission" {
@@ -42,7 +48,7 @@ job "transmission" {
       }
 
       config {
-        image = "linuxserver/transmission:latest"
+        image = "linuxserver/transmission"
 
         ports = [
           "web-ui",

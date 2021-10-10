@@ -3,7 +3,6 @@ variables {
 }
 
 job "jellyfin" {
-
   datacenters = ["syria"]
   type        = "service"
 
@@ -16,7 +15,7 @@ job "jellyfin" {
     }
 
     service {
-      name = "jellyfin-app"
+      name = "jellyfin"
       port = "http"
 
       tags = [

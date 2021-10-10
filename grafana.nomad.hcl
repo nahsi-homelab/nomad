@@ -17,6 +17,12 @@ job "grafana" {
       name = "grafana"
       port = "http"
 
+      tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.grafana.rule=Host(`grafana.service.consul`)",
+        "traefik.http.routers.grafana.tls=true"
+      ]
+
       check {
         name     = "Grafana HTTP"
         type     = "http"
@@ -62,7 +68,7 @@ job "grafana" {
 # HTTP options
 [server]
 # The public facing domain name used to access grafana from a browser
-domain = home.service.consul
+domain = grafana.service.consul
 
 # Redirect to correct domain if host header does not match domain
 # Prevents DNS rebinding attacks
@@ -70,8 +76,8 @@ enforce_domain = false
 
 # # The full public facing url you use in browser, used for redirects and emails
 # If you use reverse proxy and sub path specify full url (with sub path)
-root_url = https://home.service.consul/grafana
-serve_from_sub_path = true
+root_url = https://grafana.service.consul
+serve_from_sub_path = false
 
 # Users management and registration
 [users]

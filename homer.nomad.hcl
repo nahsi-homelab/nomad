@@ -3,6 +3,12 @@ job "homer" {
   datacenters = ["syria"]
   type        = "service"
 
+  update {
+    max_parallel = 1
+    stagger      = "10s"
+    auto_revert  = true
+  }
+
   group "homer" {
     count = 2
 
@@ -69,7 +75,7 @@ services:
         url: "https://podgrab.service.consul"
       - name: "Transmission"
         icon: "fas fa-download"
-        url: "transmission"
+        url: "https://transmission.service.consul"
 
   - name: "Operations"
     icon: "fas fa-server"
@@ -77,9 +83,11 @@ services:
       - name: "Unifi"
         url: "https://unifi.service.consul"
       - name: "Grafana"
-        url: "https://home.service.consul/grafana"
+        url: "https://grafana.service.consul"
       - name: "Prometheus"
         url: "http://prometheus.service.consul:9090"
+      - name: "Traefik"
+        url: "http://traefik.service.consul:8000"
 
   - name: "HashiStack"
     icon: "fas fa-cloud"
