@@ -82,6 +82,16 @@ scrape_configs:
       labels:
         instance: "{{ env "attr.unique.hostname" }}"
 
+  - job_name: "traefik"
+    consul_sd_configs:
+      - server: "http://host.docker.internal:8500"
+        datacenter: "oikumene"
+        services:
+          - "traefik"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
+
   - job_name: "telegraf"
     consul_sd_configs:
       - server: "http://host.docker.internal:8500"

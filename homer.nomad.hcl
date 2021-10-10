@@ -87,7 +87,7 @@ services:
       - name: "Prometheus"
         url: "https://prometheus.service.consul"
       - name: "Traefik"
-        url: "http://traefik.service.consul:8000"
+        url: "https://traefik.service.consul"
 
   - name: "HashiStack"
     icon: "fas fa-cloud"

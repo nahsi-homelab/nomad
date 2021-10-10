@@ -18,8 +18,7 @@ job "traefik" {
   group "traefik" {
     network {
       port "traefik" {
-        to = 8000
-        static = 8000
+        to = 8080
       }
 
       port "http" {
@@ -31,8 +30,6 @@ job "traefik" {
         static = 443
         to = 443
       }
-
-      port "metrics" {}
 
       port "promtail" {
         to = 3000
@@ -78,8 +75,7 @@ job "traefik" {
         ports = [
           "traefik",
           "http",
-          "https",
-          "metrics"
+          "https"
         ]
 
         args = [
@@ -116,7 +112,7 @@ entryPoints:
               - "*.service.consul"
 
   traefik:
-    address: ":8000"
+    address: ":8080"
 
 api:
   insecure: true
@@ -124,9 +120,13 @@ api:
 ping:
   entrypoint: traefik
 
-accessLog:
-  filePath: "/alloc/data/access.log"
-  format: json
+metrics:
+  prometheus:
+    entrypoint: traefik
+
+# accessLog:
+#  filePath: "/alloc/data/access.log"
+#  format: json
 
 providers:
   consulCatalog:
