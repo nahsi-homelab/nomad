@@ -1,6 +1,6 @@
 job "homer" {
 
-  datacenters = ["syria"]
+  datacenters = ["syria", "asia"]
   type        = "service"
 
   update {
@@ -85,7 +85,7 @@ services:
       - name: "Grafana"
         url: "https://grafana.service.consul"
       - name: "Prometheus"
-        url: "http://prometheus.service.consul:9090"
+        url: "https://prometheus.service.consul"
       - name: "Traefik"
         url: "http://traefik.service.consul:8000"
 

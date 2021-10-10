@@ -18,6 +18,12 @@ job "prometheus" {
       name = "prometheus"
       port = "http"
 
+      tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.prometheus.rule=Host(`prometheus.service.consul`)",
+        "traefik.http.routers.prometheus.tls=true"
+      ]
+
       check {
         name     = "Prometheus HTTP"
         type     = "http"
