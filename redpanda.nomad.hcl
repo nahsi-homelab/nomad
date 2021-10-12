@@ -110,40 +110,34 @@ job "redpanda" {
       template {
         data = <<EOH
 pandaproxy:
-  advertised_pandaproxy_api:
-    - address: redpanda-1.service.consul
-      port: 8082
-    - address: redpanda-2.service.consul
-      port: 8082
-    - address: redpanda-3.service.consul
-      port: 8082
   pandaproxy_api:
     - address: 0.0.0.0
+      port: 8082
+  advertised_pandaproxy_api:
+    - address: redpanda-{{ env "meta.redpanda_node_id" }}.service.consul
       port: 8082
 
 redpanda:
   admin:
     - address: 0.0.0.0
       port: 9644
+
+  kafka_api:
+    - address: 0.0.0.0
+      port: 9092
   advertised_kafka_api:
-    - address: redpanda-1.service.consul
+    - address: redpanda-{{ env "meta.redpanda_node_id" }}.service.consul
       port: 9092
-    - address: redpanda-2.service.consul
-      port: 9092
-    - address: redpanda-3.service.consul
-      port: 9092
+
+  rpc_server:
+    address: 0.0.0.0
+    port: 33145
   advertised_rpc_api:
     address: redpanda-{{ env "meta.redpanda_node_id" }}.service.consul
     port: 33145
   auto_create_topics_enabled: false
   data_directory: /var/lib/redpanda/data
   developer_mode: true
-  kafka_api:
-    - address: 0.0.0.0
-      port: 9092
-  rpc_server:
-    address: 0.0.0.0
-    port: 33145
 
 rpk:
   coredump_dir: /var/lib/redpanda/coredump
