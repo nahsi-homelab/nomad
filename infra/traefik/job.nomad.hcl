@@ -148,6 +148,7 @@ EOH
       service {
         name = "promtail"
         port = "promtail"
+        tags = ["service=traefik"]
         address_mode = "host"
 
         check {

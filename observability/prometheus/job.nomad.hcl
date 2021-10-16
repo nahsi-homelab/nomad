@@ -101,6 +101,7 @@ job "prometheus" {
       service {
         name = "promtail"
         port = "promtail"
+        tags = ["service=prometheus"]
         address_mode = "host"
 
         check {

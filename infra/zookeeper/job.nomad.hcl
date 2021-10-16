@@ -141,6 +141,7 @@ job "zookeeper" {
       service {
         name = "promtail"
         port = "promtail"
+        tags = ["service=zookeeper"]
         address_mode = "host"
 
         check {

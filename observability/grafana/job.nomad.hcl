@@ -119,6 +119,7 @@ EOH
       service {
         name = "promtail"
         port = "promtail"
+        tags = ["service=grafana"]
         address_mode = "host"
 
         check {

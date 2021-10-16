@@ -138,6 +138,7 @@ EOH
       service {
         name = "promtail"
         port = "promtail"
+        tags = ["service=ingress"]
         address_mode = "host"
 
         check {

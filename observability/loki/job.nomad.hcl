@@ -87,6 +87,7 @@ job "loki" {
       service {
         name = "promtail"
         port = "promtail"
+        tags = ["service=loki"]
         address_mode = "host"
 
         check {
