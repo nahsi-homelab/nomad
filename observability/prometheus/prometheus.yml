@@ -6,9 +6,19 @@ scrape_configs:
   - job_name: "prometheus"
     static_configs:
     - targets:
-        - localhost:{{ env "NOMAD_PORT_http" }}
+        - localhost:9090
       labels:
         instance: {{ env "attr.unique.hostname" }}
+
+  - job_name: "grafana"
+    consul_sd_configs:
+      - server: "http://host.docker.internal:8500"
+        datacenter: "oikumene"
+        services:
+          - "grafana"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
 
   - job_name: "traefik"
     consul_sd_configs:
@@ -106,7 +116,7 @@ scrape_configs:
       - server: "http://host.docker.internal:8500"
         datacenter: "oikumene"
         services:
-          - "jellyfin-app"
+          - "jellyfin"
     relabel_configs:
       - source_labels: ["__meta_consul_node"]
         target_label: "instance"
@@ -121,16 +131,6 @@ scrape_configs:
       - source_labels: ["__meta_consul_node"]
         target_label: "instance"
 
-  - job_name: "redpanda"
-    consul_sd_configs:
-      - server: "http://host.docker.internal:8500"
-        datacenter: "oikumene"
-        services:
-          - "redpanda"
-    relabel_configs:
-      - source_labels: ["__meta_consul_node"]
-        target_label: "instance"
-
   - job_name: "zookeeper"
     consul_sd_configs:
       - server: "http://host.docker.internal:8500"
@@ -139,6 +139,16 @@ scrape_configs:
           - "zookeeper"
         tags:
           - "metrics"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
+
+  - job_name: "redpanda"
+    consul_sd_configs:
+      - server: "http://host.docker.internal:8500"
+        datacenter: "oikumene"
+        services:
+          - "redpanda"
     relabel_configs:
       - source_labels: ["__meta_consul_node"]
         target_label: "instance"

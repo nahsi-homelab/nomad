@@ -1,35 +1,24 @@
 variables {
-  version = "2.30.3"
+  versions = {
+    prometheus = "2.30.3"
+    promtail = "2.3.0"
+  }
 }
 
 job "prometheus" {
   datacenters = ["syria"]
+  namespace   = "infra"
   type        = "service"
 
   group "prometheus" {
     network {
-      port "http" {
+      port "prometheus" {
         to = 9090
         static = 9090
       }
-    }
 
-    service {
-      name = "prometheus"
-      port = "http"
-
-      tags = [
-        "traefik.enable=true",
-        "traefik.http.routers.prometheus.rule=Host(`prometheus.service.consul`)",
-        "traefik.http.routers.prometheus.tls=true"
-      ]
-
-      check {
-        name     = "Prometheus HTTP"
-        type     = "http"
-        path     = "/-/healthy"
-        interval = "10s"
-        timeout  = "2s"
+      port "promtail" {
+        to = 3000
       }
     }
 
@@ -42,16 +31,37 @@ job "prometheus" {
       driver = "docker"
       user = "nobody"
 
+      service {
+        name = "prometheus"
+        port = "prometheus"
+        address_mode = "host"
+
+        tags = [
+          "traefik.enable=true",
+          "traefik.http.routers.prometheus.rule=Host(`prometheus.service.consul`)",
+          "traefik.http.routers.prometheus.tls=true"
+        ]
+
+        check {
+          name     = "Prometheus HTTP"
+          type     = "http"
+          path     = "/-/healthy"
+          interval = "10s"
+          timeout  = "2s"
+        }
+    }
+
+
       volume_mount {
         volume = "prometheus"
         destination = "/var/lib/prometheus"
       }
 
       config {
-        image = "prom/prometheus:v${var.version}"
+        image = "prom/prometheus:v${var.versions.prometheus}"
 
         ports = [
-          "http"
+          "prometheus"
         ]
 
         extra_hosts = [
@@ -59,7 +69,7 @@ job "prometheus" {
         ]
 
         args = [
-          "--web.listen-address=0.0.0.0:${NOMAD_PORT_http}",
+          "--web.listen-address=0.0.0.0:9090",
           "--config.file=/local/prometheus.yml",
           "--storage.tsdb.retention.time=1y",
           "--storage.tsdb.path=/var/lib/prometheus",
@@ -77,6 +87,50 @@ job "prometheus" {
       resources {
         cpu    = 300
         memory = 512
+      }
+    }
+
+    task "promtail" {
+      driver = "docker"
+
+      lifecycle {
+        hook    = "poststart"
+        sidecar = true
+      }
+
+      service {
+        name = "promtail"
+        port = "promtail"
+        address_mode = "host"
+
+        check {
+          type     = "http"
+          path     = "/ready"
+          interval = "10s"
+          timeout  = "2s"
+        }
+      }
+
+      resources {
+        cpu = 50
+        memory = 128
+      }
+
+      config {
+        image = "grafana/promtail:${var.versions.promtail}"
+
+        args = [
+          "-config.file=local/promtail.yml"
+        ]
+
+        ports = [
+          "promtail"
+        ]
+      }
+
+      template {
+        data = file("promtail.yml")
+        destination = "local/promtail.yml"
       }
     }
   }
