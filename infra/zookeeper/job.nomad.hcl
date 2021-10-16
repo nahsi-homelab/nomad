@@ -7,6 +7,7 @@ variables {
 
 job "zookeeper" {
   datacenters = ["syria", "asia"]
+  namespace   = "infra"
   type        = "service"
 
   update {
