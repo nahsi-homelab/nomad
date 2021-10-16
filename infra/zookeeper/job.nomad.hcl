@@ -160,8 +160,7 @@ job "zookeeper" {
         image = "grafana/promtail:${var.versions.promtail}"
 
         args = [
-          "-config.file",
-          "local/promtail.yml"
+          "-config.file=local/promtail.yml"
         ]
 
         ports = [
