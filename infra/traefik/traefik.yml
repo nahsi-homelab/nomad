@@ -1,0 +1,48 @@
+entryPoints:
+  http:
+    address: ":80"
+    transport:
+      lifeCycle:
+        requestAcceptGraceTimeout: 15
+        graceTimeOut: 10
+    http:
+      redirections:
+        entryPoint:
+          to: https
+          scheme: https
+
+  https:
+    address: ":443"
+    transport:
+      lifeCycle:
+        requestAcceptGraceTimeout: 15
+        graceTimeOut: 10
+    http:
+      tls:
+        domains:
+          - main: "service.consul"
+            sans:
+              - "*.service.consul"
+
+  traefik:
+    address: ":8080"
+
+api:
+  insecure: true
+
+ping:
+  entrypoint: traefik
+
+metrics:
+  prometheus:
+    entrypoint: traefik
+
+providers:
+  consulCatalog:
+    prefix: "traefik"
+    exposedByDefault: false
+    defaultRule: "Host(`{{ .Name }}.service.consul`)"
+    endpoint:
+      address: "host.docker.internal:8500"
+  file:
+    filename: "local/traefik/tls.yml"
