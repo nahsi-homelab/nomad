@@ -7,6 +7,7 @@ variables {
 
 job "ingress" {
   datacenters = ["syria"]
+  namespace   = "infra"
   type        = "service"
 
   update {
@@ -75,64 +76,13 @@ job "ingress" {
         ]
 
         args = [
-          "--configFile=local/config.yml"
+          "--configFile=local/traefik.yml"
         ]
       }
 
       template {
-        data = <<EOH
-entryPoints:
-  http:
-    address: ":80"
-    transport:
-      lifeCycle:
-        requestAcceptGraceTimeout: 15
-        graceTimeOut: 10
-    http:
-      redirections:
-        entryPoint:
-          to: https
-          scheme: https
-
-  https:
-    address: ":443"
-    transport:
-      lifeCycle:
-        requestAcceptGraceTimeout: 15
-        graceTimeOut: 10
-    http:
-      tls:
-        domains:
-          - main: "nahsi.dev"
-            sans:
-              - "*.nahsi.dev"
-
-  traefik:
-    address: ":8080"
-
-ping:
-  entrypoint: traefik
-
-metrics:
-  prometheus:
-    entrypoint: traefik
-
-accessLog:
-  filePath: "/alloc/data/access.log"
-  format: json
-
-providers:
-  consulCatalog:
-    prefix: "ingress"
-    exposedByDefault: false
-    endpoint:
-      address: "host.docker.internal:8500"
-  file:
-    filename: "local/traefik/tls.yml"
-
-EOH
-
-        destination = "local/config.yml"
+        data        = file("traefik.yml")
+        destination = "local/traefik.yml"
         change_mode = "restart"
         splay       = "1m"
       }
@@ -207,8 +157,7 @@ EOH
         image = "grafana/promtail:${var.versions.promtail}"
 
         args = [
-          "-config.file",
-          "local/config.yaml"
+          "-config.file=local/promtail.yml"
         ]
 
         ports = [
@@ -217,62 +166,8 @@ EOH
       }
 
       template {
-        data = <<EOH
-server:
-  http_listen_port: 3000
-  grpc_listen_port: 0
-
-positions:
-  filename: "local/positions.yml"
-
-client:
-  url: http://loki.service.consul:3100/loki/api/v1/push
-
-scrape_configs:
-- job_name: traefik
-  static_configs:
-  - targets:
-      - localhost
-    labels:
-      app: ingress
-      __path__: "/alloc/logs/traefik.std*.0"
-  pipeline_stages:
-    - regex:
-        expression: '^time="(?P<time>.*)" level=(?P<level>.*) msg="(?P<msg>.*)"'
-    - timestamp:
-        source: time
-        format: 2006-01-02T15:04:05Z
-
-- job_name: traefik-access
-  static_configs:
-  - targets:
-      - localhost
-    labels:
-      app: ingress
-      type: access-log
-      __path__: "/alloc/data/access.log"
-  pipeline_stages:
-    - json:
-        expressions:
-          time: time
-          level: level
-          method: RequestMethod
-          status: DownstreamStatus
-          path: RequestPath
-    - labels:
-        method:
-        status:
-    - drop:
-        source: path
-        expression: "/ping"
-    - drop:
-        source: path
-        expression: "/metrics"
-    - timestamp:
-        source: time
-        format: 2006-01-02T15:04:05Z
-EOH
-        destination = "local/config.yaml"
+        data = file("promtail.yml")
+        destination = "local/promtail.yml"
       }
     }
   }
