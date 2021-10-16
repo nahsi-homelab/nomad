@@ -1,32 +1,24 @@
-job "loki" {
+variables {
+  versions = {
+    loki = "2.3.0"
+    promtail = "2.3.0"
+  }
+}
 
+job "loki" {
   datacenters = ["syria"]
+  namespace   = "infra"
   type        = "service"
 
   group "loki" {
-
     network {
-      port "http" {
+      port "loki" {
+        to = 3100
         static = 3100
       }
-    }
 
-    service {
-      name = "loki"
-      port = "http"
-
-      tags = [
-        "traefik.enable=true",
-        "traefik.http.routers.loki.rule=Host(`loki.service.consul`)",
-        "traefik.http.routers.loki.tls=true"
-      ]
-
-      check {
-        name     = "Loki HTTP"
-        type     = "http"
-        path     = "/ready"
-        interval = "10s"
-        timeout  = "2s"
+      port "promtail" {
+        to = 3000
       }
     }
 
@@ -39,16 +31,36 @@ job "loki" {
       driver = "docker"
       user   = "nobody"
 
+      service {
+        name = "loki"
+        port = "loki"
+        address_mode = "host"
+
+        tags = [
+          "traefik.enable=true",
+          "traefik.http.routers.loki.rule=Host(`loki.service.consul`)",
+          "traefik.http.routers.loki.tls=true"
+        ]
+
+        check {
+          name     = "Loki HTTP"
+          type     = "http"
+          path     = "/ready"
+          interval = "10s"
+          timeout  = "2s"
+        }
+      }
+
       volume_mount {
         volume      = "loki"
         destination = "/loki"
       }
 
       config {
-        image = "grafana/loki:2.3.0"
+        image = "grafana/loki:${var.versions.loki}"
 
         ports = [
-          "http"
+          "loki"
         ]
 
         args = [
@@ -57,50 +69,54 @@ job "loki" {
       }
 
       template {
-        data = <<EOH
-target: all
-auth_enabled: false
-
-server:
-  http_listen_port: 3100
-
-ingester:
-  lifecycler:
-    address: 127.0.0.1
-    ring:
-      kvstore:
-        store: inmemory
-      replication_factor: 1
-    final_sleep: 0s
-  chunk_idle_period: 5m
-  chunk_retain_period: 30s
-
-schema_config:
-  configs:
-  - from: 2021-09-04
-    store: boltdb
-    object_store: filesystem
-    schema: v11
-    index:
-      prefix: index_
-      period: 168h
-
-storage_config:
-  boltdb:
-    directory: /loki/index
-
-  filesystem:
-    directory: /loki/chunks
-
-limits_config:
-  enforce_metric_name: false
-  reject_old_samples: true
-  reject_old_samples_max_age: 168h
-EOH
-
+        data = file("loki.yml")
         change_mode   = "signal"
         change_signal = "SIGHUP"
         destination   = "local/loki.yml"
+      }
+    }
+
+    task "promtail" {
+      driver = "docker"
+
+      lifecycle {
+        hook    = "poststart"
+        sidecar = true
+      }
+
+      service {
+        name = "promtail"
+        port = "promtail"
+        address_mode = "host"
+
+        check {
+          type     = "http"
+          path     = "/ready"
+          interval = "10s"
+          timeout  = "2s"
+        }
+      }
+
+      resources {
+        cpu = 50
+        memory = 128
+      }
+
+      config {
+        image = "grafana/promtail:${var.versions.promtail}"
+
+        args = [
+          "-config.file=local/promtail.yml"
+        ]
+
+        ports = [
+          "promtail"
+        ]
+      }
+
+      template {
+        data = file("promtail.yml")
+        destination = "local/promtail.yml"
       }
     }
   }
