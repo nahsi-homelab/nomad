@@ -1,34 +1,23 @@
 variables {
-  version = "8.1.7"
+  versions = {
+    grafana = "8.2.1"
+    promtail = "2.3.0"
+  }
 }
 
 job "grafana" {
   datacenters = ["syria"]
+  namespace   = "infra"
   type        = "service"
 
   group "grafana" {
     network {
-      port "http" {
+      port "grafana" {
         to = 3000
       }
-    }
 
-    service {
-      name = "grafana"
-      port = "http"
-
-      tags = [
-        "traefik.enable=true",
-        "traefik.http.routers.grafana.rule=Host(`grafana.service.consul`)",
-        "traefik.http.routers.grafana.tls=true"
-      ]
-
-      check {
-        name     = "Grafana HTTP"
-        type     = "http"
-        path     = "/api/health"
-        interval = "10s"
-        timeout  = "2s"
+      port "promtail" {
+        to = 3000
       }
     }
 
@@ -41,6 +30,26 @@ job "grafana" {
       driver = "docker"
       user = "nobody"
 
+      service {
+        name = "grafana"
+        port = "grafana"
+        address_mode = "host"
+
+        tags = [
+          "traefik.enable=true",
+          "traefik.http.routers.grafana.rule=Host(`grafana.service.consul`)",
+          "traefik.http.routers.grafana.tls=true"
+        ]
+
+        check {
+          name     = "Grafana HTTP"
+          type     = "http"
+          path     = "/api/health"
+          interval = "10s"
+          timeout  = "2s"
+        }
+      }
+
       vault {
         policies = ["grafana"]
       }
@@ -50,76 +59,33 @@ job "grafana" {
         destination = "/var/lib/grafana"
       }
 
+      env {
+        GF_PATHS_CONFIG="/local/grafana/grafana.ini"
+        GF_PATHS_PROVISIONING="/local/grafana/provisioning"
+      }
+
       config {
-        image = "grafana/grafana:${var.version}"
+        image = "grafana/grafana:${var.versions.grafana}"
 
         ports = [
-          "http"
-        ]
-
-        volumes = [
-          "local/grafana.ini:/etc/grafana/grafana.ini",
-          "local/provisioning:/etc/grafana/provisioning"
+          "grafana"
         ]
       }
 
       template {
-        data = <<EOH
-# HTTP options
-[server]
-# The public facing domain name used to access grafana from a browser
-domain = grafana.service.consul
+        data = file("grafana.ini")
+        destination = "local/grafana/grafana.ini"
+      }
 
-# Redirect to correct domain if host header does not match domain
-# Prevents DNS rebinding attacks
-enforce_domain = false
-
-# # The full public facing url you use in browser, used for redirects and emails
-# If you use reverse proxy and sub path specify full url (with sub path)
-root_url = https://grafana.service.consul
-serve_from_sub_path = false
-
-# Users management and registration
-[users]
-allow_sign_up = false
-allow_org_create = false
-auto_assign_org_role = Viewer
-default_theme = dark
-
-[security]
-admin_password = $__file{/secrets/admin_password}
-
-# Authentication
-[auth]
-disable_login_form = false
-oauth_auto_login = false
-disable_signout_menu = false
-
-[auth.github]
-enabled = true
-allow_sign_up = true
-client_id = $__file{/secrets/github/client_id}
-client_secret = $__file{/secrets/github/secret_id}
-scopes = user:email,read:org
-auth_url = https://github.com/login/oauth/authorize
-token_url = https://github.com/login/oauth/access_token
-api_url = https://api.github.com/user
-allowed_organizations = nahsi-homelab
-
-# Logging
-[log]
-mode = console
-level = info
-EOH
-
-        destination = "local/grafana.ini"
+      template {
+        data = file("provisioning/datasources.yml")
+        destination = "local/grafana/provisioning/datasources/datasources.yml"
       }
 
       template {
         data = <<EOH
 {{ with secret "secret/grafana/github" }}{{ .Data.data.client_id }}{{ end }}
 EOH
-
         destination = "secrets/github/client_id"
       }
 
@@ -127,7 +93,6 @@ EOH
         data = <<EOH
 {{ with secret "secret/grafana/github" }}{{ .Data.data.secret_id }}{{ end }}
 EOH
-
         destination = "secrets/github/secret_id"
       }
 
@@ -135,37 +100,55 @@ EOH
         data = <<EOH
 {{ with secret "secret/grafana/users/admin" }}{{ .Data.data.password }}{{ end }}
 EOH
-
         destination = "secrets/admin_password"
-      }
-
-      template {
-        data = <<EOH
----
-apiVersion: 1
-deleteDatasources: []
-datasources:
-  - basicAuth: false
-    isDefault: true
-    jsonData:
-      timeInterval: 15s
-    name: Prometheus
-    type: prometheus
-    url: "http://prometheus.service.consul:9090"
-  - basicAuth: false
-    isDefault: false
-    jsonData:
-      maxLines: 1000
-    name: Loki
-    type: loki
-    url: "http://loki.service.consul:3100"
-EOH
-
-        destination = "local/provisioning/datasources/datasources.yml"
       }
 
       resources {
         memory = 256
+      }
+    }
+
+    task "promtail" {
+      driver = "docker"
+
+      lifecycle {
+        hook    = "poststart"
+        sidecar = true
+      }
+
+      service {
+        name = "promtail"
+        port = "promtail"
+        address_mode = "host"
+
+        check {
+          type     = "http"
+          path     = "/ready"
+          interval = "10s"
+          timeout  = "2s"
+        }
+      }
+
+      resources {
+        cpu = 50
+        memory = 128
+      }
+
+      config {
+        image = "grafana/promtail:${var.versions.promtail}"
+
+        args = [
+          "-config.file=local/promtail.yml"
+        ]
+
+        ports = [
+          "promtail"
+        ]
+      }
+
+      template {
+        data = file("promtail.yml")
+        destination = "local/promtail.yml"
       }
     }
   }

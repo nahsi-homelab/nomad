@@ -1,0 +1,17 @@
+apiVersion: 1
+deleteDatasources: []
+datasources:
+  - basicAuth: false
+    isDefault: true
+    jsonData:
+      timeInterval: 15s
+    name: Prometheus
+    type: prometheus
+    url: "http://prometheus.service.consul:9090"
+  - basicAuth: false
+    isDefault: false
+    jsonData:
+      maxLines: 1000
+    name: Loki
+    type: loki
+    url: "http://loki.service.consul:3100"
