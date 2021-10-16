@@ -128,5 +128,50 @@ job "zookeeper" {
         splay = "1m"
       }
     }
+
+    task "promtail" {
+      driver = "docker"
+
+      lifecycle {
+        hook    = "poststart"
+        sidecar = true
+      }
+
+      service {
+        name = "promtail"
+        port = "promtail"
+        address_mode = "host"
+
+        check {
+          type     = "http"
+          path     = "/ready"
+          interval = "10s"
+          timeout  = "2s"
+        }
+      }
+
+      resources {
+        cpu = 50
+        memory = 128
+      }
+
+      config {
+        image = "grafana/promtail:${var.versions.promtail}"
+
+        args = [
+          "-config.file",
+          "local/promtail.yml"
+        ]
+
+        ports = [
+          "promtail"
+        ]
+      }
+
+      template {
+        data = file("promtail.yml")
+        destination = "local/promtail.yml"
+      }
+    }
   }
 }
