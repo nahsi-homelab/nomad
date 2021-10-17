@@ -1,0 +1,201 @@
+version: 1
+
+global:
+  server_name: matrix.service.consul
+
+  private_key: "/secrets/matrix.key"
+  key_validity_period: 48h0m0s
+
+  # Lists of domains that the server will trust as identity servers to verify third
+  # party identifiers such as phone numbers and email addresses.
+  trusted_third_party_id_servers:
+  - matrix.org
+  - vector.im
+
+  # Configuration for Kafka/Naffka.
+  kafka:
+    addresses:
+      - "kafka-1:9094"
+      - "kafka-2:9094"
+      - "kafka-3:9094"
+
+    topic_prefix: Dendrite
+    use_naffka: false
+
+  metrics:
+    enabled: true
+
+app_service_api:
+  internal_api:
+    listen: http://0.0.0.0:7777
+    connect: http://app-service-api.dendrite.service.consul:7777
+  database:
+    connection_string: postgresql://dendrite:
+      {{- with secret "database/static-creds/dendrite" -}}
+      {{ .Data.password }}{{ end -}}
+      @master.postgres.service.consul/dendrite?sslmode=disable
+    max_open_conns: 10
+    max_idle_conns: 2
+    conn_max_lifetime: -1
+
+  # Appservice configuration files to load into this homeserver.
+  config_files: []
+
+client_api:
+  internal_api:
+    listen: http://0.0.0.0:7771
+    connect: http://client-api.dendrite.service.consul:7771
+  external_api:
+    listen: http://0.0.0.0:8071
+
+  registration_disabled: true
+  registration_shared_secret: ""
+  enable_registration_captcha: false
+
+  rate_limiting:
+    enabled: true
+    threshold: 5
+    cooloff_ms: 500
+
+edu_server:
+  internal_api:
+    listen: http://0.0.0.0:7778
+    connect: http://edu-server.dendrite.service.consul:7778
+
+federation_api:
+  internal_api:
+    listen: http://0.0.0.0:7772
+    connect: http://federation-api.dendrite.service.consul:7772
+  external_api:
+    listen: http://0.0.0.0:8072
+
+  federation_certificates: []
+
+federation_sender:
+  internal_api:
+    listen: http://0.0.0.0:7775
+    connect: http://federation-sender.dendrite.service.consul:7775
+  database:
+    connection_string: postgresql://dendrite:
+      {{- with secret "database/static-creds/dendrite" -}}
+      {{ .Data.password }}{{ end -}}
+      @master.postgres.service.consul/dendrite?sslmode=disable
+    max_open_conns: 10
+    max_idle_conns: 2
+    conn_max_lifetime: -1
+
+  send_max_retries: 16
+
+  disable_tls_validation: false
+
+key_server:
+  internal_api:
+    listen: http://0.0.0.0:7779
+    connect: http://key-server.dendrite.service.consul:7779
+  database:
+    connection_string: postgresql://dendrite:
+      {{- with secret "database/static-creds/dendrite" -}}
+      {{ .Data.password }}{{ end -}}
+      @master.postgres.service.consul/dendrite?sslmode=disable
+    max_open_conns: 10
+    max_idle_conns: 2
+    conn_max_lifetime: -1
+
+media_api:
+  internal_api:
+    listen: http://0.0.0.0:7774
+    connect: http://media-api.dendrite.service.consul:7774
+  external_api:
+    listen: http://0.0.0.0:8074
+  database:
+    connection_string: postgresql://dendrite:
+      {{- with secret "database/static-creds/dendrite" -}}
+      {{ .Data.password }}{{ end -}}
+      @master.postgres.service.consul/dendrite?sslmode=disable
+    max_open_conns: 10
+    max_idle_conns: 2
+    conn_max_lifetime: -1
+
+  base_path: /var/dendrite/media
+  max_file_size_bytes: 10485760
+  dynamic_thumbnails: true
+  max_thumbnail_generators: 10
+
+  thumbnail_sizes:
+  - width: 32
+    height: 32
+    method: crop
+  - width: 96
+    height: 96
+    method: crop
+  - width: 640
+
+room_server:
+  internal_api:
+    listen: http://0.0.0.0:7770
+    connect: http://room-server.dendrite.service.consul:7770
+  database:
+    connection_string: postgresql://dendrite:
+      {{- with secret "database/static-creds/dendrite" -}}
+      {{ .Data.password }}{{ end -}}
+      @master.postgres.service.consul/dendrite?sslmode=disable
+    max_open_conns: 10
+    max_idle_conns: 2
+    conn_max_lifetime: -1
+
+signing_key_server:
+  internal_api:
+    listen: http://0.0.0.0:7780
+    connect: http://signing-key-server.dendrite.service.consul:7780
+  database:
+    connection_string: postgresql://dendrite:
+      {{- with secret "database/static-creds/dendrite" -}}
+      {{ .Data.password }}{{ end -}}
+      @master.postgres.service.consul/dendrite?sslmode=disable
+    max_open_conns: 10
+    max_idle_conns: 2
+    conn_max_lifetime: -1
+
+  key_perspectives:
+  - server_name: matrix.org
+    keys:
+    - key_id: ed25519:auto
+      public_key: Noi6WqcDj0QmPxCNQqgezwTlBKrfqehY1u2FyWP9uYw
+    - key_id: ed25519:a_RXGa
+      public_key: l8Hft5qXKn1vfHrg3p4+W8gELQVo8N13JkluMfmn2sQ
+      
+  prefer_direct_fetch: false
+
+sync_api:
+  internal_api:
+    listen: http://0.0.0.0:7773
+    connect: http://sync-api.dendrite.service.consul:7773
+  external_api:
+    listen: http://0.0.0.0:8073
+  database:
+    connection_string: postgresql://dendrite:
+      {{- with secret "database/static-creds/dendrite" -}}
+      {{ .Data.password }}{{ end -}}
+      @master.postgres.service.consul/dendrite?sslmode=disable
+    max_open_conns: 10
+    max_idle_conns: 2
+    conn_max_lifetime: -1
+
+user_api:
+  internal_api:
+    listen: http://0.0.0.0:7781
+    connect: http://user-api.dendrite.service.consul:7781
+  account_database:
+    connection_string: postgresql://dendrite:
+      {{- with secret "database/static-creds/dendrite" -}}
+      {{ .Data.password }}{{ end -}}
+      @master.postgres.service.consul/dendrite?sslmode=disable
+    max_open_conns: 10
+    max_idle_conns: 2
+    conn_max_lifetime: -1
+  device_database:
+    connection_string: postgresql://dendrite:
+      {{- with secret "database/static-creds/dendrite" -}}
+      {{ .Data.password }}{{ end -}}
+      @master.postgres.service.consul/dendrite?sslmode=disable
+    max_open_conns: 10
