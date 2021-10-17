@@ -85,16 +85,12 @@ job "zookeeper" {
       }
 
       env {
-        BITNAMI_DEBUG = "true"
-        JVMFLAGS = "-Xmx512m"
+        JVMFLAGS = "-Xmx512m -Djava.security.auth.login.config=/secrets/jaas.conf"
+        ALLOW_ANONYMOUS_LOGIN="yes"
 
         ZOO_SERVER_ID = meta.zoo_node_id
         ZOO_DATA_DIR = "/bitnami/zookeeper/data"
         ZOO_DATA_LOG_DIR = "/bitnami/zookeeper/datalog"
-
-        ZOO_ENABLE_AUTH = "yes"
-        ZOO_SERVER_USERS = "admin,kafka"
-        ZOO_SERVER_PASSWORDS_FILE = "/secrets/server_passwords"
       }
 
       config {
@@ -125,21 +121,9 @@ job "zookeeper" {
       }
 
       template {
-        data =<<EOH
-        ZOO_CLIENT_USER={{ with secret "secret/zookeeper/client" }}{{ .Data.data.username }}{{ end }}
-        ZOO_CLIENT_PASSWORD={{ with secret "secret/zookeeper/client" }}{{ .Data.data.password }}{{ end }}
-        EOH
-        destination = "secrets/vars.env"
-        env = true
-        splay = "1m"
-      }
-
-      template {
-        data =<<EOH
-        {{- with secret "secret/zookeeper/admin" -}}{{ .Data.data.password }}{{ end }} 
-        {{- with secret "secret/zookeeper/kafka" -}}, {{ .Data.data.password }}{{ end }}
-        EOH
-        destination = "secrets/server_passwords"
+        data = file("jaas.conf")
+        destination = "secrets/jaas.conf"
+        change_mode = "restart"
         splay = "1m"
       }
     }
