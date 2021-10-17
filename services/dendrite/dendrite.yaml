@@ -15,9 +15,9 @@ global:
   # Configuration for Kafka/Naffka.
   kafka:
     addresses:
-      - "kafka-1:9094"
-      - "kafka-2:9094"
-      - "kafka-3:9094"
+      - "kafka-1.service.consul:9094"
+      - "kafka-2.service.consul:9094"
+      - "kafka-3.service.consul:9094"
 
     topic_prefix: Dendrite
     use_naffka: false
