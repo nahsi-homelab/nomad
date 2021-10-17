@@ -1,0 +1,37 @@
+logger:
+  # Valid values are: debug, info, warn, error, fatal, panic
+  level: info
+
+kafka:
+  brokers:
+    - "kafka-1.service.consul:9092"
+    - "kafka-2.service.consul:9092"
+    - "kafka-3.service.consul:9092"
+  clientId: "kminion"
+
+minion:
+  consumerGroups:
+    enabled: true
+    scrapeMode: offsetsTopic
+    granularity: partition
+    allowedGroups: [ ".*" ]
+    ignoredGroups: [ ]
+  topics:
+    granularity: partition
+    allowedTopics: [ ".*" ]
+    ignoredTopics: [ ]
+    # infoMetric is a configuration object for the kminion_kafka_topic_info metric
+    infoMetric:
+      configKeys:
+        - "cleanup.policy"
+        - "compression.type"
+        - "retention.ms"
+        - "message.format.version"
+        - "message.max.bytes"
+  logDirs:
+    enabled: true
+
+exporter:
+  namespace: "kminion"
+  host: ""
+  port: 8080

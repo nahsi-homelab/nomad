@@ -1,6 +1,7 @@
 variables {
   versions = {
     kafka = "2.8.1"
+    kminion = "master"
     promtail = "2.3.0"
   }
 }
@@ -13,7 +14,6 @@ job "kafka" {
   update {
     max_parallel = 1
     stagger      = "1m"
-    auto_revert  = true
   }
 
   group "kafka" {
@@ -96,14 +96,12 @@ job "kafka" {
       template {
         data = file("server.properties")
         destination = "local/server.properties"
-        change_mode = "restart"
         splay = "1m"
       }
 
       template {
         data = file("jaas.conf")
         destination = "secrets/jaas.conf"
-        change_mode = "restart"
         splay = "1m"
       }
     }
@@ -151,6 +149,69 @@ job "kafka" {
       template {
         data = file("promtail.yml")
         destination = "local/promtail.yml"
+      }
+    }
+  }
+
+  group "kminion" {
+    network {
+      port "kminion" {
+        to = 8080
+      }
+    }
+
+    task "kminion" {
+      driver = "docker"
+      user = "nobody"
+
+      vault {
+        policies = ["kminion"]
+      }
+
+      service {
+        name = "kminion"
+        port = "kminion"
+        address_mode = "host"
+
+        check {
+          type     = "http"
+          path     = "/"
+          interval = "10s"
+          timeout  = "2s"
+        }
+      }
+
+      resources {
+        cpu = 100
+        memory = 128
+      }
+
+      env {
+        CONFIG_FILEPATH="/local/kminion.yml"
+      }
+
+      config {
+        image = "quay.io/cloudhut/kminion:${var.versions.kminion}"
+
+        ports = [
+          "kminion"
+        ]
+      }
+
+      template {
+        data = file("kminion.yml")
+        destination = "local/kminion.yml"
+      }
+
+      template {
+        data =<<EOH
+        KAFKA_SASL_ENABLED=true
+        KAFKA_SASL_USERNAME={{ with secret "secret/kafka/kminion" }}{{ .Data.data.username }}{{ end }}
+        KAFKA_SASL_PASSWORD={{ with secret "secret/kafka/kminion" }}{{ .Data.data.password }}{{ end }}
+        KAFKA_SASL_MECHANISM=PLAIN
+        EOH
+        destination = "secrets/kminion.env"
+        env = true
       }
     }
   }
