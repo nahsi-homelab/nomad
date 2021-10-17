@@ -172,13 +172,6 @@ job "kafka" {
         name = "kminion"
         port = "kminion"
         address_mode = "host"
-
-        check {
-          type     = "http"
-          path     = "/"
-          interval = "10s"
-          timeout  = "2s"
-        }
       }
 
       resources {
