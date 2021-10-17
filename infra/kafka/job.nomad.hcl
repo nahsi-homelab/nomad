@@ -30,6 +30,11 @@ job "kafka" {
         static = 9093
       }
 
+      port "dendrite" {
+        to = 9094
+        static = 9094
+      }
+
       port "promtail" {
         to = 3000
       }
@@ -85,7 +90,8 @@ job "kafka" {
 
         ports = [
           "client",
-          "internal"
+          "internal",
+          "dendrite"
         ]
 
         volumes = [
