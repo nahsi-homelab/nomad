@@ -48,8 +48,8 @@ client_api:
   external_api:
     listen: http://0.0.0.0:8071
 
-  registration_disabled: true
-  registration_shared_secret: ""
+  registration_disabled: false
+  registration_shared_secret: {{ with secret "secret/dendrite/registration-key" }}{{ .Data.data.key }}{{ end }}
   enable_registration_captcha: false
 
   rate_limiting:

@@ -75,9 +75,11 @@ job "dendrite" {
       user = "nobody"
 
       service {
-        name = "dendrite-app-service-api"
+        name = "dendrite"
         port = "internal"
         address_mode = "host"
+
+        tags = ["app-service-api"]
       }
 
       vault {
@@ -105,16 +107,9 @@ job "dendrite" {
 
       template {
         data =<<EOH
-        {{- with secret "secret/dendrite/key" -}}{{ .Data.data.private_key }}{{ end }}
+        {{- with secret "secret/dendrite/matrix-key" -}}{{ .Data.data.private_key }}{{ end }}
         EOH
         destination = "secrets/matrix.key"
-      }
-
-      template {
-        data =<<EOH
-        {{- with secret "secret/dendrite/key" -}}{{ .Data.data.private_key }}{{ end }}
-        EOH
-        destination = "local/matrix.key"
       }
 
       resources {
@@ -139,6 +134,14 @@ job "dendrite" {
     task "client-api" {
       driver = "docker"
       user = "nobody"
+
+      service { 
+        name = "dendrite"
+        port = "internal"
+        address_mode = "host"
+
+        tags = ["client-api"]
+      }
 
       service {
         name = "dendrite-client-api"
@@ -178,7 +181,7 @@ job "dendrite" {
 
       template {
         data =<<EOH
-        {{- with secret "secret/dendrite/key" -}}{{ .Data.data.private_key }}{{ end }}
+        {{- with secret "secret/dendrite/matrix-key" -}}{{ .Data.data.private_key }}{{ end }}
         EOH
         destination = "secrets/matrix.key"
       }
@@ -201,10 +204,12 @@ job "dendrite" {
       driver = "docker"
       user = "nobody"
 
-      service {
-        name = "dendrite-edu-server"
+      service { 
+        name = "dendrite"
         port = "internal"
         address_mode = "host"
+
+        tags = ["edu-server"]
       }
 
       vault {
@@ -232,7 +237,7 @@ job "dendrite" {
 
       template {
         data =<<EOH
-        {{- with secret "secret/dendrite/key" -}}{{ .Data.data.private_key }}{{ end }}
+        {{- with secret "secret/dendrite/matrix-key" -}}{{ .Data.data.private_key }}{{ end }}
         EOH
         destination = "secrets/matrix.key"
       }
@@ -259,6 +264,14 @@ job "dendrite" {
     task "federation-api" {
       driver = "docker"
       user = "nobody"
+
+      service { 
+        name = "dendrite"
+        port = "internal"
+        address_mode = "host"
+
+        tags = ["federaion-api"]
+      }
 
       service {
         name = "dendrite-federation-api"
@@ -298,7 +311,7 @@ job "dendrite" {
 
       template {
         data =<<EOH
-        {{- with secret "secret/dendrite/key" -}}{{ .Data.data.private_key }}{{ end }}
+        {{- with secret "secret/dendrite/matrix-key" -}}{{ .Data.data.private_key }}{{ end }}
         EOH
         destination = "secrets/matrix.key"
       }
@@ -321,10 +334,12 @@ job "dendrite" {
       driver = "docker"
       user = "nobody"
 
-      service {
-        name = "dendrite-federation-sender"
+      service { 
+        name = "dendrite"
         port = "internal"
         address_mode = "host"
+
+        tags = ["federaion-sender"]
       }
 
       vault {
@@ -352,7 +367,7 @@ job "dendrite" {
 
       template {
         data =<<EOH
-        {{- with secret "secret/dendrite/key" -}}{{ .Data.data.private_key }}{{ end }}
+        {{- with secret "secret/dendrite/matrix-key" -}}{{ .Data.data.private_key }}{{ end }}
         EOH
         destination = "secrets/matrix.key"
       }
@@ -375,10 +390,12 @@ job "dendrite" {
       driver = "docker"
       user = "nobody"
 
-      service {
-        name = "dendrite-key-server"
+      service { 
+        name = "dendrite"
         port = "internal"
         address_mode = "host"
+
+        tags = ["key-server"]
       }
 
       vault {
@@ -406,7 +423,7 @@ job "dendrite" {
 
       template {
         data =<<EOH
-        {{- with secret "secret/dendrite/key" -}}{{ .Data.data.private_key }}{{ end }}
+        {{- with secret "secret/dendrite/matrix-key" -}}{{ .Data.data.private_key }}{{ end }}
         EOH
         destination = "secrets/matrix.key"
       }
@@ -433,6 +450,14 @@ job "dendrite" {
     task "media-api" {
       driver = "docker"
       user = "nobody"
+
+      service {
+        name = "dendrite"
+        port = "internal"
+        address_mode = "host"
+
+        tags = ["media-api"]
+      }
 
       service {
         name = "dendrite-media-api"
@@ -472,7 +497,7 @@ job "dendrite" {
 
       template {
         data =<<EOH
-        {{- with secret "secret/dendrite/key" -}}{{ .Data.data.private_key }}{{ end }}
+        {{- with secret "secret/dendrite/matrix-key" -}}{{ .Data.data.private_key }}{{ end }}
         EOH
         destination = "secrets/matrix.key"
       }
@@ -496,9 +521,11 @@ job "dendrite" {
       user = "nobody"
 
       service {
-        name = "dendrite-room-server"
+        name = "dendrite"
         port = "internal"
         address_mode = "host"
+
+        tags = ["room-server"]
       }
 
       vault {
@@ -526,7 +553,7 @@ job "dendrite" {
 
       template {
         data =<<EOH
-        {{- with secret "secret/dendrite/key" -}}{{ .Data.data.private_key }}{{ end }}
+        {{- with secret "secret/dendrite/matrix-key" -}}{{ .Data.data.private_key }}{{ end }}
         EOH
         destination = "secrets/matrix.key"
       }
@@ -550,9 +577,11 @@ job "dendrite" {
       user = "nobody"
 
       service {
-        name = "dendrite-signing-key-server"
+        name = "dendrite"
         port = "internal"
         address_mode = "host"
+
+        tags = ["signing-key-server"]
       }
 
       vault {
@@ -580,7 +609,7 @@ job "dendrite" {
 
       template {
         data =<<EOH
-        {{- with secret "secret/dendrite/key" -}}{{ .Data.data.private_key }}{{ end }}
+        {{- with secret "secret/dendrite/matrix-key" -}}{{ .Data.data.private_key }}{{ end }}
         EOH
         destination = "secrets/matrix.key"
       }
@@ -607,6 +636,14 @@ job "dendrite" {
     task "sync-api" {
       driver = "docker"
       user = "nobody"
+
+      service {
+        name = "dendrite"
+        port = "internal"
+        address_mode = "host"
+
+        tags = ["sync-api"]
+      }
 
       service {
         name = "dendrite-sync-api"
@@ -646,7 +683,7 @@ job "dendrite" {
 
       template {
         data =<<EOH
-        {{- with secret "secret/dendrite/key" -}}{{ .Data.data.private_key }}{{ end }}
+        {{- with secret "secret/dendrite/matrix-key" -}}{{ .Data.data.private_key }}{{ end }}
         EOH
         destination = "secrets/matrix.key"
       }
@@ -660,8 +697,8 @@ job "dendrite" {
   group "user-api" {
     network {
       port "internal" {
-        to = 7773
-        static = 7773
+        to = 7781
+        static = 7781
       }
     }
 
@@ -670,9 +707,11 @@ job "dendrite" {
       user = "nobody"
 
       service {
-        name = "dendrite-user-api"
+        name = "dendrite"
         port = "internal"
         address_mode = "host"
+
+        tags = ["user-api"]
       }
 
       vault {
@@ -700,7 +739,7 @@ job "dendrite" {
 
       template {
         data =<<EOH
-        {{- with secret "secret/dendrite/key" -}}{{ .Data.data.private_key }}{{ end }}
+        {{- with secret "secret/dendrite/matrix-key" -}}{{ .Data.data.private_key }}{{ end }}
         EOH
         destination = "secrets/matrix.key"
       }
