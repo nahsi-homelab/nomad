@@ -28,15 +28,6 @@ job "dendrite" {
         tags = [
           "app-service-api"
         ]
-
-        check {
-          name     = "app-service-api HTTP"
-          type     = "http"
-          port     = "internal"
-          path     = "/health"
-          interval = "10s"
-          timeout  = "2s"
-        }
       }
 
       vault {
@@ -103,17 +94,11 @@ job "dendrite" {
         address_mode = "host"
 
         tags = [
-          "client-api"
+          "client-api",
+          "traefik.enable=true",
+          "traefik.http.routers.dendrite-client-api.rule=Host(`matrix.service.consul`) && Path(`/_matrix/client`)",
+          "traefik.http.routers.dendrite-client-api.tls=true"
         ]
-
-        check {
-          name     = "client-api HTTP"
-          type     = "http"
-          port     = "internal"
-          path     = "/health"
-          interval = "10s"
-          timeout  = "2s"
-        }
       }
 
       vault {
@@ -172,15 +157,6 @@ job "dendrite" {
         tags = [
           "edu-server"
         ]
-
-        check {
-          name     = "edu-server HTTP"
-          type     = "http"
-          port     = "internal"
-          path     = "/health"
-          interval = "10s"
-          timeout  = "2s"
-        }
       }
 
       vault {
@@ -240,17 +216,11 @@ job "dendrite" {
         address_mode = "host"
 
         tags = [
-          "federation-api"
+          "federation-api",
+          "traefik.enable=true",
+          "traefik.http.routers.dendrite-federation-api.rule=Host(`matrix.service.consul`) && Path(`/_matrix/federation`, `/_matrix/key`)",
+          "traefik.http.routers.dendrite-federation-api.tls=true"
         ]
-
-        check {
-          name     = "federation-api HTTP"
-          type     = "http"
-          port     = "internal"
-          path     = "/health"
-          interval = "10s"
-          timeout  = "2s"
-        }
       }
 
       vault {
@@ -309,15 +279,6 @@ job "dendrite" {
         tags = [
           "federation-sender"
         ]
-
-        check {
-          name     = "federation-sender HTTP"
-          type     = "http"
-          port     = "internal"
-          path     = "/health"
-          interval = "10s"
-          timeout  = "2s"
-        }
       }
 
       vault {
@@ -375,15 +336,6 @@ job "dendrite" {
         tags = [
           "key-server"
         ]
-
-        check {
-          name     = "key-server HTTP"
-          type     = "http"
-          port     = "internal"
-          path     = "/health"
-          interval = "10s"
-          timeout  = "2s"
-        }
       }
 
       vault {
@@ -443,17 +395,11 @@ job "dendrite" {
         address_mode = "host"
 
         tags = [
-          "media-api"
+          "media-api",
+          "traefik.enable=true",
+          "traefik.http.routers.dendrite-media-api.rule=Host(`matrix.service.consul`) && Path(`/_matrix/media`)",
+          "traefik.http.routers.dendrite-media-api.tls=true"
         ]
-
-        check {
-          name     = "media-api HTTP"
-          type     = "http"
-          port     = "internal"
-          path     = "/health"
-          interval = "10s"
-          timeout  = "2s"
-        }
       }
 
       vault {
@@ -512,15 +458,6 @@ job "dendrite" {
         tags = [
           "room-server"
         ]
-
-        check {
-          name     = "room-server HTTP"
-          type     = "http"
-          port     = "internal"
-          path     = "/health"
-          interval = "10s"
-          timeout  = "2s"
-        }
       }
 
       vault {
@@ -578,15 +515,6 @@ job "dendrite" {
         tags = [
           "signing-key-server"
         ]
-
-        check {
-          name     = "signing-key-server HTTP"
-          type     = "http"
-          port     = "internal"
-          path     = "/health"
-          interval = "10s"
-          timeout  = "2s"
-        }
       }
 
       vault {
@@ -646,17 +574,11 @@ job "dendrite" {
         address_mode = "host"
 
         tags = [
-          "sync-api"
+          "sync-api",
+          "traefik.enable=true",
+          "traefik.http.routers.dendrite-sync-api.rule=Host(`matrix.service.consul`) && Path(`/_matrix/.*?/(sync|user/.*?/filter/?.*|keys/changes|rooms/.*?/messages)$`, `/_matrix/key`)",
+          "traefik.http.routers.dendrite-sync-api.tls=true"
         ]
-
-        check {
-          name     = "sync-api HTTP"
-          type     = "http"
-          port     = "internal"
-          path     = "/health"
-          interval = "10s"
-          timeout  = "2s"
-        }
       }
 
       vault {
@@ -715,15 +637,6 @@ job "dendrite" {
         tags = [
           "user-api"
         ]
-
-        check {
-          name     = "user-api HTTP"
-          type     = "http"
-          port     = "internal"
-          path     = "/health"
-          interval = "10s"
-          timeout  = "2s"
-        }
       }
 
       vault {
