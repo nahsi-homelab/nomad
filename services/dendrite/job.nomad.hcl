@@ -13,6 +13,7 @@ job "dendrite" {
     network {
       port "internal" {
         to = 7777
+        static = 7777
       }
     }
 
@@ -21,13 +22,9 @@ job "dendrite" {
       user = "nobody"
 
       service {
-        name = "dendrite"
+        name = "dendrite-app-service-api"
         port = "internal"
         address_mode = "host"
-
-        tags = [
-          "app-service-api"
-        ]
       }
 
       vault {
@@ -77,10 +74,12 @@ job "dendrite" {
     network {
       port "internal" {
         to = 7771
+        static = 7771
       }
 
       port "external" {
         to = 8071
+        static = 8071
       }
     }
 
@@ -89,14 +88,13 @@ job "dendrite" {
       user = "nobody"
 
       service {
-        name = "dendrite"
+        name = "dendrite-client-api"
         port = "external"
         address_mode = "host"
 
         tags = [
-          "client-api",
           "traefik.enable=true",
-          "traefik.http.routers.dendrite-client-api.rule=Host(`matrix.service.consul`) && Path(`/_matrix/client`)",
+          "traefik.http.routers.dendrite-client-api.rule=Host(`matrix.service.consul`) && PathPrefix(`/_matrix/client`)",
           "traefik.http.routers.dendrite-client-api.tls=true"
         ]
       }
@@ -142,6 +140,7 @@ job "dendrite" {
     network {
       port "internal" {
         to = 7778
+        static = 7778
       }
     }
 
@@ -150,13 +149,9 @@ job "dendrite" {
       user = "nobody"
 
       service {
-        name = "dendrite"
+        name = "dendrite-edu-server"
         port = "internal"
         address_mode = "host"
-
-        tags = [
-          "edu-server"
-        ]
       }
 
       vault {
@@ -199,10 +194,12 @@ job "dendrite" {
     network {
       port "internal" {
         to = 7772
+        static = 7772
       }
 
       port "external" {
         to = 8072
+        static = 8072
       }
     }
 
@@ -211,14 +208,13 @@ job "dendrite" {
       user = "nobody"
 
       service {
-        name = "dendrite"
+        name = "dendrite-federation-api"
         port = "external"
         address_mode = "host"
 
         tags = [
-          "federation-api",
           "traefik.enable=true",
-          "traefik.http.routers.dendrite-federation-api.rule=Host(`matrix.service.consul`) && Path(`/_matrix/federation`, `/_matrix/key`)",
+          "traefik.http.routers.dendrite-federation-api.rule=Host(`matrix.service.consul`) && PathPrefix(`/_matrix/federation`, `/_matrix/key`)",
           "traefik.http.routers.dendrite-federation-api.tls=true"
         ]
       }
@@ -264,6 +260,7 @@ job "dendrite" {
     network {
       port "internal" {
         to = 7775
+        static = 7775
       }
     }
 
@@ -272,13 +269,9 @@ job "dendrite" {
       user = "nobody"
 
       service {
-        name = "dendrite"
+        name = "dendrite-federation-sender"
         port = "internal"
         address_mode = "host"
-
-        tags = [
-          "federation-sender"
-        ]
       }
 
       vault {
@@ -321,6 +314,7 @@ job "dendrite" {
     network {
       port "internal" {
         to = 7779
+        static = 7779
       }
     }
 
@@ -329,13 +323,9 @@ job "dendrite" {
       user = "nobody"
 
       service {
-        name = "dendrite"
+        name = "dendrite-key-server"
         port = "internal"
         address_mode = "host"
-
-        tags = [
-          "key-server"
-        ]
       }
 
       vault {
@@ -378,10 +368,12 @@ job "dendrite" {
     network {
       port "internal" {
         to = 7774
+        static = 7774
       }
 
       port "external" {
         to = 8074
+        static = 8074
       }
     }
 
@@ -390,14 +382,13 @@ job "dendrite" {
       user = "nobody"
 
       service {
-        name = "dendrite"
+        name = "dendrite-media-api"
         port = "external"
         address_mode = "host"
 
         tags = [
-          "media-api",
           "traefik.enable=true",
-          "traefik.http.routers.dendrite-media-api.rule=Host(`matrix.service.consul`) && Path(`/_matrix/media`)",
+          "traefik.http.routers.dendrite-media-api.rule=Host(`matrix.service.consul`) && PathPrefix(`/_matrix/media`)",
           "traefik.http.routers.dendrite-media-api.tls=true"
         ]
       }
@@ -443,6 +434,7 @@ job "dendrite" {
     network {
       port "internal" {
         to = 7770
+        static = 7770
       }
     }
 
@@ -451,13 +443,9 @@ job "dendrite" {
       user = "nobody"
 
       service {
-        name = "dendrite"
+        name = "dendrite-room-server"
         port = "internal"
         address_mode = "host"
-
-        tags = [
-          "room-server"
-        ]
       }
 
       vault {
@@ -500,6 +488,7 @@ job "dendrite" {
     network {
       port "internal" {
         to = 7780
+        static = 7780
       }
     }
 
@@ -508,13 +497,9 @@ job "dendrite" {
       user = "nobody"
 
       service {
-        name = "dendrite"
+        name = "dendrite-signing-key-server"
         port = "internal"
         address_mode = "host"
-
-        tags = [
-          "signing-key-server"
-        ]
       }
 
       vault {
@@ -557,10 +542,12 @@ job "dendrite" {
     network {
       port "internal" {
         to = 7773
+        static = 7773
       }
 
       port "external" {
         to = 8073
+        static = 8073
       }
     }
 
@@ -569,14 +556,13 @@ job "dendrite" {
       user = "nobody"
 
       service {
-        name = "dendrite"
+        name = "dendrite-sync-api"
         port = "external"
         address_mode = "host"
 
         tags = [
-          "sync-api",
           "traefik.enable=true",
-          "traefik.http.routers.dendrite-sync-api.rule=Host(`matrix.service.consul`) && Path(`/_matrix/.*?/(sync|user/.*?/filter/?.*|keys/changes|rooms/.*?/messages)$`, `/_matrix/key`)",
+          "traefik.http.routers.dendrite-sync-api.rule=Host(`matrix.service.consul`) && PathPrefix(`/_matrix/client/.*/(sync|user/.*/filter/.*|keys/changes|rooms/.*/messages)$`, `/_matrix/key`)",
           "traefik.http.routers.dendrite-sync-api.tls=true"
         ]
       }
@@ -622,6 +608,7 @@ job "dendrite" {
     network {
       port "internal" {
         to = 7773
+        static = 7773
       }
     }
 
@@ -630,13 +617,9 @@ job "dendrite" {
       user = "nobody"
 
       service {
-        name = "dendrite"
+        name = "dendrite-user-api"
         port = "internal"
         address_mode = "host"
-
-        tags = [
-          "user-api"
-        ]
       }
 
       vault {
