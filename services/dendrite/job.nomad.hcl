@@ -2,12 +2,65 @@ variables {
   versions = {
     dendrite = "v0.5.0"
     promtail = "2.3.0"
+    caddy = "2.4.5"
   }
 }
 
 job "dendrite" {
   datacenters = ["syria"]
   type        = "service"
+
+  group "well-known" {
+    network {
+      port "well-known" {
+        to = 80
+      }
+    }
+
+    service {
+      name = "matrix"
+      port = "well-known"
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.dendrite-well-knonw.rule=Host(`matrix.service.consul`) && Path(`/.well-known/matrix/server`)",
+        "traefik.http.routers.dendrite-well-knonw.tls=true"
+      ]
+    }
+
+    task "caddy" {
+      driver = "docker"
+
+      config {
+        image = "caddy:${var.versions.caddy}-alpine"
+
+        ports = [
+          "well-known"
+        ]
+
+        volumes = [
+          "local/Caddyfile:/etc/caddy/Caddyfile"
+        ]
+      }
+
+      template {
+        data = <<EOH
+        :80
+        respond 200 {
+          body "{ \"m.server\": \"matrix.service.consul:443\" }"
+          close
+        }
+        EOH
+
+        destination   = "local/Caddyfile"
+        change_mode   = "restart"
+      }
+
+      resources {
+        memory = 16
+      }
+    }
+  }
 
   group "app-service-api" {
     network {
