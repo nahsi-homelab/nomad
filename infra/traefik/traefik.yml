@@ -37,6 +37,10 @@ metrics:
   prometheus:
     entrypoint: traefik
 
+accessLog:
+  filePath: "/alloc/data/access.log"
+  format: json
+
 providers:
   consulCatalog:
     prefix: "traefik"

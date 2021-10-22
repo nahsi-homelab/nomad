@@ -22,3 +22,32 @@ scrape_configs:
     - timestamp:
         source: time
         format: 2006-01-02T15:04:05Z
+
+- job_name: traefik-access
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      app: traefik
+      type: access-log
+      __path__: "/alloc/data/access.log"
+  pipeline_stages:
+    - json:
+        expressions:
+          time: time
+          level: level
+          method: RequestMethod
+          status: DownstreamStatus
+          path: RequestPath
+    - labels:
+        method:
+        status:
+    - drop:
+        source: path
+        expression: "/ping"
+    - drop:
+        source: path
+        expression: "/metrics"
+    - timestamp:
+        source: time
+        format: 2006-01-02T15:04:05Z
