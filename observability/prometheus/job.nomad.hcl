@@ -17,7 +17,6 @@ job "prometheus" {
         to = 9090
         static = 9090
       }
-
       port "promtail" {
         to = 3000
       }
@@ -38,7 +37,12 @@ job "prometheus" {
         sidecar_service {}
       }
 
+      meta {
+        dashboard = "UDdpyzz7z"
+      }
+
       check {
+        expose   = true
         name     = "Prometheus HTTP"
         type     = "http"
         path     = "/-/healthy"
@@ -65,7 +69,9 @@ job "prometheus" {
       config {
         image = "prom/prometheus:v${var.versions.prometheus}"
 
-        ports = ["prometheus"]
+        ports = [
+          "prometheus"
+        ]
 
         args = [
           "--web.listen-address=0.0.0.0:9090",
