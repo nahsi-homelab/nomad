@@ -12,12 +12,56 @@ job "grafana" {
 
   group "grafana" {
     network {
-      port "grafana" {
-        to = 3000
+      mode = "bridge"
+      port "promtail" {
+        to = 3001
+      }
+      port "metrics" {}
+      port "health" {}
+    }
+
+    service {
+      name = "grafana"
+      port = 3000
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.grafana.rule=Host(`grafana.service.consul`)",
+        "traefik.http.routers.grafana.entrypoints=https",
+        "traefik.http.routers.grafana.tls=true",
+        "traefik.consulcatalog.connect=true",
+
+        "metrics=${NOMAD_HOST_ADDR_metrics}"
+      ]
+
+      connect {
+        sidecar_service {
+          proxy {
+            expose {
+              path {
+                path = "/metrics"
+                protocol = "http"
+                local_path_port = 3000
+                listener_port = "metrics"
+              }
+              path {
+                path = "/api/health"
+                protocol = "http"
+                local_path_port = 3000
+                listener_port = "health"
+              }
+            }
+          }
+        }
       }
 
-      port "promtail" {
-        to = 3000
+      check {
+        name     = "Grafana HTTP"
+        port     = "health"
+        type     = "http"
+        path     = "/api/health"
+        interval = "10s"
+        timeout  = "2s"
       }
     }
 
@@ -29,26 +73,6 @@ job "grafana" {
     task "grafana" {
       driver = "docker"
       user = "nobody"
-
-      service {
-        name = "grafana"
-        port = "grafana"
-        address_mode = "host"
-
-        tags = [
-          "traefik.enable=true",
-          "traefik.http.routers.grafana.rule=Host(`grafana.service.consul`)",
-          "traefik.http.routers.grafana.tls=true"
-        ]
-
-        check {
-          name     = "Grafana HTTP"
-          type     = "http"
-          path     = "/api/health"
-          interval = "10s"
-          timeout  = "2s"
-        }
-      }
 
       vault {
         policies = ["grafana"]
@@ -66,10 +90,6 @@ job "grafana" {
 
       config {
         image = "grafana/grafana:${var.versions.grafana}"
-
-        ports = [
-          "grafana"
-        ]
       }
 
       template {
