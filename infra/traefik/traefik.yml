@@ -45,8 +45,9 @@ providers:
   consulCatalog:
     prefix: "traefik"
     exposedByDefault: false
-    defaultRule: "Host(`{{ .Name }}.service.consul`)"
     endpoint:
       address: "host.docker.internal:8500"
+    connectAware: true
+    serviceName: "traefik-internal"
   file:
     filename: "local/traefik/tls.yml"

@@ -38,8 +38,13 @@ job "traefik" {
     }
 
     service {
-      name = "traefik"
+      name = "traefik-internal"
       port = "traefik"
+      task = "traefik"
+
+      connect {
+        native = true
+      }
 
       tags = [
         "traefik.enable=true",
