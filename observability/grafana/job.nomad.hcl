@@ -13,11 +13,19 @@ job "grafana" {
   group "grafana" {
     network {
       mode = "bridge"
+      port "envoy" {
+        to = 9102
+      }
       port "promtail" {
         to = 3001
       }
       port "metrics" {}
       port "health" {}
+    }
+
+    service {
+      name = "envoy"
+      port = "envoy"
     }
 
     service {
@@ -37,6 +45,10 @@ job "grafana" {
       connect {
         sidecar_service {
           proxy {
+            upstreams {
+              destination_name = "prometheus"
+              local_bind_port = 9090
+            }
             expose {
               path {
                 path = "/metrics"
