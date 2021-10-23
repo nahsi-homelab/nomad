@@ -61,6 +61,32 @@ job "zookeeper" {
     service {
       name = "zookeeper-${meta.zoo_node_id}"
       port = "client"
+
+      check {
+        name     = "ZooKeeper ruok"
+        task     = "zookeeper"
+        type     = "script"
+        command  = "/bin/bash"
+        args     = [
+          "-c",
+          "[[ $(echo ruok|nc zookeeper-${meta.zoo_node_id} 2181) == imok ]]"
+        ]
+        interval = "10s"
+        timeout  = "1s"
+      }
+    }
+
+    service {
+      name = "promtail"
+      port = "promtail"
+      tags = ["service=zookeeper"]
+
+      check {
+        type     = "http"
+        path     = "/ready"
+        interval = "10s"
+        timeout  = "2s"
+      }
     }
 
     volume "zookeeper" {
@@ -136,20 +162,6 @@ job "zookeeper" {
       lifecycle {
         hook    = "poststart"
         sidecar = true
-      }
-
-      service {
-        name = "promtail"
-        port = "promtail"
-        tags = ["service=zookeeper"]
-        address_mode = "host"
-
-        check {
-          type     = "http"
-          path     = "/ready"
-          interval = "10s"
-          timeout  = "2s"
-        }
       }
 
       resources {
