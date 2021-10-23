@@ -10,6 +10,10 @@ job "zookeeper" {
   namespace   = "infra"
   type        = "service"
 
+  constraint {
+    distinct_property = meta.zoo_node_id
+  }
+
   update {
     max_parallel = 1
     stagger      = "1m"
@@ -48,6 +52,17 @@ job "zookeeper" {
       }
     }
 
+    service {
+      name = "zookeeper"
+      port = "metrics"
+      tags = ["metrics"]
+    }
+
+    service {
+      name = "zookeeper-${meta.zoo_node_id}"
+      port = "client"
+    }
+
     volume "zookeeper" {
       type = "host"
       source = "zookeeper"
@@ -59,19 +74,6 @@ job "zookeeper" {
 
       vault {
         policies = ["zookeeper"]
-      }
-
-      service {
-        name = "zookeeper"
-        port = "metrics"
-        tags = ["metrics"]
-        address_mode = "host"
-      }
-
-      service {
-        name = "zookeeper-${meta.zoo_node_id}"
-        port = "client"
-        address_mode = "host"
       }
 
       resources {
@@ -95,7 +97,6 @@ job "zookeeper" {
 
       config {
         image = "bitnami/zookeeper:${var.versions.zookeeper}"
-        hostname = "zookeeper-${meta.zoo_node_id}"
         extra_hosts = [
           "zookeeper-${meta.zoo_node_id}.service.consul:0.0.0.0"
         ]
