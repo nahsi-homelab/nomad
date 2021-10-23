@@ -37,10 +37,13 @@ job "grafana" {
         "traefik.http.routers.grafana.rule=Host(`grafana.service.consul`)",
         "traefik.http.routers.grafana.entrypoints=https",
         "traefik.http.routers.grafana.tls=true",
-        "traefik.consulcatalog.connect=true",
-
-        "metrics=${NOMAD_HOST_ADDR_metrics}"
+        "traefik.consulcatalog.connect=true"
       ]
+
+      meta {
+        metrics = "${NOMAD_HOST_ADDR_metrics}"
+        dashboard = "isFoa0z7K"
+      }
 
       connect {
         sidecar_service {

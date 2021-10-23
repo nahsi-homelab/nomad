@@ -22,6 +22,38 @@ job "prometheus" {
       }
     }
 
+    service {
+      name = "prometheus"
+      port = "prometheus"
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.prometheus.rule=Host(`prometheus.service.consul`)",
+        "traefik.http.routers.prometheus.tls=true"
+      ]
+
+      check {
+        name     = "Prometheus HTTP"
+        type     = "http"
+        path     = "/-/healthy"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+
+    service {
+      name = "promtail"
+      port = "promtail"
+      tags = ["service=prometheus"]
+
+      check {
+        type     = "http"
+        path     = "/ready"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+
     volume "prometheus" {
       type = "host"
       source = "prometheus"
@@ -30,26 +62,6 @@ job "prometheus" {
     task "prometheus" {
       driver = "docker"
       user = "nobody"
-
-      service {
-        name = "prometheus"
-        port = "prometheus"
-        address_mode = "host"
-
-        tags = [
-          "traefik.enable=true",
-          "traefik.http.routers.prometheus.rule=Host(`prometheus.service.consul`)",
-          "traefik.http.routers.prometheus.tls=true"
-        ]
-
-        check {
-          name     = "Prometheus HTTP"
-          type     = "http"
-          path     = "/-/healthy"
-          interval = "10s"
-          timeout  = "2s"
-        }
-    }
 
 
       volume_mount {
@@ -60,13 +72,7 @@ job "prometheus" {
       config {
         image = "prom/prometheus:v${var.versions.prometheus}"
 
-        ports = [
-          "prometheus"
-        ]
-
-        extra_hosts = [
-          "host.docker.internal:host-gateway"
-        ]
+        ports = ["prometheus"]
 
         args = [
           "--web.listen-address=0.0.0.0:9090",
@@ -96,20 +102,6 @@ job "prometheus" {
       lifecycle {
         hook    = "poststart"
         sidecar = true
-      }
-
-      service {
-        name = "promtail"
-        port = "promtail"
-        tags = ["service=prometheus"]
-        address_mode = "host"
-
-        check {
-          type     = "http"
-          path     = "/ready"
-          interval = "10s"
-          timeout  = "2s"
-        }
       }
 
       resources {

@@ -18,9 +18,9 @@ scrape_configs:
     relabel_configs:
       - source_labels: ["__meta_consul_node"]
         target_label: "instance"
-      - source_labels: ["__meta_consul_tags"]
+      - source_labels: ["__meta_consul_service_metadata_metrics"]
         target_label: "__address__"
-        regex: ".*,metrics=(.*),.*"
+        regex: "(.*)"
         replacement: "$1"
 
   - job_name: "traefik"
