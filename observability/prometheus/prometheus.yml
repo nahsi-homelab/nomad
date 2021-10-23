@@ -5,15 +5,14 @@ global:
 scrape_configs:
   - job_name: "prometheus"
     static_configs:
-    - targets:
+      - targets:
         - localhost:9090
-      labels:
-        instance: {{ env "attr.unique.hostname" }}
+        labels:
+          instance: {{ env "attr.unique.hostname" }}
 
   - job_name: "grafana"
     consul_sd_configs:
-      - server: "http://host.docker.internal:8500"
-        datacenter: "oikumene"
+      - server: "http://consul.service.consul:8500"
         services:
           - "grafana"
     relabel_configs:
@@ -26,8 +25,7 @@ scrape_configs:
 
   - job_name: "traefik"
     consul_sd_configs:
-      - server: "http://host.docker.internal:8500"
-        datacenter: "oikumene"
+      - server: "http://consul.service.consul:8500"
         services:
           - "traefik"
     relabel_configs:
@@ -36,8 +34,7 @@ scrape_configs:
 
   - job_name: "ingress"
     consul_sd_configs:
-      - server: "http://host.docker.internal:8500"
-        datacenter: "oikumene"
+      - server: "http://consul.service.consul:8500"
         services:
           - "ingress"
     relabel_configs:
@@ -46,8 +43,7 @@ scrape_configs:
 
   - job_name: "telegraf"
     consul_sd_configs:
-      - server: "http://host.docker.internal:8500"
-        datacenter: "oikumene"
+      - server: "http://consul.service.consul:8500"
         services:
           - "telegraf"
     relabel_configs:
@@ -60,8 +56,7 @@ scrape_configs:
 
   - job_name: "promtail"
     consul_sd_configs:
-      - server: "http://host.docker.internal:8500"
-        datacenter: "oikumene"
+      - server: "http://consul.service.consul:8500"
         services:
           - "promtail"
     relabel_configs:
@@ -74,8 +69,7 @@ scrape_configs:
 
   - job_name: "loki"
     consul_sd_configs:
-      - server: "http://host.docker.internal:8500"
-        datacenter: "oikumene"
+      - server: "http://consul.service.consul:8500"
         services:
           - "loki"
     relabel_configs:
@@ -87,8 +81,7 @@ scrape_configs:
     params:
       format: ["prometheus"]
     consul_sd_configs:
-      - server: "http://host.docker.internal:8500"
-        datacenter: "oikumene"
+      - server: "http://consul.service.consul:8500"
         services:
           - "telegraf"
     relabel_configs:
@@ -101,8 +94,7 @@ scrape_configs:
 
   - job_name: "envoy"
     consul_sd_configs:
-      - server: "http://host.docker.internal:8500"
-        datacenter: "oikumene"
+      - server: "http://consul.service.consul:8500"
         services:
           - "envoy"
     relabel_configs:
@@ -115,8 +107,7 @@ scrape_configs:
 
   - job_name: "unpoller"
     consul_sd_configs:
-      - server: "http://host.docker.internal:8500"
-        datacenter: "oikumene"
+      - server: "http://consul.service.consul:8500"
         services:
           - "unpoller"
     relabel_configs:
@@ -125,8 +116,7 @@ scrape_configs:
 
   - job_name: "transmission-exporter"
     consul_sd_configs:
-      - server: "http://host.docker.internal:8500"
-        datacenter: "oikumene"
+      - server: "http://consul.service.consul:8500"
         services:
           - "transmission-exporter"
     relabel_configs:
@@ -135,8 +125,7 @@ scrape_configs:
 
   - job_name: "jellyfin"
     consul_sd_configs:
-      - server: "http://host.docker.internal:8500"
-        datacenter: "oikumene"
+      - server: "http://consul.service.consul:8500"
         services:
           - "jellyfin"
     relabel_configs:
@@ -145,8 +134,7 @@ scrape_configs:
 
   - job_name: "postgres"
     consul_sd_configs:
-      - server: "http://host.docker.internal:8500"
-        datacenter: "oikumene"
+      - server: "http://consul.service.consul:8500"
         services:
           - "postgres-exporter"
     relabel_configs:
@@ -155,8 +143,7 @@ scrape_configs:
 
   - job_name: "zookeeper"
     consul_sd_configs:
-      - server: "http://host.docker.internal:8500"
-        datacenter: "oikumene"
+      - server: "http://consul.service.consul:8500"
         services:
           - "zookeeper"
         tags:
@@ -167,8 +154,7 @@ scrape_configs:
 
   - job_name: "redpanda"
     consul_sd_configs:
-      - server: "http://host.docker.internal:8500"
-        datacenter: "oikumene"
+      - server: "http://consul.service.consul:8500"
         services:
           - "redpanda"
     relabel_configs:
@@ -177,8 +163,7 @@ scrape_configs:
 
   - job_name: "kafka"
     consul_sd_configs:
-      - server: "http://host.docker.internal:8500"
-        datacenter: "oikumene"
+      - server: "http://consul.service.consul:8500"
         services:
           - "kminion"
     relabel_configs:
