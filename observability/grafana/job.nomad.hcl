@@ -42,7 +42,7 @@ job "grafana" {
 
       meta {
         metrics = "${NOMAD_HOST_ADDR_metrics}"
-        dashboard = "isFoa0z7K"
+        dashboard = "isFoa0z7k"
       }
 
       connect {
