@@ -12,6 +12,7 @@ job "prometheus" {
 
   group "prometheus" {
     network {
+      mode = "bridge"
       port "prometheus" {
         to = 9090
         static = 9090
@@ -29,26 +30,18 @@ job "prometheus" {
       tags = [
         "traefik.enable=true",
         "traefik.http.routers.prometheus.rule=Host(`prometheus.service.consul`)",
-        "traefik.http.routers.prometheus.tls=true"
+        "traefik.http.routers.prometheus.tls=true",
+        "traefik.consulcatalog.connect=true"
       ]
+
+      connect {
+        sidecar_service {}
+      }
 
       check {
         name     = "Prometheus HTTP"
         type     = "http"
         path     = "/-/healthy"
-        interval = "10s"
-        timeout  = "2s"
-      }
-    }
-
-    service {
-      name = "promtail"
-      port = "promtail"
-      tags = ["service=prometheus"]
-
-      check {
-        type     = "http"
-        path     = "/ready"
         interval = "10s"
         timeout  = "2s"
       }
