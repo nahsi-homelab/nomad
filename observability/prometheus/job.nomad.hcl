@@ -13,6 +13,9 @@ job "prometheus" {
   group "prometheus" {
     network {
       mode = "bridge"
+      port "envoy" {
+        to = 9102
+      }
       port "prometheus" {
         to = 9090
         static = 9090
@@ -20,6 +23,11 @@ job "prometheus" {
       port "promtail" {
         to = 3000
       }
+    }
+
+    service {
+      name = "envoy"
+      port = "envoy"
     }
 
     service {
