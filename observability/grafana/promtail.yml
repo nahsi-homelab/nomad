@@ -1,5 +1,5 @@
 server:
-  http_listen_port: 3001
+  http_listen_port: 3000
   grpc_listen_port: 0
 
 positions:

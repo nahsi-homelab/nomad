@@ -12,10 +12,6 @@ job "prometheus" {
 
   group "prometheus" {
     network {
-      mode = "bridge"
-      port "envoy" {
-        to = 9102
-      }
       port "prometheus" {
         to = 9090
         static = 9090
@@ -26,31 +22,20 @@ job "prometheus" {
     }
 
     service {
-      name = "envoy"
-      port = "envoy"
-    }
-
-    service {
       name = "prometheus"
       port = "prometheus"
 
       tags = [
         "traefik.enable=true",
         "traefik.http.routers.prometheus.rule=Host(`prometheus.service.consul`)",
-        "traefik.http.routers.prometheus.tls=true",
-        "traefik.consulcatalog.connect=true"
+        "traefik.http.routers.prometheus.tls=true"
       ]
-
-      connect {
-        sidecar_service {}
-      }
 
       meta {
         dashboard = "UDdpyzz7z"
       }
 
       check {
-        expose   = true
         name     = "Prometheus HTTP"
         type     = "http"
         path     = "/-/healthy"

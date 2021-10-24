@@ -12,67 +12,31 @@ job "grafana" {
 
   group "grafana" {
     network {
-      mode = "bridge"
-      port "envoy" {
-        to = 9102
+      port "grafana" {
+        to = 3000
       }
       port "promtail" {
-        to = 3001
+        to = 3000
       }
-      port "metrics" {}
-      port "health" {}
-    }
-
-    service {
-      name = "envoy"
-      port = "envoy"
     }
 
     service {
       name = "grafana"
-      port = 3000
+      port = "grafana"
 
       tags = [
         "traefik.enable=true",
         "traefik.http.routers.grafana.rule=Host(`grafana.service.consul`)",
         "traefik.http.routers.grafana.entrypoints=https",
         "traefik.http.routers.grafana.tls=true",
-        "traefik.consulcatalog.connect=true"
       ]
 
       meta {
-        metrics = "${NOMAD_HOST_ADDR_metrics}"
         dashboard = "isFoa0z7k"
-      }
-
-      connect {
-        sidecar_service {
-          proxy {
-            upstreams {
-              destination_name = "prometheus"
-              local_bind_port = 9090
-            }
-            expose {
-              path {
-                path = "/metrics"
-                protocol = "http"
-                local_path_port = 3000
-                listener_port = "metrics"
-              }
-              path {
-                path = "/api/health"
-                protocol = "http"
-                local_path_port = 3000
-                listener_port = "health"
-              }
-            }
-          }
-        }
       }
 
       check {
         name     = "Grafana HTTP"
-        port     = "health"
         type     = "http"
         path     = "/api/health"
         interval = "10s"
@@ -105,6 +69,10 @@ job "grafana" {
 
       config {
         image = "grafana/grafana:${var.versions.grafana}"
+
+        ports = [
+          "grafana"
+        ]
       }
 
       template {
