@@ -1,5 +1,5 @@
 variables {
-  version = "2.4.5"
+  version = "2.4.5-0.88.1"
 }
 
 job "website" {
@@ -20,19 +20,21 @@ job "website" {
       tags = [
         "ingress.enable=true",
         "ingress.http.routers.website.rule=Host(`nahsi.dev`)",
-        "ingress.http.routers.website.tls=true"
+        "ingress.http.routers.website.tls=true",
       ]
     }
 
     task "website" {
       driver = "docker"
+      user = "nobody"
 
       vault {
-        policies = ["public-cert"]
+        policies = ["website"]
       }
 
       config {
-        image = "caddy:${var.version}-alpine"
+        image = "nahsihub/caddy-hugo:${var.version}"
+        force_pull = true
 
         ports = [
           "http"
@@ -44,35 +46,16 @@ job "website" {
       }
 
       template {
-        data = <<EOH
-nahsi.dev:80 {
-  encode zstd gzip
-  respond "nothing here yet"
-}
-EOH
-
-        destination   = "local/Caddyfile"
-        change_mode   = "restart"
+        data = file("Caddyfile")
+        destination = "local/Caddyfile"
       }
 
       template {
-        data = <<EOH
-{{- with secret "secret/certificate" -}}
-{{ .Data.data.ca_bundle }}{{ end }}
-EOH
-
-        change_mode   = "restart"
-        destination   = "secrets/cert.pem"
-      }
-
-      template {
-        data = <<EOH
-{{- with secret "secret/certificate" -}}
-{{ .Data.data.key }}{{ end }}
-EOH
-
-        change_mode   = "restart"
-        destination   = "secrets/key.pem"
+        data =<<EOH
+        WEBHOOK_SECRET={{ with secret "secret/website/webhook" }}{{ .Data.data.secret }}{{ end }}
+        EOH
+        destination = "secrets/webhook.env"
+        env = true
       }
 
       resources {

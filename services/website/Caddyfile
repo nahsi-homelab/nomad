@@ -1,0 +1,16 @@
+nahsi.dev:80 {
+  encode zstd gzip
+  root www
+  file_server
+
+  route /webhook {
+    webhook {
+      repo https://github.com/nahsi/www
+      path site
+      branch main
+      command hugo --destination ../www
+      submodule
+      secret ${WWW_SECRET}
+    }
+  }
+}
