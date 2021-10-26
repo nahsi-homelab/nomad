@@ -48,7 +48,7 @@ job "traefik" {
 
       tags = [
         "traefik.enable=true",
-        "traefik.http.routers.api.rule=Host(`traefik.service.consul`)",
+        "traefik.http.routers.api.rule=Host(`traefik-internal.service.consul`)",
         "traefik.http.routers.api.service=api@internal",
         "traefik.http.routers.api.tls=true"
       ]
