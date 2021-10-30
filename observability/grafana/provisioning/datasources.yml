@@ -15,3 +15,8 @@ datasources:
     name: Loki
     type: loki
     url: "http://loki.service.consul:3100"
+  - basicAuth: false
+    isDefault: false
+    name: Tempo
+    type: tempo
+    url: "http://tempo.service.consul:3200"
