@@ -27,7 +27,7 @@ scrape_configs:
     consul_sd_configs:
       - server: "http://consul.service.consul:8500"
         services:
-          - "traefik"
+          - "traefik-internal"
     relabel_configs:
       - source_labels: ["__meta_consul_node"]
         target_label: "instance"
@@ -55,12 +55,6 @@ scrape_configs:
         target_label: "$1"
 
   - job_name: "promtail"
-    static_configs:
-      - targets:
-        - "localhost:3000"
-        labels:
-          instance: {{ env "attr.unique.hostname" }}
-          service: "prometheus"
     consul_sd_configs:
       - server: "http://consul.service.consul:8500"
         services:
@@ -99,11 +93,6 @@ scrape_configs:
         target_label: "instance"
 
   - job_name: "envoy"
-    static_configs:
-      - targets:
-        - "localhost:9102"
-        labels:
-          instance: {{ env "attr.unique.hostname" }}
     consul_sd_configs:
       - server: "http://consul.service.consul:8500"
         services:
