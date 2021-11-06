@@ -4,6 +4,19 @@ variables {
     promtail = "2.3.0"
     caddy = "2.4.5"
   }
+
+  loki = {
+    loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+    loki-pipeline-stages =<<EOF
+    - multiline:
+        firstline: '^time=".*"'
+    - regex:
+        expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
+    - timestamp:
+        source: time
+        format: 2006-01-02T15:04:05.000Z
+    EOF
+  }
 }
 
 job "dendrite" {
@@ -104,17 +117,9 @@ job "dendrite" {
         logging {
           type = "loki"
           config {
-            loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+            loki-url = var.loki.loki-url
             loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
-            loki-pipeline-stages =<<EOF
-              - multiline:
-                  firstline: '^time=".*"'
-              - regex:
-                  expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
-              - timestamp:
-                  source: time
-                  format: 2006-01-02T15:04:05.000Z
-            EOF
+            loki-pipeline-stages = var.loki.loki-pipeline-stages
           }
         }
       }
@@ -234,17 +239,9 @@ job "dendrite" {
         logging {
           type = "loki"
           config {
-            loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+            loki-url = var.loki.loki-url
             loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
-            loki-pipeline-stages =<<EOF
-              - multiline:
-                  firstline: '^time=".*"'
-              - regex:
-                  expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
-              - timestamp:
-                  source: time
-                  format: 2006-01-02T15:04:05.000Z
-            EOF
+            loki-pipeline-stages = var.loki.loki-pipeline-stages
           }
         }
       }
@@ -308,17 +305,9 @@ job "dendrite" {
         logging {
           type = "loki"
           config {
-            loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+            loki-url = var.loki.loki-url
             loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
-            loki-pipeline-stages =<<EOF
-              - multiline:
-                  firstline: '^time=".*"'
-              - regex:
-                  expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
-              - timestamp:
-                  source: time
-                  format: 2006-01-02T15:04:05.000Z
-            EOF
+            loki-pipeline-stages = var.loki.loki-pipeline-stages
           }
         }
       }
@@ -442,17 +431,9 @@ job "dendrite" {
         logging {
           type = "loki"
           config {
-            loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+            loki-url = var.loki.loki-url
             loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
-            loki-pipeline-stages =<<EOF
-              - multiline:
-                  firstline: '^time=".*"'
-              - regex:
-                  expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
-              - timestamp:
-                  source: time
-                  format: 2006-01-02T15:04:05.000Z
-            EOF
+            loki-pipeline-stages = var.loki.loki-pipeline-stages
           }
         }
       }
@@ -523,17 +504,9 @@ job "dendrite" {
         logging {
           type = "loki"
           config {
-            loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+            loki-url = var.loki.loki-url
             loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
-            loki-pipeline-stages =<<EOF
-              - multiline:
-                  firstline: '^time=".*"'
-              - regex:
-                  expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
-              - timestamp:
-                  source: time
-                  format: 2006-01-02T15:04:05.000Z
-            EOF
+            loki-pipeline-stages = var.loki.loki-pipeline-stages
           }
         }
       }
@@ -597,17 +570,9 @@ job "dendrite" {
         logging {
           type = "loki"
           config {
-            loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+            loki-url = var.loki.loki-url
             loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
-            loki-pipeline-stages =<<EOF
-              - multiline:
-                  firstline: '^time=".*"'
-              - regex:
-                  expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
-              - timestamp:
-                  source: time
-                  format: 2006-01-02T15:04:05.000Z
-            EOF
+            loki-pipeline-stages = var.loki.loki-pipeline-stages
           }
         }
       }
@@ -704,17 +669,9 @@ job "dendrite" {
         logging {
           type = "loki"
           config {
-            loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+            loki-url = var.loki.loki-url
             loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
-            loki-pipeline-stages =<<EOF
-              - multiline:
-                  firstline: '^time=".*"'
-              - regex:
-                  expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
-              - timestamp:
-                  source: time
-                  format: 2006-01-02T15:04:05.000Z
-            EOF
+            loki-pipeline-stages = var.loki.loki-pipeline-stages
           }
         }
       }
@@ -785,17 +742,9 @@ job "dendrite" {
         logging {
           type = "loki"
           config {
-            loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+            loki-url = var.loki.loki-url
             loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
-            loki-pipeline-stages =<<EOF
-              - multiline:
-                  firstline: '^time=".*"'
-              - regex:
-                  expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
-              - timestamp:
-                  source: time
-                  format: 2006-01-02T15:04:05.000Z
-            EOF
+            loki-pipeline-stages = var.loki.loki-pipeline-stages
           }
         }
       }
@@ -859,17 +808,9 @@ job "dendrite" {
         logging {
           type = "loki"
           config {
-            loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+            loki-url = var.loki.loki-url
             loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
-            loki-pipeline-stages =<<EOF
-              - multiline:
-                  firstline: '^time=".*"'
-              - regex:
-                  expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
-              - timestamp:
-                  source: time
-                  format: 2006-01-02T15:04:05.000Z
-            EOF
+            loki-pipeline-stages = var.loki.loki-pipeline-stages
           }
         }
       }
@@ -977,17 +918,9 @@ job "dendrite" {
         logging {
           type = "loki"
           config {
-            loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+            loki-url = var.loki.loki-url
             loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
-            loki-pipeline-stages =<<EOF
-              - multiline:
-                  firstline: '^time=".*"'
-              - regex:
-                  expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
-              - timestamp:
-                  source: time
-                  format: 2006-01-02T15:04:05.000Z
-            EOF
+            loki-pipeline-stages = var.loki.loki-pipeline-stages
           }
         }
       }
@@ -1051,17 +984,9 @@ job "dendrite" {
         logging {
           type = "loki"
           config {
-            loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+            loki-url = var.loki.loki-url
             loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
-            loki-pipeline-stages =<<EOF
-              - multiline:
-                  firstline: '^time=".*"'
-              - regex:
-                  expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
-              - timestamp:
-                  source: time
-                  format: 2006-01-02T15:04:05.000Z
-            EOF
+            loki-pipeline-stages = var.loki.loki-pipeline-stages
           }
         }
       }
