@@ -143,7 +143,7 @@ job "dendrite" {
       tags = [
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.dendrite-client-api.rule=Host(`matrix.service.consul`) && PathPrefix(`/_matrix/client`)"
+        "traefik.http.routers.dendrite-client-api.rule=Host(`matrix.service.consul`) && PathPrefix(`/_matrix/client`, `/_synapse/admin/v1/register`)"
       ]
 
       connect {
