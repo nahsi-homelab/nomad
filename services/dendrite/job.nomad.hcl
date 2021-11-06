@@ -75,73 +75,6 @@ job "dendrite" {
     }
   }
 
-  group "app-service-api" {
-    network {
-      mode = "bridge"
-
-      port "envoy" {
-        to = 9102
-      }
-    }
-
-    service {
-      name = "envoy"
-      port = "envoy"
-
-      meta {
-        app = "dendrite-app-service-api"
-      }
-    }
-
-    service {
-      name = "dendrite-app-service-api"
-      port = 7777
-
-      connect {
-        sidecar_service {}
-      }
-    }
-
-    task "app-service-api" {
-      driver = "docker"
-      user = "nobody"
-
-      vault {
-        policies = ["dendrite"]
-      }
-
-      config {
-        image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
-        command = "appservice"
-        volumes = [ "local/:/etc/dendrite" ]
-        logging {
-          type = "loki"
-          config {
-            loki-url = var.loki.loki-url
-            loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
-            loki-pipeline-stages = var.loki.loki-pipeline-stages
-          }
-        }
-      }
-
-      template {
-        data = file("dendrite.yaml")
-        destination = "local/dendrite.yaml"
-      }
-
-      template {
-        data =<<EOH
-        {{- with secret "secret/dendrite/matrix-key" -}}{{ .Data.data.private_key }}{{ end }}
-        EOH
-        destination = "secrets/matrix.key"
-      }
-
-      resources {
-        memory = 256
-      }
-    }
-  }
-
   group "client-api" {
     network {
       mode = "bridge"
@@ -167,7 +100,7 @@ job "dendrite" {
       port = "envoy-external"
 
       meta {
-        app = "dendrite-user-api-external"
+        app = "dendrite-client-api-external"
       }
     }
 
@@ -195,8 +128,8 @@ job "dendrite" {
               local_bind_port = "7775"
             }
             upstreams {
-              destination_name = "dendrite-app-service-api"
-              local_bind_port = "7777"
+              destination_name = "dendrite-key-server"
+              local_bind_port = "7779"
             }
           }
         }
@@ -383,10 +316,6 @@ job "dendrite" {
               local_bind_port = "7775"
             }
             upstreams {
-              destination_name = "dendrite-app-service-api"
-              local_bind_port = "7777"
-            }
-            upstreams {
               destination_name = "dendrite-key-server"
               local_bind_port = "7779"
             }
@@ -480,6 +409,10 @@ job "dendrite" {
       connect {
         sidecar_service {
           proxy {
+            upstreams {
+              destination_name = "dendrite-room-server"
+              local_bind_port = "7770"
+            }
             upstreams {
               destination_name = "dendrite-key-server"
               local_bind_port = "7779"
@@ -629,7 +562,14 @@ job "dendrite" {
       port = 7774
 
       connect {
-        sidecar_service {}
+        sidecar_service {
+          proxy {
+            upstreams {
+              destination_name = "dendrite-user-api"
+              local_bind_port = "7781"
+            }
+          }
+        }
       }
     }
 
@@ -889,7 +829,7 @@ job "dendrite" {
       tags = [
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.dendrite-sync-api.rule=Host(`matrix.service.consul`) && PathPrefix(`/_matrix/client/.*/(sync|user/.*/filter/.*|keys/changes|rooms/.*/messages)$`, `/_matrix/key`)"
+        "traefik.http.routers.dendrite-sync-api.rule=Host(`matrix.service.consul`) && PathPrefix(`/_matrix/client/?.*/(sync|user/.*?/filter/?.*|keys/changes|rooms/.*?/messages)$`)"
       ]
 
       connect {
@@ -965,7 +905,14 @@ job "dendrite" {
       port = 7781
 
       connect {
-        sidecar_service {}
+        sidecar_service {
+          proxy {
+            upstreams {
+              destination_name = "dendrite-key-server"
+              local_bind_port = "7779"
+            }
+          }
+        }
       }
     }
 
