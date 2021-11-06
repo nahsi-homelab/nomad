@@ -65,6 +65,19 @@ job "dendrite" {
   group "app-service-api" {
     network {
       mode = "bridge"
+
+      port "envoy" {
+        to = 9102
+      }
+    }
+
+    service {
+      name = "envoy"
+      port = "envoy"
+
+      meta {
+        app = "dendrite-app-service-api"
+      }
     }
 
     service {
@@ -115,6 +128,30 @@ job "dendrite" {
   group "client-api" {
     network {
       mode = "bridge"
+      port "envoy" {
+        to = 9102
+      }
+      port "envoy-external" {
+        to = 9101
+      }
+    }
+
+    service {
+      name = "envoy"
+      port = "envoy"
+
+      meta {
+        app = "dendrite-client-api"
+      }
+    }
+
+    service {
+      name = "envoy"
+      port = "envoy-external"
+
+      meta {
+        app = "dendrite-user-api-external"
+      }
     }
 
     service { 
@@ -209,6 +246,18 @@ job "dendrite" {
   group "edu-server" {
     network {
       mode = "bridge"
+      port "envoy" {
+        to = 9102
+      }
+    }
+
+    service {
+      name = "envoy"
+      port = "envoy"
+
+      meta {
+        app = "dendrite-edu-server"
+      }
     }
 
     service { 
@@ -259,6 +308,30 @@ job "dendrite" {
   group "federation-api" {
     network {
       mode = "bridge"
+      port "envoy" {
+        to = 9102
+      }
+      port "envoy-external" {
+        to = 9101
+      }
+    }
+
+    service {
+      name = "envoy"
+      port = "envoy"
+
+      meta {
+        app = "dendrite-federation-api"
+      }
+    }
+
+    service {
+      name = "envoy"
+      port = "envoy-external"
+
+      meta {
+        app = "dendrite-federation-api-external"
+      }
     }
 
     service { 
@@ -357,6 +430,18 @@ job "dendrite" {
   group "federation-sender" {
     network {
       mode = "bridge"
+      port "envoy" {
+        to = 9102
+      }
+    }
+
+    service {
+      name = "envoy"
+      port = "envoy"
+
+      meta {
+        app = "dendrite-federation-sender"
+      }
     }
 
     service { 
@@ -414,6 +499,18 @@ job "dendrite" {
   group "key-server" {
     network {
       mode = "bridge"
+      port "envoy" {
+        to = 9102
+      }
+    }
+
+    service {
+      name = "envoy"
+      port = "envoy"
+
+      meta {
+        app = "dendrite-key-server"
+      }
     }
 
     service { 
@@ -464,6 +561,30 @@ job "dendrite" {
   group "media-api" {
     network {
       mode = "bridge"
+      port "envoy" {
+        to = 9102
+      }
+      port "envoy-external" {
+        to = 9101
+      }
+    }
+
+    service {
+      name = "envoy"
+      port = "envoy"
+
+      meta {
+        app = "dendrite-media-api"
+      }
+    }
+
+    service {
+      name = "envoy"
+      port = "envoy-external"
+
+      meta {
+        app = "dendrite-media-api-external"
+      }
     }
 
     service {
@@ -535,6 +656,18 @@ job "dendrite" {
   group "room-server" {
     network {
       mode = "bridge"
+      port "envoy" {
+        to = 9102
+      }
+    }
+
+    service {
+      name = "envoy"
+      port = "envoy"
+
+      meta {
+        app = "dendrite-room-server"
+      }
     }
 
     service {
@@ -592,6 +725,18 @@ job "dendrite" {
   group "signing-key-server" {
     network {
       mode = "bridge"
+      port "envoy" {
+        to = 9102
+      }
+    }
+
+    service {
+      name = "envoy"
+      port = "envoy"
+
+      meta {
+        app = "dendrite-signing-key-server"
+      }
     }
 
     service {
@@ -642,6 +787,30 @@ job "dendrite" {
   group "sync-api" {
     network {
       mode = "bridge"
+      port "envoy" {
+        to = 9102
+      }
+      port "envoy-external" {
+        to = 9101
+      }
+    }
+
+    service {
+      name = "envoy"
+      port = "envoy"
+
+      meta {
+        app = "dendrite-sync-api"
+      }
+    }
+
+    service {
+      name = "envoy"
+      port = "envoy-external"
+
+      meta {
+        app = "dendrite-sync-api-external"
+      }
     }
 
     service {
@@ -724,6 +893,18 @@ job "dendrite" {
   group "user-api" {
     network {
       mode = "bridge"
+      port "envoy" {
+        to = 9102
+      }
+    }
+
+    service {
+      name = "envoy"
+      port = "envoy"
+
+      meta {
+        app = "dendrite-user-api"
+      }
     }
 
     service {
