@@ -23,8 +23,8 @@ job "dendrite" {
 
       tags = [
         "traefik.enable=true",
-        "traefik.http.routers.dendrite-well-knonw.rule=Host(`matrix.service.consul`) && Path(`/.well-known/matrix/server`)",
-        "traefik.http.routers.dendrite-well-knonw.tls=true"
+        "traefik.http.routers.dendrite-well-known.rule=Host(`matrix.service.consul`) && Path(`/.well-known/matrix/server`)",
+        "traefik.http.routers.dendrite-well-known.tls=true"
       ]
     }
 
@@ -44,7 +44,7 @@ job "dendrite" {
       }
 
       template {
-        data = <<EOH
+        data =<<EOH
         :80
         respond 200 {
           body "{ \"m.server\": \"matrix.service.consul:443\" }"
@@ -64,23 +64,21 @@ job "dendrite" {
 
   group "app-service-api" {
     network {
-      port "internal" {
-        to = 7777
-        static = 7777
+      mode = "bridge"
+    }
+
+    service {
+      name = "dendrite-app-service-api"
+      port = 7777
+
+      connect {
+        sidecar_service {}
       }
     }
 
     task "app-service-api" {
       driver = "docker"
       user = "nobody"
-
-      service {
-        name = "dendrite"
-        port = "internal"
-        address_mode = "host"
-
-        tags = ["app-service-api"]
-      }
 
       vault {
         policies = ["dendrite"]
@@ -90,10 +88,6 @@ job "dendrite" {
         image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
 
         command = "appservice"
-
-        ports = [
-          "internal"
-        ]
 
         volumes = [
           "local/:/etc/dendrite"
@@ -120,40 +114,65 @@ job "dendrite" {
 
   group "client-api" {
     network {
-      port "internal" {
-        to = 7771
-        static = 7771
-      }
+      mode = "bridge"
+    }
 
-      port "external" {
-        to = 8071
-        static = 8071
+    service { 
+      name = "dendrite-client-api"
+      port = 7771
+
+      connect {
+        sidecar_service {
+          proxy {
+            upstreams {
+              destination_name = "dendrite-user-api"
+              local_bind_port = "7781"
+            }
+            upstreams {
+              destination_name = "dendrite-room-server"
+              local_bind_port = "7770"
+            }
+            upstreams {
+              destination_name = "dendrite-edu-server"
+              local_bind_port = "7778"
+            }
+            upstreams {
+              destination_name = "dendrite-federation-sender"
+              local_bind_port = "7775"
+            }
+            upstreams {
+              destination_name = "dendrite-app-service-api"
+              local_bind_port = "7777"
+            }
+          }
+        }
+      }
+    }
+
+    service {
+      name = "dendrite-client-api-external"
+      port = 8071
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
+        "traefik.http.routers.dendrite-client-api.rule=Host(`matrix.service.consul`) && PathPrefix(`/_matrix/client`)"
+      ]
+
+      connect {
+        sidecar_service {
+          proxy {
+            config {
+              envoy_prometheus_bind_addr = "0.0.0.0:9101"
+            }
+          }
+        }
       }
     }
 
     task "client-api" {
       driver = "docker"
       user = "nobody"
-
-      service { 
-        name = "dendrite"
-        port = "internal"
-        address_mode = "host"
-
-        tags = ["client-api"]
-      }
-
-      service {
-        name = "dendrite-client-api"
-        port = "external"
-        address_mode = "host"
-
-        tags = [
-          "traefik.enable=true",
-          "traefik.http.routers.dendrite-client-api.rule=Host(`matrix.service.consul`) && PathPrefix(`/_matrix/client`)",
-          "traefik.http.routers.dendrite-client-api.tls=true"
-        ]
-      }
 
       vault {
         policies = ["dendrite"]
@@ -163,11 +182,6 @@ job "dendrite" {
         image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
 
         command = "clientapi"
-
-        ports = [
-          "internal",
-          "external"
-        ]
 
         volumes = [
           "local/:/etc/dendrite"
@@ -194,23 +208,21 @@ job "dendrite" {
 
   group "edu-server" {
     network {
-      port "internal" {
-        to = 7778
-        static = 7778
+      mode = "bridge"
+    }
+
+    service { 
+      name = "dendrite-edu-server"
+      port = 7778
+
+      connect {
+        sidecar_service {}
       }
     }
 
     task "edu-server" {
       driver = "docker"
       user = "nobody"
-
-      service { 
-        name = "dendrite"
-        port = "internal"
-        address_mode = "host"
-
-        tags = ["edu-server"]
-      }
 
       vault {
         policies = ["dendrite"]
@@ -220,10 +232,6 @@ job "dendrite" {
         image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
 
         command = "eduserver"
-
-        ports = [
-          "internal"
-        ]
 
         volumes = [
           "local/:/etc/dendrite"
@@ -250,40 +258,69 @@ job "dendrite" {
 
   group "federation-api" {
     network {
-      port "internal" {
-        to = 7772
-        static = 7772
-      }
+      mode = "bridge"
+    }
 
-      port "external" {
-        to = 8072
-        static = 8072
+    service { 
+      name = "dendrite-federation-api"
+      port = 7772
+
+      connect {
+        sidecar_service {
+          proxy {
+            upstreams {
+              destination_name = "dendrite-user-api"
+              local_bind_port = "7781"
+            }
+            upstreams {
+              destination_name = "dendrite-room-server"
+              local_bind_port = "7770"
+            }
+            upstreams {
+              destination_name = "dendrite-edu-server"
+              local_bind_port = "7778"
+            }
+            upstreams {
+              destination_name = "dendrite-federation-sender"
+              local_bind_port = "7775"
+            }
+            upstreams {
+              destination_name = "dendrite-app-service-api"
+              local_bind_port = "7777"
+            }
+            upstreams {
+              destination_name = "dendrite-key-server"
+              local_bind_port = "7779"
+            }
+          }
+        }
+      }
+    }
+
+    service { 
+      name = "dendrite-federation-api-external"
+      port = 8072
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
+        "traefik.http.routers.dendrite-federation-api.rule=Host(`matrix.service.consul`) && PathPrefix(`/_matrix/federation`, `/_matrix/key`)",
+      ]
+
+      connect {
+        sidecar_service {
+          proxy {
+            config {
+              envoy_prometheus_bind_addr = "0.0.0.0:9101"
+            }
+          }
+        }
       }
     }
 
     task "federation-api" {
       driver = "docker"
       user = "nobody"
-
-      service { 
-        name = "dendrite"
-        port = "internal"
-        address_mode = "host"
-
-        tags = ["federaion-api"]
-      }
-
-      service {
-        name = "dendrite-federation-api"
-        port = "external"
-        address_mode = "host"
-
-        tags = [
-          "traefik.enable=true",
-          "traefik.http.routers.dendrite-federation-api.rule=Host(`matrix.service.consul`) && PathPrefix(`/_matrix/federation`, `/_matrix/key`)",
-          "traefik.http.routers.dendrite-federation-api.tls=true"
-        ]
-      }
 
       vault {
         policies = ["dendrite"]
@@ -293,11 +330,6 @@ job "dendrite" {
         image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
 
         command = "federationapi"
-
-        ports = [
-          "internal",
-          "external"
-        ]
 
         volumes = [
           "local/:/etc/dendrite"
@@ -324,23 +356,28 @@ job "dendrite" {
 
   group "federation-sender" {
     network {
-      port "internal" {
-        to = 7775
-        static = 7775
+      mode = "bridge"
+    }
+
+    service { 
+      name = "dendrite-federation-sender"
+      port = 7775
+
+      connect {
+        sidecar_service {
+          proxy {
+            upstreams {
+              destination_name = "dendrite-key-server"
+              local_bind_port = "7779"
+            }
+          }
+        }
       }
     }
 
     task "federation-sender" {
       driver = "docker"
       user = "nobody"
-
-      service { 
-        name = "dendrite"
-        port = "internal"
-        address_mode = "host"
-
-        tags = ["federaion-sender"]
-      }
 
       vault {
         policies = ["dendrite"]
@@ -350,10 +387,6 @@ job "dendrite" {
         image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
 
         command = "federationsender"
-
-        ports = [
-          "internal"
-        ]
 
         volumes = [
           "local/:/etc/dendrite"
@@ -380,23 +413,21 @@ job "dendrite" {
 
   group "key-server" {
     network {
-      port "internal" {
-        to = 7779
-        static = 7779
+      mode = "bridge"
+    }
+
+    service { 
+      name = "dendrite-key-server"
+      port = 7779
+
+      connect {
+        sidecar_service {}
       }
     }
 
     task "key-server" {
       driver = "docker"
       user = "nobody"
-
-      service { 
-        name = "dendrite"
-        port = "internal"
-        address_mode = "host"
-
-        tags = ["key-server"]
-      }
 
       vault {
         policies = ["dendrite"]
@@ -406,10 +437,6 @@ job "dendrite" {
         image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
 
         command = "keyserver"
-
-        ports = [
-          "internal"
-        ]
 
         volumes = [
           "local/:/etc/dendrite"
@@ -436,40 +463,42 @@ job "dendrite" {
 
   group "media-api" {
     network {
-      port "internal" {
-        to = 7774
-        static = 7774
-      }
+      mode = "bridge"
+    }
 
-      port "external" {
-        to = 8074
-        static = 8074
+    service {
+      name = "dendrite-media-api"
+      port = 7774
+
+      connect {
+        sidecar_service {}
+      }
+    }
+
+    service {
+      name = "dendrite-media-api-external"
+      port = 8074
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
+        "traefik.http.routers.dendrite-media-api.rule=Host(`matrix.service.consul`) && PathPrefix(`/_matrix/media`)",
+      ]
+
+      connect {
+        sidecar_service {
+          proxy {
+            config {
+              envoy_prometheus_bind_addr = "0.0.0.0:9101"
+            }
+          }
+        }
       }
     }
 
     task "media-api" {
       driver = "docker"
       user = "nobody"
-
-      service {
-        name = "dendrite"
-        port = "internal"
-        address_mode = "host"
-
-        tags = ["media-api"]
-      }
-
-      service {
-        name = "dendrite-media-api"
-        port = "external"
-        address_mode = "host"
-
-        tags = [
-          "traefik.enable=true",
-          "traefik.http.routers.dendrite-media-api.rule=Host(`matrix.service.consul`) && PathPrefix(`/_matrix/media`)",
-          "traefik.http.routers.dendrite-media-api.tls=true"
-        ]
-      }
 
       vault {
         policies = ["dendrite"]
@@ -479,11 +508,6 @@ job "dendrite" {
         image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
 
         command = "mediaapi"
-
-        ports = [
-          "internal",
-          "external"
-        ]
 
         volumes = [
           "local/:/etc/dendrite"
@@ -510,23 +534,28 @@ job "dendrite" {
 
   group "room-server" {
     network {
-      port "internal" {
-        to = 7770
-        static = 7770
+      mode = "bridge"
+    }
+
+    service {
+      name = "dendrite-room-server"
+      port = 7770
+
+      connect {
+        sidecar_service {
+          proxy {
+            upstreams {
+              destination_name = "dendrite-key-server"
+              local_bind_port = "7779"
+            }
+          }
+        }
       }
     }
 
     task "room-server" {
       driver = "docker"
       user = "nobody"
-
-      service {
-        name = "dendrite"
-        port = "internal"
-        address_mode = "host"
-
-        tags = ["room-server"]
-      }
 
       vault {
         policies = ["dendrite"]
@@ -536,10 +565,6 @@ job "dendrite" {
         image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
 
         command = "roomserver"
-
-        ports = [
-          "internal"
-        ]
 
         volumes = [
           "local/:/etc/dendrite"
@@ -566,23 +591,21 @@ job "dendrite" {
 
   group "signing-key-server" {
     network {
-      port "internal" {
-        to = 7780
-        static = 7780
+      mode = "bridge"
+    }
+
+    service {
+      name = "dendrite-signing-key-server"
+      port = 7780
+
+      connect {
+        sidecar_service {}
       }
     }
 
     task "signing-key-server" {
       driver = "docker"
       user = "nobody"
-
-      service {
-        name = "dendrite"
-        port = "internal"
-        address_mode = "host"
-
-        tags = ["signing-key-server"]
-      }
 
       vault {
         policies = ["dendrite"]
@@ -592,10 +615,6 @@ job "dendrite" {
         image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
 
         command = "signingkeyserver"
-
-        ports = [
-          "internal"
-        ]
 
         volumes = [
           "local/:/etc/dendrite"
@@ -622,40 +641,53 @@ job "dendrite" {
 
   group "sync-api" {
     network {
-      port "internal" {
-        to = 7773
-        static = 7773
-      }
+      mode = "bridge"
+    }
 
-      port "external" {
-        to = 8073
-        static = 8073
+    service {
+      name = "dendrite-sync-api"
+      port = 7773
+
+      connect {
+        sidecar_service {
+          proxy {
+            upstreams {
+              destination_name = "dendrite-user-api"
+              local_bind_port = "7781"
+            }
+            upstreams {
+              destination_name = "dendrite-room-server"
+              local_bind_port = "7770"
+            }
+          }
+        }
+      }
+    }
+
+    service {
+      name = "dendrite-sync-api-external"
+      port = 8073
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
+        "traefik.http.routers.dendrite-sync-api.rule=Host(`matrix.service.consul`) && PathPrefix(`/_matrix/client/.*/(sync|user/.*/filter/.*|keys/changes|rooms/.*/messages)$`, `/_matrix/key`)"
+      ]
+
+      connect {
+        sidecar_service {
+          proxy {
+            config {
+              envoy_prometheus_bind_addr = "0.0.0.0:9101"
+            }
+          }
+        }
       }
     }
 
     task "sync-api" {
       driver = "docker"
       user = "nobody"
-
-      service {
-        name = "dendrite"
-        port = "internal"
-        address_mode = "host"
-
-        tags = ["sync-api"]
-      }
-
-      service {
-        name = "dendrite-sync-api"
-        port = "external"
-        address_mode = "host"
-
-        tags = [
-          "traefik.enable=true",
-          "traefik.http.routers.dendrite-sync-api.rule=Host(`matrix.service.consul`) && PathPrefix(`/_matrix/client/.*/(sync|user/.*/filter/.*|keys/changes|rooms/.*/messages)$`, `/_matrix/key`)",
-          "traefik.http.routers.dendrite-sync-api.tls=true"
-        ]
-      }
 
       vault {
         policies = ["dendrite"]
@@ -665,11 +697,6 @@ job "dendrite" {
         image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
 
         command = "syncapi"
-
-        ports = [
-          "internal",
-          "external"
-        ]
 
         volumes = [
           "local/:/etc/dendrite"
@@ -696,23 +723,21 @@ job "dendrite" {
 
   group "user-api" {
     network {
-      port "internal" {
-        to = 7781
-        static = 7781
+      mode = "bridge"
+    }
+
+    service {
+      name = "dendrite-user-api"
+      port = 7781
+
+      connect {
+        sidecar_service {}
       }
     }
 
     task "user-api" {
       driver = "docker"
       user = "nobody"
-
-      service {
-        name = "dendrite"
-        port = "internal"
-        address_mode = "host"
-
-        tags = ["user-api"]
-      }
 
       vault {
         policies = ["dendrite"]
@@ -722,10 +747,6 @@ job "dendrite" {
         image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
 
         command = "userapi"
-
-        ports = [
-          "internal"
-        ]
 
         volumes = [
           "local/:/etc/dendrite"

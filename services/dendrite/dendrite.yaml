@@ -27,8 +27,8 @@ global:
 
 app_service_api:
   internal_api:
-    listen: http://0.0.0.0:7777
-    connect: http://app-service-api.dendrite.service.consul:7777
+    listen: http://127.0.0.1:7777
+    connect: http://127.0.0.1:7777
   database:
     connection_string: postgresql://dendrite:
       {{- with secret "database/static-creds/dendrite" -}}
@@ -43,10 +43,10 @@ app_service_api:
 
 client_api:
   internal_api:
-    listen: http://0.0.0.0:7771
-    connect: http://client-api.dendrite.service.consul:7771
+    listen: http://127.0.0.1:7771
+    connect: http://127.0.0.1:7771
   external_api:
-    listen: http://0.0.0.0:8071
+    listen: http://127.0.0.1:8071
 
   registration_disabled: false
   registration_shared_secret: {{ with secret "secret/dendrite/registration-key" }}{{ .Data.data.key }}{{ end }}
@@ -59,22 +59,22 @@ client_api:
 
 edu_server:
   internal_api:
-    listen: http://0.0.0.0:7778
-    connect: http://edu-server.dendrite.service.consul:7778
+    listen: http://127.0.0.1:7778
+    connect: http://127.0.0.1:7778
 
 federation_api:
   internal_api:
-    listen: http://0.0.0.0:7772
-    connect: http://federation-api.dendrite.service.consul:7772
+    listen: http://127.0.0.1:7772
+    connect: http://127.0.0.1:7772
   external_api:
-    listen: http://0.0.0.0:8072
+    listen: http://127.0.0.1:8072
 
   federation_certificates: []
 
 federation_sender:
   internal_api:
-    listen: http://0.0.0.0:7775
-    connect: http://federation-sender.dendrite.service.consul:7775
+    listen: http://127.0.0.1:7775
+    connect: http://127.0.0.1:7775
   database:
     connection_string: postgresql://dendrite:
       {{- with secret "database/static-creds/dendrite" -}}
@@ -90,8 +90,8 @@ federation_sender:
 
 key_server:
   internal_api:
-    listen: http://0.0.0.0:7779
-    connect: http://key-server.dendrite.service.consul:7779
+    listen: http://127.0.0.1:7779
+    connect: http://127.0.0.1:7779
   database:
     connection_string: postgresql://dendrite:
       {{- with secret "database/static-creds/dendrite" -}}
@@ -103,10 +103,10 @@ key_server:
 
 media_api:
   internal_api:
-    listen: http://0.0.0.0:7774
-    connect: http://media-api.dendrite.service.consul:7774
+    listen: http://127.0.0.1:7774
+    connect: http://127.0.0.1:7774
   external_api:
-    listen: http://0.0.0.0:8074
+    listen: http://127.0.0.1:8074
   database:
     connection_string: postgresql://dendrite:
       {{- with secret "database/static-creds/dendrite" -}}
@@ -132,8 +132,8 @@ media_api:
 
 room_server:
   internal_api:
-    listen: http://0.0.0.0:7770
-    connect: http://room-server.dendrite.service.consul:7770
+    listen: http://127.0.0.1:7770
+    connect: http://127.0.0.1:7770
   database:
     connection_string: postgresql://dendrite:
       {{- with secret "database/static-creds/dendrite" -}}
@@ -145,8 +145,8 @@ room_server:
 
 signing_key_server:
   internal_api:
-    listen: http://0.0.0.0:7780
-    connect: http://signing-key-server.dendrite.service.consul:7780
+    listen: http://127.0.0.1:7780
+    connect: http://127.0.0.1:7780
   database:
     connection_string: postgresql://dendrite:
       {{- with secret "database/static-creds/dendrite" -}}
@@ -168,10 +168,10 @@ signing_key_server:
 
 sync_api:
   internal_api:
-    listen: http://0.0.0.0:7773
-    connect: http://sync-api.dendrite.service.consul:7773
+    listen: http://127.0.0.1:7773
+    connect: http://127.0.0.1:7773
   external_api:
-    listen: http://0.0.0.0:8073
+    listen: http://127.0.0.1:8073
   database:
     connection_string: postgresql://dendrite:
       {{- with secret "database/static-creds/dendrite" -}}
@@ -183,8 +183,8 @@ sync_api:
 
 user_api:
   internal_api:
-    listen: http://0.0.0.0:7781
-    connect: http://user-api.dendrite.service.consul:7781
+    listen: http://127.0.0.1:7781
+    connect: http://127.0.0.1:7781
   account_database:
     connection_string: postgresql://dendrite:
       {{- with secret "database/static-creds/dendrite" -}}
