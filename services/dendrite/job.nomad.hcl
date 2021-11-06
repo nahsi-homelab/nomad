@@ -99,12 +99,24 @@ job "dendrite" {
 
       config {
         image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
-
         command = "appservice"
-
-        volumes = [
-          "local/:/etc/dendrite"
-        ]
+        volumes = [ "local/:/etc/dendrite" ]
+        logging {
+          type = "loki"
+          config {
+            loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+            loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
+            loki-pipeline-stages =<<EOF
+              - multiline:
+                  firstline: '^time=".*"'
+              - regex:
+                  expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
+              - timestamp:
+                  source: time
+                  format: 2006-01-02T15:04:05.000Z
+            EOF
+          }
+        }
       }
 
       template {
@@ -217,12 +229,24 @@ job "dendrite" {
 
       config {
         image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
-
         command = "clientapi"
-
-        volumes = [
-          "local/:/etc/dendrite"
-        ]
+        volumes = [ "local/:/etc/dendrite" ]
+        logging {
+          type = "loki"
+          config {
+            loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+            loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
+            loki-pipeline-stages =<<EOF
+              - multiline:
+                  firstline: '^time=".*"'
+              - regex:
+                  expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
+              - timestamp:
+                  source: time
+                  format: 2006-01-02T15:04:05.000Z
+            EOF
+          }
+        }
       }
 
       template {
@@ -279,12 +303,24 @@ job "dendrite" {
 
       config {
         image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
-
         command = "eduserver"
-
-        volumes = [
-          "local/:/etc/dendrite"
-        ]
+        volumes = [ "local/:/etc/dendrite" ]
+        logging {
+          type = "loki"
+          config {
+            loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+            loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
+            loki-pipeline-stages =<<EOF
+              - multiline:
+                  firstline: '^time=".*"'
+              - regex:
+                  expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
+              - timestamp:
+                  source: time
+                  format: 2006-01-02T15:04:05.000Z
+            EOF
+          }
+        }
       }
 
       template {
@@ -401,12 +437,24 @@ job "dendrite" {
 
       config {
         image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
-
         command = "federationapi"
-
-        volumes = [
-          "local/:/etc/dendrite"
-        ]
+        volumes = [ "local/:/etc/dendrite" ]
+        logging {
+          type = "loki"
+          config {
+            loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+            loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
+            loki-pipeline-stages =<<EOF
+              - multiline:
+                  firstline: '^time=".*"'
+              - regex:
+                  expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
+              - timestamp:
+                  source: time
+                  format: 2006-01-02T15:04:05.000Z
+            EOF
+          }
+        }
       }
 
       template {
@@ -470,12 +518,24 @@ job "dendrite" {
 
       config {
         image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
-
         command = "federationsender"
-
-        volumes = [
-          "local/:/etc/dendrite"
-        ]
+        volumes = [ "local/:/etc/dendrite" ]
+        logging {
+          type = "loki"
+          config {
+            loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+            loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
+            loki-pipeline-stages =<<EOF
+              - multiline:
+                  firstline: '^time=".*"'
+              - regex:
+                  expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
+              - timestamp:
+                  source: time
+                  format: 2006-01-02T15:04:05.000Z
+            EOF
+          }
+        }
       }
 
       template {
@@ -532,12 +592,24 @@ job "dendrite" {
 
       config {
         image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
-
         command = "keyserver"
-
-        volumes = [
-          "local/:/etc/dendrite"
-        ]
+        volumes = [ "local/:/etc/dendrite" ]
+        logging {
+          type = "loki"
+          config {
+            loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+            loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
+            loki-pipeline-stages =<<EOF
+              - multiline:
+                  firstline: '^time=".*"'
+              - regex:
+                  expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
+              - timestamp:
+                  source: time
+                  format: 2006-01-02T15:04:05.000Z
+            EOF
+          }
+        }
       }
 
       template {
@@ -627,12 +699,24 @@ job "dendrite" {
 
       config {
         image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
-
         command = "mediaapi"
-
-        volumes = [
-          "local/:/etc/dendrite"
-        ]
+        volumes = [ "local/:/etc/dendrite" ]
+        logging {
+          type = "loki"
+          config {
+            loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+            loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
+            loki-pipeline-stages =<<EOF
+              - multiline:
+                  firstline: '^time=".*"'
+              - regex:
+                  expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
+              - timestamp:
+                  source: time
+                  format: 2006-01-02T15:04:05.000Z
+            EOF
+          }
+        }
       }
 
       template {
@@ -696,12 +780,24 @@ job "dendrite" {
 
       config {
         image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
-
         command = "roomserver"
-
-        volumes = [
-          "local/:/etc/dendrite"
-        ]
+        volumes = [ "local/:/etc/dendrite" ]
+        logging {
+          type = "loki"
+          config {
+            loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+            loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
+            loki-pipeline-stages =<<EOF
+              - multiline:
+                  firstline: '^time=".*"'
+              - regex:
+                  expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
+              - timestamp:
+                  source: time
+                  format: 2006-01-02T15:04:05.000Z
+            EOF
+          }
+        }
       }
 
       template {
@@ -758,12 +854,24 @@ job "dendrite" {
 
       config {
         image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
-
         command = "signingkeyserver"
-
-        volumes = [
-          "local/:/etc/dendrite"
-        ]
+        volumes = [ "local/:/etc/dendrite" ]
+        logging {
+          type = "loki"
+          config {
+            loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+            loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
+            loki-pipeline-stages =<<EOF
+              - multiline:
+                  firstline: '^time=".*"'
+              - regex:
+                  expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
+              - timestamp:
+                  source: time
+                  format: 2006-01-02T15:04:05.000Z
+            EOF
+          }
+        }
       }
 
       template {
@@ -864,12 +972,24 @@ job "dendrite" {
 
       config {
         image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
-
         command = "syncapi"
-
-        volumes = [
-          "local/:/etc/dendrite"
-        ]
+        volumes = [ "local/:/etc/dendrite" ]
+        logging {
+          type = "loki"
+          config {
+            loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+            loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
+            loki-pipeline-stages =<<EOF
+              - multiline:
+                  firstline: '^time=".*"'
+              - regex:
+                  expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
+              - timestamp:
+                  source: time
+                  format: 2006-01-02T15:04:05.000Z
+            EOF
+          }
+        }
       }
 
       template {
@@ -926,12 +1046,24 @@ job "dendrite" {
 
       config {
         image = "matrixdotorg/dendrite-polylith:${var.versions.dendrite}"
-
         command = "userapi"
-
-        volumes = [
-          "local/:/etc/dendrite"
-        ]
+        volumes = [ "local/:/etc/dendrite" ]
+        logging {
+          type = "loki"
+          config {
+            loki-url = "http://loki.service.consul:3100/loki/api/v1/push"
+            loki-external-labels = "app=dendrite,subsystem=${NOMAD_TASK_NAME}"
+            loki-pipeline-stages =<<EOF
+              - multiline:
+                  firstline: '^time=".*"'
+              - regex:
+                  expression: 'time="(?P<time>)" level=(?P<level>) msg="(?P<msg>\w+)"'
+              - timestamp:
+                  source: time
+                  format: 2006-01-02T15:04:05.000Z
+            EOF
+          }
+        }
       }
 
       template {
