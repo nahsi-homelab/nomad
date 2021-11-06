@@ -6,6 +6,8 @@ bootstrap:
     loop_wait: 10
     retry_timeout: 10
     maximum_lag_on_failover: 1048576
+    postgresql:
+      use_slots: false
 
   pg_hba:
     - "host replication repl 0.0.0.0/0 md5"
@@ -19,7 +21,7 @@ restapi:
   listen: "0.0.0.0:8008"
 
 consul:
-  host: "host.docker.internal"
+  host: "172.17.0.1"
   port: 8500
   register_service: true
 

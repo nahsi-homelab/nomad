@@ -29,6 +29,31 @@ job "patroni" {
       }
     }
 
+    service {
+      name = "patroni"
+      port = "patroni"
+
+      check {
+        name     = "Patroni HTTP"
+        type     = "http"
+        path     = "/liveness"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+
+    service {
+      name = "promtail"
+      port = "promtail"
+
+      check {
+        type     = "http"
+        path     = "/ready"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+
     volume "postgres" {
       type = "host"
       source = "postgres"
@@ -38,24 +63,10 @@ job "patroni" {
       driver = "docker"
       user = "999"
 
-      kill_timeout = "30s"
+      kill_timeout = "45s"
 
       vault {
         policies = ["postgres"]
-      }
-
-      service {
-        name = "patroni"
-        port = "patroni"
-        address_mode = "host"
-
-        check {
-          name     = "Patroni HTTP"
-          type     = "http"
-          path     = "/health"
-          interval = "10s"
-          timeout  = "2s"
-        }
       }
 
       resources {
@@ -119,19 +130,6 @@ EOF
         sidecar = true
       }
 
-      service {
-        name = "promtail"
-        port = "promtail"
-        address_mode = "host"
-
-        check {
-          type     = "http"
-          path     = "/ready"
-          interval = "10s"
-          timeout  = "2s"
-        }
-      }
-
       resources {
         cpu = 50
         memory = 128
@@ -163,26 +161,25 @@ EOF
       }
     }
 
+    service {
+      name = "postgres-exporter"
+      port = "exporter"
+
+      check {
+        name     = "postgres-exporter"
+        path     = "/"
+        type     = "http"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+
     task "postgres-exporter" {
       driver = "docker"
       user = "nobody"
 
       vault {
         policies = ["postgres"]
-      }
-
-      service {
-        name = "postgres-exporter"
-        port = "exporter"
-        address_mode = "host"
-
-        check {
-          name     = "postgres-exporter"
-          path     = "/"
-          type     = "http"
-          interval = "10s"
-          timeout  = "2s"
-        }
       }
 
       resources {
