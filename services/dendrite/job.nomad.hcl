@@ -484,7 +484,14 @@ job "dendrite" {
       port = 7779
 
       connect {
-        sidecar_service {}
+        sidecar_service {
+          proxy {
+            upstreams {
+              destination_name = "dendrite-user-api"
+              local_bind_port = "7781"
+            }
+          }
+        }
       }
     }
 
@@ -529,6 +536,7 @@ job "dendrite" {
   }
 
   group "media-api" {
+    ephemeral_disk {}
     network {
       mode = "bridge"
       port "envoy" {
@@ -661,6 +669,10 @@ job "dendrite" {
             upstreams {
               destination_name = "dendrite-key-server"
               local_bind_port = "7779"
+            }
+            upstreams {
+              destination_name = "dendrite-federation-sender"
+              local_bind_port = "7775"
             }
           }
         }
@@ -817,6 +829,10 @@ job "dendrite" {
               destination_name = "dendrite-room-server"
               local_bind_port = "7770"
             }
+            upstreams {
+              destination_name = "dendrite-key-server"
+              local_bind_port = "7779"
+            }
           }
         }
       }
@@ -829,7 +845,7 @@ job "dendrite" {
       tags = [
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.dendrite-sync-api.rule=Host(`matrix.service.consul`) && PathPrefix(`/_matrix/client/?.*/(sync|user/.*?/filter/?.*|keys/changes|rooms/.*?/messages)$`)"
+        "traefik.http.routers.dendrite-sync-api.rule=Host(`matrix.service.consul`) && (Path(`/_matrix/client/{.*}/sync`) || Path(`/_matrix/client/r0/user/{userid:.*}/filter`) || PathPrefix(`/_matrix/client/{.*}/user/{userid:.*}/filter/{filterid:.*}`) || Path(`/_matrix/client/{.*}/keys/changes`) || Path(`/_matrix/client/{.*}/rooms/{roomid:.*}/messages`))"
       ]
 
       connect {
