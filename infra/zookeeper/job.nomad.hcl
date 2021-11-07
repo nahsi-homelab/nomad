@@ -17,7 +17,6 @@ job "zookeeper" {
   update {
     max_parallel = 1
     stagger      = "1m"
-    auto_revert  = true
   }
 
   group "zookeeper" {
