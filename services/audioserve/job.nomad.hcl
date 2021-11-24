@@ -15,7 +15,8 @@ job "audioserve" {
 
       tags = [
         "traefik.enable=true",
-        "traefik.http.routers.audioserve.tls=true"
+        "traefik.http.routers.audioserve.rule=Host(`audioserve.service.consul`)",
+        "traefik.http.routers.audioserve.tls=true",
       ]
     }
 
