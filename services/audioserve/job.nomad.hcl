@@ -3,6 +3,9 @@ job "audioserve" {
   type        = "service"
 
   group "audioserve" {
+    ephemeral_disk {
+      sticky = true
+    }
     network {
       port "http" {
         to = 3000
@@ -17,17 +20,24 @@ job "audioserve" {
         "traefik.enable=true",
         "traefik.http.routers.audioserve.rule=Host(`audioserve.service.consul`)",
         "traefik.http.routers.audioserve.tls=true",
+        "ingress.enable=true",
+        "ingress.http.routers.audioserve.rule=Host(`audioserve.nahsi.dev`)",
+        "ingress.http.routers.audioserve.tls=true",
       ]
     }
 
     task "audioserve" {
       driver = "docker"
 
+      vault {
+        policies = ["audioserve"]
+      }
+
       config {
         image = "izderadicka/audioserve"
 
         args = [
-          "--no-authentication",
+          "--data-dir=/alloc/data/",
           "/audiobooks",
           "/podcasts"
         ]
@@ -40,6 +50,14 @@ job "audioserve" {
           "/home/nahsi/media/audio/audiobooks:/audiobooks:ro",
           "/home/nahsi/media/audio/podcasts:/podcasts:ro",
         ]
+      }
+
+      template {
+        data = <<EOH
+AUDIOSERVE_SHARED_SECRET={{ with secret "secret/audioserve/nahsi" }}{{ .Data.data.secret }}{{ end }}
+EOH
+        destination = "secrets/audioserve.env"
+        env = true
       }
 
       resources {
