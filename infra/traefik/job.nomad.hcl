@@ -1,14 +1,19 @@
 variables {
   versions = {
-    traefik = "2.5.3"
+    traefik = "2.5.4"
     promtail = "2.3.0"
   }
 }
 
 job "traefik" {
-  datacenters = ["syria", "asia"]
-  namespace   = "infra"
-  type        = "system"
+  datacenters = [
+    "syria",
+    "asia",
+    "pontus"
+  ]
+
+  namespace = "infra"
+  type      = "system"
 
   update {
     max_parallel = 1
