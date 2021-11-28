@@ -1,14 +1,19 @@
 variables {
   versions = {
     zookeeper = "3.7.0"
-    promtail = "2.3.0"
+    promtail = "2.4.1"
   }
 }
 
 job "zookeeper" {
-  datacenters = ["syria", "asia"]
-  namespace   = "infra"
-  type        = "service"
+  datacenters = [
+    "syria",
+    "asia",
+    "pontus"
+  ]
+
+  namespace = "infra"
+  type      = "service"
 
   constraint {
     distinct_property = meta.zoo_node_id
@@ -20,7 +25,7 @@ job "zookeeper" {
   }
 
   group "zookeeper" {
-    count = 3
+    count = 5
 
     network {
       port "client" {
@@ -68,9 +73,9 @@ job "zookeeper" {
         command  = "/bin/bash"
         args     = [
           "-c",
-          "[[ $(echo ruok|nc zookeeper-${meta.zoo_node_id} 2181) == imok ]]"
+          "[[ $(echo ruok|nc ${NOMAD_IP_client} ${NOMAD_PORT_client}) == imok ]] || exit 2"
         ]
-        interval = "10s"
+        interval = "60s"
         timeout  = "1s"
       }
     }
@@ -98,7 +103,9 @@ job "zookeeper" {
       user = "1001"
 
       vault {
-        policies = ["zookeeper"]
+        policies = [
+          "zookeeper"
+        ]
       }
 
       resources {
@@ -143,14 +150,12 @@ job "zookeeper" {
         data = file("zoo.cfg")
         destination = "local/zoo.cfg"
         change_mode = "restart"
-        splay = "1m"
       }
 
       template {
         data = file("jaas.conf")
         destination = "secrets/jaas.conf"
         change_mode = "restart"
-        splay = "1m"
       }
     }
 
