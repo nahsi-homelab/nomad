@@ -1,7 +1,7 @@
 variables {
   versions = {
-    loki = "2.3.0"
-    promtail = "2.3.0"
+    loki = "2.4.1"
+    promtail = "2.4.1"
   }
 }
 
@@ -27,29 +27,44 @@ job "loki" {
       source = "loki"
     }
 
+    service {
+      name = "promtail"
+      port = "promtail"
+
+      meta {
+        sidecar_to = "loki"
+      }
+
+      check {
+        type     = "http"
+        path     = "/ready"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+
+    service {
+      name = "loki"
+      port = "loki"
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.loki.rule=Host(`loki.service.consul`)",
+        "traefik.http.routers.loki.tls=true"
+      ]
+
+      check {
+        name     = "Loki HTTP"
+        type     = "http"
+        path     = "/ready"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+
     task "loki" {
       driver = "docker"
       user   = "nobody"
-
-      service {
-        name = "loki"
-        port = "loki"
-        address_mode = "host"
-
-        tags = [
-          "traefik.enable=true",
-          "traefik.http.routers.loki.rule=Host(`loki.service.consul`)",
-          "traefik.http.routers.loki.tls=true"
-        ]
-
-        check {
-          name     = "Loki HTTP"
-          type     = "http"
-          path     = "/ready"
-          interval = "10s"
-          timeout  = "2s"
-        }
-      }
 
       volume_mount {
         volume      = "loki"
@@ -84,23 +99,9 @@ job "loki" {
         sidecar = true
       }
 
-      service {
-        name = "promtail"
-        port = "promtail"
-        tags = ["service=loki"]
-        address_mode = "host"
-
-        check {
-          type     = "http"
-          path     = "/ready"
-          interval = "10s"
-          timeout  = "2s"
-        }
-      }
-
       resources {
         cpu = 50
-        memory = 128
+        memory = 64
       }
 
       config {

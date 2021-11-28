@@ -1,7 +1,7 @@
 variables {
   versions = {
     grafana = "8.2.3"
-    promtail = "2.3.0"
+    promtail = "2.4.1"
   }
 }
 
@@ -17,6 +17,22 @@ job "grafana" {
       }
       port "promtail" {
         to = 3000
+      }
+    }
+
+    service {
+      name = "promtail"
+      port = "promtail"
+
+      meta {
+        sidecar_to = "grafana"
+      }
+
+      check {
+        type     = "http"
+        path     = "/ready"
+        interval = "10s"
+        timeout  = "2s"
       }
     }
 
@@ -135,7 +151,7 @@ EOH
 
       resources {
         cpu = 50
-        memory = 128
+        memory = 64
       }
 
       config {

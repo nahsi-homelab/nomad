@@ -1,7 +1,7 @@
 variables {
   versions = {
     prometheus = "2.30.3"
-    promtail = "2.3.0"
+    promtail = "2.4.1"
   }
 }
 
@@ -18,6 +18,22 @@ job "prometheus" {
       }
       port "promtail" {
         to = 3000
+      }
+    }
+
+    service {
+      name = "promtail"
+      port = "promtail"
+
+      meta {
+        sidecar_to = "prometheus"
+      }
+
+      check {
+        type     = "http"
+        path     = "/ready"
+        interval = "10s"
+        timeout  = "2s"
       }
     }
 
@@ -98,7 +114,7 @@ job "prometheus" {
 
       resources {
         cpu = 50
-        memory = 128
+        memory = 64
       }
 
       config {

@@ -83,7 +83,10 @@ job "zookeeper" {
     service {
       name = "promtail"
       port = "promtail"
-      tags = ["service=zookeeper"]
+
+      meta {
+        sidecar_to = "zookeeper" 
+      }
 
       check {
         type     = "http"
