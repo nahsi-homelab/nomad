@@ -1,22 +1,31 @@
 variables {
   versions = {
-    traefik = "2.5.3"
-    promtail = "2.3.0"
+    traefik = "2.5.4"
+    promtail = "2.4.1"
   }
 }
 
 job "ingress" {
-  datacenters = ["syria"]
-  namespace   = "infra"
-  type        = "service"
+  datacenters = [
+    "syria",
+    "asia",
+    "pontus"
+  ]
+
+  namespace = "infra"
+  type      = "service"
 
   update {
     max_parallel = 1
     stagger      = "1m"
-    auto_revert  = true
+  }
+
+  constraint {
+    distinct_property = "${node.datacenter}"
   }
 
   group "traefik" {
+    count = 3
     network {
       port "traefik" {
         to = 8080
