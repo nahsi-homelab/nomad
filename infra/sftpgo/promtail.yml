@@ -1,0 +1,36 @@
+server:
+  http_listen_port: 3000
+  grpc_listen_port: 0
+
+positions:
+  filename: "local/positions.yml"
+
+client:
+  url: http://loki.service.consul:3100/loki/api/v1/push
+
+scrape_configs:
+- job_name: sftpgo
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      app: sftpgo
+      __path__: "/alloc/logs/sftpgo.std*.0"
+  pipeline_stages:
+    - json:
+        expressions:
+          time: time
+          level: level
+          sender: sender
+          user_agent: user_agent
+    - labels:
+        sender:
+    - drop:
+        source: level
+        expression: "debug"
+    - drop:
+        source: user_agent
+        expression: "Consul Health Check"
+    - timestamp:
+        source: time
+        format: 2006-01-02T15:04:05.000

@@ -1,0 +1,19 @@
+data_provider:
+  driver: "postgresql"
+  name: "sftpgo"
+  host: "master.postgres.service.consul"
+  port: "5432"
+  username: "sftpgo"
+  sslmode: 0
+httpd:
+  bindings:
+    port: 8080
+    address: "" # listen on all interfaces
+webdavd:
+  bindings:
+    address: "" # listen on all interfaces
+    port: 8088
+  cache:
+    expiration_time: "60" # in minutes
+telemetry:
+  bind_address: "" # listen on all interfaces
