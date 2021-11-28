@@ -24,3 +24,5 @@ scrape_configs:
     - timestamp:
         source: time
         format: 2006-01-02 15:04:05,000
+    - drop:
+        expression: ".*Processing ruok command from.*"
