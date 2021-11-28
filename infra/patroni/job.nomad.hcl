@@ -1,18 +1,21 @@
 variables {
   versions = {
     patroni = "latest"
-    promtail = "2.3.0"
+    promtail = "2.4.1"
     exporter = "0.10.0"
   }
 }
 
 job "patroni" {
-  datacenters = ["syria", "asia"]
-  namespace   = "infra"
-  type        = "service"
+  datacenters = [
+    "syria",
+    "asia"
+  ]
+
+  namespace = "infra"
 
   group "patroni" {
-    count = 2
+    count = 3
 
     network {
       port "postgres" {
@@ -30,6 +33,22 @@ job "patroni" {
     }
 
     service {
+      name = "promtail"
+      port = "promtail"
+
+      meta {
+        sidecar_to = "postgres"
+      }
+
+      check {
+        type     = "http"
+        path     = "/ready"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+
+    service {
       name = "patroni"
       port = "patroni"
 
@@ -37,18 +56,6 @@ job "patroni" {
         name     = "Patroni HTTP"
         type     = "http"
         path     = "/liveness"
-        interval = "10s"
-        timeout  = "2s"
-      }
-    }
-
-    service {
-      name = "promtail"
-      port = "promtail"
-
-      check {
-        type     = "http"
-        path     = "/ready"
         interval = "10s"
         timeout  = "2s"
       }
@@ -132,7 +139,7 @@ EOF
 
       resources {
         cpu = 50
-        memory = 128
+        memory = 64
       }
 
       config {
@@ -183,6 +190,7 @@ EOF
       }
 
       resources {
+        cpu = 50
         memory = 64
       }
 
