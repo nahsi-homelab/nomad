@@ -8,12 +8,15 @@ data_provider:
 httpd:
   bindings:
     port: 8080
-    address: "" # listen on all interfaces
+    address: ""
 webdavd:
   bindings:
-    address: "" # listen on all interfaces
+    address: ""
     port: 8088
   cache:
     expiration_time: "60" # in minutes
+sftpd:
+  bindings:
+    port: 0
 telemetry:
-  bind_address: "" # listen on all interfaces
+  bind_address: ""

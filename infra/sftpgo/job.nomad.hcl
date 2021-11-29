@@ -80,6 +80,7 @@ job "sftpgo" {
 
     task "sftpgo" {
       driver = "docker"
+      user   = "nobody"
 
       vault {
         policies = ["sftpgo"]
@@ -101,7 +102,7 @@ job "sftpgo" {
 
       template {
         data = file("sftpgo.yml")
-        destination   = "local/sftpgo.yml"
+        destination = "local/sftpgo.yml"
       }
 
       template {
@@ -122,6 +123,7 @@ EOF
 
     task "promtail" {
       driver = "docker"
+      user   = "nobody"
 
       lifecycle {
         hook    = "poststart"
