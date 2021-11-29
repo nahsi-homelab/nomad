@@ -91,6 +91,8 @@ services:
         url: "https://prometheus.service.consul"
       - name: "Traefik"
         url: "https://traefik-internal.service.consul"
+      - name: "SFTPGO"
+        url: "https://sftpgo.service.consul"
 
   - name: "HashiStack"
     icon: "fas fa-cloud"
