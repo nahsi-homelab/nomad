@@ -2,6 +2,11 @@ job "audioserve" {
   datacenters = ["syria"]
   type        = "service"
 
+  constraint {
+    attribute = attr.unique.hostname
+    value = "antiochia"
+  }
+
   group "audioserve" {
     ephemeral_disk {
       sticky = true

@@ -6,6 +6,11 @@ job "polaris" {
   datacenters = ["syria"]
   type        = "service"
 
+  constraint {
+    attribute = attr.unique.hostname
+    value = "antiochia"
+  }
+
   group "polaris" {
     network {
       port "http" {}
