@@ -152,20 +152,24 @@ scrape_configs:
       - source_labels: ["__meta_consul_node"]
         target_label: "instance"
 
-  - job_name: "redpanda"
-    consul_sd_configs:
-      - server: "http://consul.service.consul:8500"
-        services:
-          - "redpanda"
-    relabel_configs:
-      - source_labels: ["__meta_consul_node"]
-        target_label: "instance"
-
   - job_name: "kafka"
     consul_sd_configs:
       - server: "http://consul.service.consul:8500"
         services:
           - "kminion"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
+
+  - job_name: "minio"
+    metrics_path: "/minio/v2/metrics/node"
+    scheme: "https"
+    tls_config:
+      insecure_skip_verify: true
+    consul_sd_configs:
+      - server: "http://consul.service.consul:8500"
+        services:
+          - "minio"
     relabel_configs:
       - source_labels: ["__meta_consul_node"]
         target_label: "instance"
