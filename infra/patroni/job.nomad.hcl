@@ -55,9 +55,15 @@ job "patroni" {
       check {
         name     = "Patroni HTTP"
         type     = "http"
-        path     = "/liveness"
+        path     = "/health"
         interval = "10s"
         timeout  = "2s"
+      }
+
+      check_restart {
+        limit = 3
+        grace = "3m"
+        ignore_warnings = false
       }
     }
 
