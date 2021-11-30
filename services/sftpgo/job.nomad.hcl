@@ -11,8 +11,6 @@ job "sftpgo" {
     "asia"
   ]
 
-  namespace = "infra"
-
   group "sftpgo" {
     ephemeral_disk {}
 
