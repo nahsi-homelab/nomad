@@ -123,8 +123,6 @@ job "minio" {
           
         MINIO_SERVER_URL           = "https://minio.service.consul"
         MINIO_BROWSER_REDIRECT_URL = "https://minio.nahsi.dev"
-
-        MINIO_PROMETHEUS_AUTH_TYPE = "public"
         MINIO_PROMETHEUS_URL       = "http://prometheus.service.consul:9090"
       }
 
