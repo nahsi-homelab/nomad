@@ -1,6 +1,6 @@
 variables {
   versions = {
-    minio = "RELEASE.2021-11-24T23-19-33Z"
+    minio = "RELEASE.2021-12-10T23-03-39Z"
   }
 }
 
@@ -24,7 +24,7 @@ job "minio" {
   group "minio" {
     count = 4
     network {
-      port "http" {
+      port "api" {
         to = 9000
         static = 9000
       }
@@ -36,21 +36,23 @@ job "minio" {
     }
 
     service {
-      name = "minio-console"
+      name = "minio"
       port = "console"
 
       tags = [
         "traefik.enable=true",
-        "traefik.http.routers.minio.rule=Host(`minio.service.consul`)",
-        "traefik.http.routers.minio.entrypoints=https",
-        "traefik.http.routers.minio.tls=true",
+        "traefik.http.routers.minio-ui.rule=Host(`minio.service.consul`)",
+        "traefik.http.routers.minio-ui.entrypoints=https",
+        "traefik.http.routers.minio-ui.tls=true",
+        "traefik.http.services.minio-ui.loadbalancer.server.scheme=https",
+        "traefik.http.services.minio-ui.loadbalancer.serverstransport=skipverify@file",
       ]
 
       check {
         name     = "Minio liveness"
         type     = "http"
         protocol = "https"
-        port     = "http"
+        port     = "api"
         path     = "/minio/health/live"
         interval = "10s"
         timeout  = "2s"
@@ -60,8 +62,17 @@ job "minio" {
     }
 
     service {
-      name = "minio"
-      port = "http"
+      name = "minio-api"
+      port = "api"
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.minio-api.rule=Host(`minio-api.service.consul`)",
+        "traefik.http.routers.minio-api.entrypoints=https",
+        "traefik.http.routers.minio-api.tls=true",
+        "traefik.http.services.minio-api.loadbalancer.server.scheme=https",
+        "traefik.http.services.minio-api.loadbalancer.serverstransport=skipverify@file",
+      ]
 
       check {
         name     = "Minio liveness"
@@ -77,11 +88,11 @@ job "minio" {
 
     service {
       name = "minio-${meta.minio_node_id}"
-      port = "http"
+      port = "api"
     }
 
     volume "minio" {
-      type = "host"
+      type   = "host"
       source = "minio"
     }
 
@@ -94,25 +105,24 @@ job "minio" {
       }
 
       volume_mount {
-        volume = "minio"
+        volume      = "minio"
         destination = "/data"
       }
 
       env {
         MINIO_USERNAME = "nobody"
           
-        MINIO_SERVER_URL = "https://minio-1.service.consul"
+        MINIO_SERVER_URL           = "https://minio-api.service.consul"
         MINIO_BROWSER_REDIRECT_URL = "https://minio.service.consul"
-        MINIO_SITE_REGION = "${NOMAD_DC}"
         MINIO_PROMETHEUS_AUTH_TYPE = "public"
       }
 
       config {
-        image = "minio/minio:${var.versions.minio}"
+        image    = "minio/minio:${var.versions.minio}"
         hostname = "minio-${meta.minio_node_id}.service.consul"
 
         ports = [
-          "http",
+          "api",
           "console"
         ]
 
@@ -138,7 +148,7 @@ job "minio" {
 
       template {
         data =<<-EOH
-        {{- with secret "pki/issue/internal" "common_name=minio.service.consul" "alt_names=*.service.consul,localhost" -}}
+        {{- with secret "pki/issue/internal" "common_name=minio.service.consul" "alt_names=*.service.consul" -}}
         {{ .Data.issuing_ca }}{{ end }}
         EOH
 
@@ -149,7 +159,7 @@ job "minio" {
 
       template {
         data =<<-EOH
-        {{- with secret "pki/issue/internal" "common_name=minio.service.consul" "alt_names=*.service.consul,localhost" -}}
+        {{- with secret "pki/issue/internal" "common_name=minio.service.consul" "alt_names=minio.service.consul,*.service.consul,localhost" "ip_sans=127.0.0.1" -}}
         {{ .Data.certificate }}{{ end }}
         EOH
 
@@ -160,7 +170,7 @@ job "minio" {
 
       template {
         data =<<-EOH
-        {{- with secret "pki/issue/internal" "common_name=minio.service.consul" "alt_names=*.service.consul,localhost" -}}
+        {{- with secret "pki/issue/internal" "common_name=minio.service.consul" "alt_names=minio.service.consul,*.service.consul,localhost" "ip_sans=127.0.0.1" -}}
         {{ .Data.private_key }}{{ end }}
         EOH
 
