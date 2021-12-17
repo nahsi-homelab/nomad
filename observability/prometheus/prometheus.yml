@@ -168,3 +168,6 @@ scrape_configs:
     static_configs:
       - targets:
          - "s3.nahsi.dev"
+    relabel_configs:
+      - source_labels: ["__address__"]
+        target_label: "instance"
