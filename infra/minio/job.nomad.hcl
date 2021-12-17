@@ -25,27 +25,27 @@ job "minio" {
     count = 4
     network {
       port "api" {
-        to = 9000
+        to     = 9000
         static = 9000
       }
 
       port "console" {
-        to = 9001
+        to     = 9001
         static = 9001
       }
     }
 
     service {
-      name = "minio"
+      name = "minio-console"
       port = "console"
 
       tags = [
-        "traefik.enable=true",
-        "traefik.http.routers.minio-ui.rule=Host(`minio.service.consul`)",
-        "traefik.http.routers.minio-ui.entrypoints=https",
-        "traefik.http.routers.minio-ui.tls=true",
-        "traefik.http.services.minio-ui.loadbalancer.server.scheme=https",
-        "traefik.http.services.minio-ui.loadbalancer.serverstransport=skipverify@file",
+        "ingress.enable=true",
+        "ingress.http.routers.minio-ui.rule=Host(`minio.nahsi.dev`)",
+        "ingress.http.routers.minio-ui.entrypoints=https",
+        "ingress.http.routers.minio-ui.tls=true",
+        "ingress.http.services.minio-ui.loadbalancer.server.scheme=https",
+        "ingress.http.services.minio-ui.loadbalancer.serverstransport=skipverify@file",
       ]
 
       check {
@@ -62,16 +62,22 @@ job "minio" {
     }
 
     service {
-      name = "minio-api"
+      name = "minio"
       port = "api"
 
       tags = [
         "traefik.enable=true",
-        "traefik.http.routers.minio-api.rule=Host(`minio-api.service.consul`)",
+        "traefik.http.routers.minio-api.rule=Host(`minio.service.consul`)",
         "traefik.http.routers.minio-api.entrypoints=https",
         "traefik.http.routers.minio-api.tls=true",
         "traefik.http.services.minio-api.loadbalancer.server.scheme=https",
         "traefik.http.services.minio-api.loadbalancer.serverstransport=skipverify@file",
+        "ingress.enable=true",
+        "ingress.http.routers.minio-api.rule=Host(`s3.nahsi.dev`)",
+        "ingress.http.routers.minio-api.entrypoints=https",
+        "ingress.http.routers.minio-api.tls=true",
+        "ingress.http.services.minio-api.loadbalancer.server.scheme=https",
+        "ingress.http.services.minio-api.loadbalancer.serverstransport=skipverify@file",
       ]
 
       check {
@@ -111,9 +117,12 @@ job "minio" {
 
       env {
         MINIO_USERNAME = "nobody"
+
+        MINIO_SITE_NAME   = "homelab"
+        MINIO_SITE_REGION = "homelab"
           
-        MINIO_SERVER_URL           = "https://minio-api.service.consul"
-        MINIO_BROWSER_REDIRECT_URL = "https://minio.service.consul"
+        MINIO_SERVER_URL           = "https://minio.service.consul"
+        MINIO_BROWSER_REDIRECT_URL = "https://minio.nahsi.dev"
         MINIO_PROMETHEUS_AUTH_TYPE = "public"
       }
 
