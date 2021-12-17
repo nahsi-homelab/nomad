@@ -69,6 +69,9 @@ job "prometheus" {
       driver = "docker"
       user = "nobody"
 
+      vault {
+        policies = ["prometheus"]
+      }
 
       volume_mount {
         volume = "prometheus"

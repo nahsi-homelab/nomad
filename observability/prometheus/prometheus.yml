@@ -161,15 +161,10 @@ scrape_configs:
       - source_labels: ["__meta_consul_node"]
         target_label: "instance"
 
-  - job_name: "minio"
-    metrics_path: "/minio/v2/metrics/node"
+  - job_name: "minio-job"
+    bearer_token: '{{ with secret "secret/minio/prometheus" }}{{ .Data.data.token }}{{ end }}'
+    metrics_path: "/minio/v2/metrics/cluster"
     scheme: "https"
-    tls_config:
-      insecure_skip_verify: true
-    consul_sd_configs:
-      - server: "http://consul.service.consul:8500"
-        services:
-          - "minio"
-    relabel_configs:
-      - source_labels: ["__meta_consul_node"]
-        target_label: "instance"
+    static_configs:
+      - targets:
+         - "s3.nahsi.dev"
