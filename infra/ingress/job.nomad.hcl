@@ -102,6 +102,11 @@ tls:
   certificates:
     - certFile: "secrets/cert.pem"
       keyFile: "secrets/key.pem"
+
+http:
+  serversTransports:
+    skipverify:
+      insecureSkipVerify: true
 EOH
 
         destination = "local/traefik/tls.yml"
