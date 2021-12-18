@@ -93,6 +93,8 @@ services:
         url: "https://traefik-internal.service.consul"
       - name: "SFTPGO"
         url: "https://sftpgo.service.consul"
+      - name: "minio"
+        url: "https://minio.nahsi.dev"
 
   - name: "HashiStack"
     icon: "fas fa-cloud"
