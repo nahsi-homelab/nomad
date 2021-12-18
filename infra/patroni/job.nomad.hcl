@@ -76,7 +76,8 @@ job "patroni" {
       driver = "docker"
       user = "999"
 
-      kill_timeout = "45s"
+      kill_signal  = "SIGINT"
+      kill_timeout = "90s"
 
       vault {
         policies = ["postgres"]
