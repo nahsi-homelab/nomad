@@ -79,6 +79,8 @@ services:
       - name: "Transmission"
         icon: "fas fa-download"
         url: "https://transmission.service.consul"
+      - name: "LLPSI"
+        url: "https://llpsi.service.consul"
 
   - name: "Operations"
     icon: "fas fa-server"
