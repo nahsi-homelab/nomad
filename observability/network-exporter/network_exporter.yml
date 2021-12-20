@@ -1,0 +1,50 @@
+conf:
+  refresh: 15m
+  nameserver: 1.1.1.1:53
+
+icmp:
+  interval: 5s
+  timeout: 1s
+  count: 5
+
+mtr:
+  interval: 5s
+  timeout: 500ms
+  max-hops: 30
+  count: 5
+
+tcp:
+  interval: 5s
+  timeout: 1s
+
+http_get:
+  interval: 1h
+  timeout: 30s
+
+targets:
+  # syria
+  - name: syria
+    host: syria.nahsi.dev
+    type: ICMP+MTR
+
+  - name: syria-http
+    host: https://syria.nahsi.dev/512.rand
+    type: HTTPGet
+
+  # asia
+  - name: asia
+    host: asia.nahsi.dev
+    type: ICMP+MTR
+
+  - name: asia-http
+    host: https://asia.nahsi.dev/512.rand
+    type: HTTPGet
+
+  # pontus
+  - name: pontus
+    host: pontus.nahsi.dev
+    type: ICMP+MTR
+
+  - name: pontus-http
+    host: https://pontus.nahsi.dev/512.rand
+    type: HTTPGet
