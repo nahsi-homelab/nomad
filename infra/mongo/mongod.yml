@@ -1,0 +1,13 @@
+net:
+  bindIp: "0.0.0.0"
+  tls:
+    mode: "preferTLS"
+    certificateKeyFile: '/secrets/certs/{{ env "meta.mongo_node_id" }}.pem'
+    clusterFile: '/secrets/certs/{{ env "meta.mongo_node_id" }}.pem'
+    CAFile: "/secrets/certs/CA.pem"
+
+replication:
+  replSetName: "main"
+
+security:
+  clusterAuthMode: "x509"
