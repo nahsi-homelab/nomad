@@ -105,7 +105,7 @@ job "sftpgo" {
 
       template {
         data = <<EOF
-SFTPGO_DATA_PROVIDER__PASSWORD={{- with secret "database/static-creds/sftpgo" -}}{{ .Data.password }}{{ end -}}
+SFTPGO_DATA_PROVIDER__PASSWORD={{- with secret "postgres/static-creds/sftpgo" -}}{{ .Data.password }}{{ end -}}
 EOF
 
         destination = "secrets/vars.env"
