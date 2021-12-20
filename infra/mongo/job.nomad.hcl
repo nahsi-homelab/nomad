@@ -153,7 +153,9 @@ job "mongo" {
 
         args = [
           "--log.level=warn",
-          "--mongodb.direct-connect=false"
+          "--mongodb.direct-connect=false",
+          "--no-collector.diagnosticdata=false",
+          "--compatible-mode=true"
         ]
       }
 
