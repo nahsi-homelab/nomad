@@ -66,12 +66,6 @@ job "minio" {
       port = "api"
 
       tags = [
-        "traefik.enable=true",
-        "traefik.http.routers.minio-api.rule=Host(`minio.service.consul`)",
-        "traefik.http.routers.minio-api.entrypoints=https",
-        "traefik.http.routers.minio-api.tls=true",
-        "traefik.http.services.minio-api.loadbalancer.server.scheme=https",
-        "traefik.http.services.minio-api.loadbalancer.serverstransport=skipverify@file",
         "ingress.enable=true",
         "ingress.http.routers.minio-api.rule=Host(`s3.nahsi.dev`)",
         "ingress.http.routers.minio-api.entrypoints=https",
@@ -121,7 +115,7 @@ job "minio" {
         MINIO_SITE_NAME   = "homelab"
         MINIO_SITE_REGION = "homelab"
           
-        MINIO_SERVER_URL           = "https://minio.service.consul"
+        MINIO_SERVER_URL           = "https://s3.nahsi.dev"
         MINIO_BROWSER_REDIRECT_URL = "https://minio.nahsi.dev"
         MINIO_PROMETHEUS_URL       = "http://prometheus.service.consul:9090"
       }
