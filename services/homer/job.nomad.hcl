@@ -9,6 +9,11 @@ job "homer" {
     auto_revert  = true
   }
 
+  constraint {
+    operator = "distinct_hosts"
+    value = "true"
+  }
+
   group "homer" {
     count = 2
 
