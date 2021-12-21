@@ -35,41 +35,6 @@ job "network-exporter" {
       }
     }
 
-    service {
-      name = "random-files"
-      port = "web"
-
-      tags = [
-        "ingress.enable=true",
-        "ingress.http.routers.random-files.entrypoints=https",
-        "ingress.http.routers.random-files.tls=true",
-        "ingress.http.routers.random-files.rule=Host(`${node.datacenter}.nahsi.dev`)"
-      ]
-
-      check {
-        type     = "http"
-        path     = "/"
-        interval = "20s"
-        timeout  = "2s"
-      }
-    }
-
-    service {
-      name = "network-exporter"
-      port = "exporter"
-
-      meta {
-        dc = node.datacenter
-      }
-
-      check {
-        type     = "http"
-        path     = "/"
-        interval = "20s"
-        timeout  = "2s"
-      }
-    }
-
     task "random-files" {
       driver = "docker"
       user   = "nobody"
@@ -84,6 +49,26 @@ job "network-exporter" {
         SERVER_ROOT = "/alloc/data/files"
       }
 
+      service {
+        name = "random-files"
+        port = "web"
+
+        tags = [
+          "ingress.enable=true",
+          "ingress.http.routers.random-files.entrypoints=https",
+          "ingress.http.routers.random-files.tls=true",
+          "ingress.http.routers.random-files.rule=Host(`${node.datacenter}.nahsi.dev`)"
+        ]
+
+      check {
+        type     = "http"
+        path     = "/"
+        interval = "20s"
+        timeout  = "2s"
+      }
+    }
+
+
       config {
         image = "nahsihub/random-files"
         ports = ["web"]
@@ -97,6 +82,22 @@ job "network-exporter" {
       resources {
         cpu    = 10
         memory = 32
+      }
+
+      service {
+        name = "network-exporter"
+        port = "exporter"
+
+        meta {
+          dc = node.datacenter
+        }
+
+        check {
+          type     = "http"
+          path     = "/"
+          interval = "20s"
+          timeout  = "2s"
+        }
       }
 
       config {
