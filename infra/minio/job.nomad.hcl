@@ -100,6 +100,12 @@ job "minio" {
       driver = "docker"
       user   = "nobody"
 
+      resources {
+        cpu        = 300
+        memory     = 512
+        memory_max = 1024
+      }
+
       vault {
         policies = ["minio"]
       }
@@ -180,11 +186,6 @@ job "minio" {
         change_mode = "restart"
         destination = "secrets/certs/private.key"
         splay       = "1m"
-      }
-
-      resources {
-        cpu    = 200
-        memory = 512
       }
     }
   }
