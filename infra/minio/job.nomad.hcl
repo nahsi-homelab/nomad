@@ -121,7 +121,7 @@ job "minio" {
         MINIO_SITE_NAME   = "homelab"
         MINIO_SITE_REGION = "homelab"
           
-        MINIO_SERVER_URL           = "https://s3.nahsi.dev"
+        MINIO_SERVER_URL           = "https://minio.service.consul:9000"
         MINIO_BROWSER_REDIRECT_URL = "https://minio.nahsi.dev"
         MINIO_PROMETHEUS_URL       = "http://prometheus.service.consul:9090"
       }
