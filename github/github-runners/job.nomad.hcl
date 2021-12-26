@@ -8,7 +8,6 @@ variables {
 job "github-runners" {
   datacenters = [
     "syria",
-    "asia"
   ]
 
   namespace = "github"
