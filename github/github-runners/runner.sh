@@ -104,6 +104,7 @@ register_runner() {
 }
 
 remove_runner() {
+  kill -INT $PID
   get_token remove
   ${RUNNER_DIR}/config.sh remove \
     --unattended \
@@ -113,4 +114,5 @@ remove_runner() {
 register_runner
 trap 'remove_runner' INT TERM
 ${RUNNER_DIR}/bin/Runner.Listener run "$@" &
-wait $!
+PID=$!
+wait $PID
