@@ -106,6 +106,7 @@ job "github-runners" {
 
       config {
         command = "bash"
+        cap_add = ["net_admin"]
         args = [
           "local/runner.sh",
         ]
