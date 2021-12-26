@@ -129,10 +129,6 @@ job "github-runners" {
 
   group "workflows-test-exec" {
     count = 1
-    constraint {
-      attribute = meta.virtualbox
-      value     = "true"
-    }
 
     volume "docker-socket" {
       type   = "host"
