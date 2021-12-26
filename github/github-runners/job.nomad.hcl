@@ -23,11 +23,6 @@ job "github-runners" {
       distinct_hosts = true
     }
 
-    constraint {
-      attribute = meta.virtualbox
-      value     = "true"
-    }
-
     volume "docker-socket" {
       type   = "host"
       source = "docker-socket"
@@ -36,6 +31,11 @@ job "github-runners" {
     volume "vboxdrv" {
       type   = "host"
       source = "vboxdrv"
+    }
+
+    volume "vboxnetctl" {
+      type   = "host"
+      source = "vboxnetctl"
     }
 
     task "download-runner" {
@@ -90,6 +90,11 @@ job "github-runners" {
       volume_mount {
         volume      = "vboxdrv"
         destination = "/dev/vboxdrv"
+      }
+
+      volume_mount {
+        volume      = "vboxnetctl"
+        destination = "/dev/vboxnetctl"
       }
 
       env {
