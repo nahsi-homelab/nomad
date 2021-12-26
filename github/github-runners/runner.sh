@@ -37,7 +37,7 @@ case $RUNNER_TYPE in
       log "GITHUB_REPO must be defined when RUNNER_TYPE=repo"
       exit 1
     else
-      url="https://api.github.com/$GITHUB_REPO/actions/runners"
+      url="https://api.github.com/repos/$GITHUB_REPO/actions/runners"
       RUNNER_URL="https://github.com/$GITHUB_REPO"
     fi
   ;;
