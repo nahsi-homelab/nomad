@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: nahsi/files-to-matrix@add-action
+      - uses: nahsi/files-to-matrix@v1
         with:
           files: "infra/*"
           settings: >-
