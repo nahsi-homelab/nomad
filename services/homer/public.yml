@@ -1,0 +1,43 @@
+title: "nahsi.dev"
+subtitle: "Dashboard"
+columns: "auto"
+connectivityCheck: true
+footer: ""
+
+colors:
+  dark:
+    highlight-primary: "#373B41"
+    highlight-secondary: "#282A2E"
+    highlight-hover: "#373B41"
+    background: "#1D1F21"
+    card-background: "#373B41"
+  light:
+    highlight-primary: "#373B41"
+    highlight-secondary: "#282A2E"
+    highlight-hover: "#373B41"
+
+links:
+  - name: "Telegram"
+    icon: "fab fa-telegram"
+    url: "https://t.me/nahsi_at_tg"
+    target: "_blank"
+
+  - name: "Mail"
+    icon: "fas fa-envelope"
+    url: "mailto:nahsi@airmail.cc"
+    target: "_blank"
+
+services:
+  - icon: "fas fa-globe"
+    items:
+      - name: "Jellyfin"
+        logo: "https://s3.nahsi.dev/homer/jellyfin.svg"
+        url: "https://jellyfin.nahsi.dev"
+
+      - name: "MinIO"
+        logo: "https://s3.nahsi.dev/homer/minio.png"
+        url: "https://minio.nahsi.dev"
+
+      - name: "LLPSI"
+        subtitle: "Lingua Latina Per Se Illustrata exercises"
+        url: "https://llpsi.nahsi.dev"
