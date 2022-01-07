@@ -37,7 +37,7 @@ jobs:
         id: jobs
         uses: nahsi/files-to-matrix@v1
         with:
-          files: "${{ steps.files.outputs.changed_files }}"
+          files: "${{ steps.files.outputs.all_changed_files }}"
           settings: >-
             [
               {
