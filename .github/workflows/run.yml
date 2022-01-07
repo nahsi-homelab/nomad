@@ -1,0 +1,102 @@
+name: "Run jobs"
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: "Branch, tag or SHA to checkout to"
+        type: string
+        default: "${{ github.ref }}"
+      namespace:
+        description: "Nomad namespace"
+        type: string
+        required: true
+
+    outputs:
+      matrix:
+        description: "Created job matrix"
+        value: "${{ jobs.matrix.outputs.jobs }}"
+
+jobs:
+  matrix:
+    name: "Create matrix"
+    runs-on: ubuntu-latest
+
+    outputs:
+      jobs: "${{ steps.jobs.outputs.matrix }}"
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: "Get changed files"
+        id: files
+        uses: tj-actions/changed-files@v13
+        with:
+          files: "${{ inputs.namespace }}"
+
+      - name: "Create matrix"
+        if: steps.files.outputs.any_changed == 'true'
+        id: jobs
+        uses: nahsi/files-to-matrix@v1
+        with:
+          files: "${{ steps.files.outputs.changed_files }}"
+          settings: >-
+            [
+              {
+                "name": "namespace",
+                "level": 0
+              },
+              {
+                "name": "name",
+                "level": 1
+              }
+            ]
+
+  run:
+    name: "Run job"
+    if: needs.matrix.outputs.jobs
+    runs-on: driver-exec
+    needs: matrix
+
+    strategy:
+      fail-fast: false
+      matrix:
+        job: "${{ needs.matrix.outputs.jobs }}"
+
+    env:
+      NOMAD_ADDR: "http://nomad.service.consul:4646"
+
+    defaults:
+      run:
+        working-directory: "${{ matrix.job.namespace }}/${{ matrix.job.name }}"
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Check connection"
+        run: nomad node status
+
+      - name: "Validate"
+        run: nomad validate job.nomad.hcl
+
+      - name: "Plan"
+        run: |
+          echo "Run nomad plan"
+          if out="$(nomad plan job.nomad.hcl)"; then
+            echo "$out"
+          else
+            # Plan will return one of the following exit codes:
+            # * 0: No allocations created or destroyed.
+            # * 1: Allocations created or destroyed.
+            # * 255: Error determining plan results.
+            case $? in
+              255) echo "$out"; exit 1 ;;
+              1) echo "$out"; exit 0 ;;
+            esac
+          fi
+
+      - name: "Run"
+        if: github.event_name == 'push'
+        run: nomad run job.nomad.hcl
