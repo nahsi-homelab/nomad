@@ -7,12 +7,12 @@ job "transmission" {
     network {
       port "web-ui" {
         static = 9091
-        to = 9091
+        to     = 9091
       }
 
       port "torrent" {
         static = 51413
-        to = 51413
+        to     = 51413
       }
     }
 
@@ -28,7 +28,7 @@ job "transmission" {
     }
 
     volume "transmission" {
-      type = "host"
+      type   = "host"
       source = "transmission"
     }
 
@@ -36,14 +36,14 @@ job "transmission" {
       driver = "docker"
 
       env {
-        PUID = "1000"
-        PGID = "1000"
-        TZ = "Europe/Moscow"
-        TRANSMISSION_WEB_HOME="/flood-for-transmission"
+        PUID                  = "1000"
+        PGID                  = "1000"
+        TZ                    = "Europe/Moscow"
+        TRANSMISSION_WEB_HOME = "/flood-for-transmission"
       }
 
       volume_mount {
-        volume = "transmission"
+        volume      = "transmission"
         destination = "/config"
       }
 
@@ -81,12 +81,12 @@ job "transmission" {
       driver = "docker"
 
       env {
-        WEB_ADDR=":${NOMAD_PORT_http}"
-        TRANSMISSION_ADDR="http://transmission.service.consul:9091"
+        WEB_ADDR          = ":${NOMAD_PORT_http}"
+        TRANSMISSION_ADDR = "http://transmission.service.consul:9091"
       }
 
       config {
-        image = "metalmatze/transmission-exporter:master"
+        image      = "metalmatze/transmission-exporter:master"
         force_pull = true
 
         ports = [

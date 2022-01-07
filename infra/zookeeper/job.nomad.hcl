@@ -1,7 +1,7 @@
 variables {
   versions = {
     zookeeper = "3.7.0"
-    promtail = "2.4.1"
+    promtail  = "2.4.1"
   }
 }
 
@@ -29,17 +29,17 @@ job "zookeeper" {
 
     network {
       port "client" {
-        to = 2181
+        to     = 2181
         static = 2181
       }
 
       port "follower" {
-        to = 2888
+        to     = 2888
         static = 2888
       }
 
       port "election" {
-        to = 3888
+        to     = 3888
         static = 3888
       }
 
@@ -67,11 +67,11 @@ job "zookeeper" {
       port = "client"
 
       check {
-        name     = "ZooKeeper ruok"
-        task     = "zookeeper"
-        type     = "script"
-        command  = "/bin/bash"
-        args     = [
+        name    = "ZooKeeper ruok"
+        task    = "zookeeper"
+        type    = "script"
+        command = "/bin/bash"
+        args = [
           "-c",
           "[[ $(echo ruok|nc ${NOMAD_IP_client} ${NOMAD_PORT_client}) == imok ]] || exit 2"
         ]
@@ -85,7 +85,7 @@ job "zookeeper" {
       port = "promtail"
 
       meta {
-        sidecar_to = "zookeeper" 
+        sidecar_to = "zookeeper"
       }
 
       check {
@@ -97,13 +97,13 @@ job "zookeeper" {
     }
 
     volume "zookeeper" {
-      type = "host"
+      type   = "host"
       source = "zookeeper"
     }
 
     task "zookeeper" {
       driver = "docker"
-      user = "1001"
+      user   = "1001"
 
       vault {
         policies = [
@@ -112,21 +112,21 @@ job "zookeeper" {
       }
 
       resources {
-        cpu = 300
+        cpu    = 300
         memory = 512
       }
 
       volume_mount {
-        volume = "zookeeper"
+        volume      = "zookeeper"
         destination = "/bitnami/zookeeper"
       }
 
       env {
-        JVMFLAGS = "-Xmx512m -Djava.security.auth.login.config=/secrets/jaas.conf"
-        ALLOW_ANONYMOUS_LOGIN="yes"
+        JVMFLAGS              = "-Xmx512m -Djava.security.auth.login.config=/secrets/jaas.conf"
+        ALLOW_ANONYMOUS_LOGIN = "yes"
 
-        ZOO_SERVER_ID = meta.zoo_node_id
-        ZOO_DATA_DIR = "/bitnami/zookeeper/data"
+        ZOO_SERVER_ID    = meta.zoo_node_id
+        ZOO_DATA_DIR     = "/bitnami/zookeeper/data"
         ZOO_DATA_LOG_DIR = "/bitnami/zookeeper/datalog"
       }
 
@@ -150,13 +150,13 @@ job "zookeeper" {
       }
 
       template {
-        data = file("zoo.cfg")
+        data        = file("zoo.cfg")
         destination = "local/zoo.cfg"
         change_mode = "restart"
       }
 
       template {
-        data = file("jaas.conf")
+        data        = file("jaas.conf")
         destination = "secrets/jaas.conf"
         change_mode = "restart"
       }
@@ -164,7 +164,7 @@ job "zookeeper" {
 
     task "promtail" {
       driver = "docker"
-      user = "nobody"
+      user   = "nobody"
 
       lifecycle {
         hook    = "poststart"
@@ -172,7 +172,7 @@ job "zookeeper" {
       }
 
       resources {
-        cpu = 50
+        cpu    = 50
         memory = 128
       }
 
@@ -189,7 +189,7 @@ job "zookeeper" {
       }
 
       template {
-        data = file("promtail.yml")
+        data        = file("promtail.yml")
         destination = "local/promtail.yml"
       }
     }

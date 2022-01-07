@@ -28,36 +28,36 @@ job "jellyfin" {
       ]
 
       check {
-        type = "http"
+        type     = "http"
         protocol = "http"
-        path = "/health"
-        port = "http"
+        path     = "/health"
+        port     = "http"
         interval = "20s"
-        timeout = "2s"
+        timeout  = "2s"
       }
     }
 
     volume "jellyfin" {
-      type = "host"
+      type   = "host"
       source = "jellyfin"
     }
 
     volume "jellyfin-cache" {
-      type = "host"
+      type   = "host"
       source = "jellyfin-cache"
     }
 
     task "jellyfin" {
       driver = "docker"
-      user = "nobody"
+      user   = "nobody"
 
       volume_mount {
-        volume = "jellyfin"
+        volume      = "jellyfin"
         destination = "/config"
       }
 
       volume_mount {
-        volume = "jellyfin-cache"
+        volume      = "jellyfin-cache"
         destination = "/cache"
       }
 
@@ -76,7 +76,7 @@ job "jellyfin" {
       }
 
       resources {
-        cpu = 10000
+        cpu    = 10000
         memory = 2048
       }
     }

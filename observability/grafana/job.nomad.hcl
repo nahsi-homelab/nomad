@@ -1,6 +1,6 @@
 variables {
   versions = {
-    grafana = "8.2.3"
+    grafana  = "8.2.3"
     promtail = "2.4.1"
   }
 }
@@ -61,26 +61,26 @@ job "grafana" {
     }
 
     volume "grafana" {
-      type = "host"
+      type   = "host"
       source = "grafana"
     }
 
     task "grafana" {
       driver = "docker"
-      user = "nobody"
+      user   = "nobody"
 
       vault {
         policies = ["grafana"]
       }
 
       volume_mount {
-        volume = "grafana"
+        volume      = "grafana"
         destination = "/var/lib/grafana"
       }
 
       env {
-        GF_PATHS_CONFIG="/local/grafana/grafana.ini"
-        GF_PATHS_PROVISIONING="/local/grafana/provisioning"
+        GF_PATHS_CONFIG       = "/local/grafana/grafana.ini"
+        GF_PATHS_PROVISIONING = "/local/grafana/provisioning"
       }
 
       config {
@@ -92,31 +92,31 @@ job "grafana" {
       }
 
       template {
-        data = file("grafana.ini")
+        data        = file("grafana.ini")
         destination = "local/grafana/grafana.ini"
       }
 
       template {
-        data = file("provisioning/datasources.yml")
+        data        = file("provisioning/datasources.yml")
         destination = "local/grafana/provisioning/datasources/datasources.yml"
       }
 
       template {
-        data = <<EOH
+        data        = <<EOH
 {{ with secret "secret/grafana/github" }}{{ .Data.data.client_id }}{{ end }}
 EOH
         destination = "secrets/github/client_id"
       }
 
       template {
-        data = <<EOH
+        data        = <<EOH
 {{ with secret "secret/grafana/github" }}{{ .Data.data.secret_id }}{{ end }}
 EOH
         destination = "secrets/github/secret_id"
       }
 
       template {
-        data = <<EOH
+        data        = <<EOH
 {{ with secret "secret/grafana/users/admin" }}{{ .Data.data.password }}{{ end }}
 EOH
         destination = "secrets/admin_password"
@@ -136,9 +136,9 @@ EOH
       }
 
       service {
-        name = "promtail"
-        port = "promtail"
-        tags = ["service=grafana"]
+        name         = "promtail"
+        port         = "promtail"
+        tags         = ["service=grafana"]
         address_mode = "host"
 
         check {
@@ -150,7 +150,7 @@ EOH
       }
 
       resources {
-        cpu = 50
+        cpu    = 50
         memory = 64
       }
 
@@ -167,7 +167,7 @@ EOH
       }
 
       template {
-        data = file("promtail.yml")
+        data        = file("promtail.yml")
         destination = "local/promtail.yml"
       }
     }

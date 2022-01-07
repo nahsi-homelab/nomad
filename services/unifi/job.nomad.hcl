@@ -6,27 +6,27 @@ job "unifi" {
     network {
       port "web-ui" {
         static = 8443
-        to = 8443
+        to     = 8443
       }
 
       port "inform" {
         static = 8080
-        to = 8080
+        to     = 8080
       }
 
       port "stun" {
         static = 3478
-        to = 3478
+        to     = 3478
       }
 
       port "device-discovery" {
         static = 10001
-        to = 10001
+        to     = 10001
       }
 
       port "l2-discovery" {
         static = 1900
-        to = 1900
+        to     = 1900
       }
 
     }
@@ -56,7 +56,7 @@ job "unifi" {
     }
 
     volume "unifi" {
-      type = "host"
+      type   = "host"
       source = "unifi"
     }
 
@@ -69,7 +69,7 @@ job "unifi" {
       }
 
       volume_mount {
-        volume = "unifi"
+        volume      = "unifi"
         destination = "/config"
       }
 
@@ -113,7 +113,7 @@ job "unifi" {
       }
 
       config {
-        image = "golift/unifi-poller"
+        image      = "golift/unifi-poller"
         force_pull = true
 
         ports = [
@@ -126,7 +126,7 @@ job "unifi" {
       }
 
       template {
-        data = <<EOH
+        data        = <<EOH
         [unifi.defaults]
           url = "https://unifi.service.consul:8443"
           verify_ssl = false

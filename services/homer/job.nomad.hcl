@@ -11,7 +11,7 @@ job "homer" {
 
   constraint {
     operator = "distinct_hosts"
-    value = "true"
+    value    = "true"
   }
 
   group "homer" {
@@ -50,7 +50,7 @@ job "homer" {
 
       template {
         destination = "local/config.yml"
-        data = <<EOH
+        data        = <<EOH
 ---
 title: "Dashboard"
 subtitle: "Homelab"

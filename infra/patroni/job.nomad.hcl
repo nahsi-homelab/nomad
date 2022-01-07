@@ -1,6 +1,6 @@
 variables {
   versions = {
-    patroni = "latest"
+    patroni  = "latest"
     promtail = "2.4.1"
     exporter = "0.10.0"
   }
@@ -19,7 +19,7 @@ job "patroni" {
 
     network {
       port "postgres" {
-        to = 5432
+        to     = 5432
         static = 5432
       }
 
@@ -61,20 +61,20 @@ job "patroni" {
       }
 
       check_restart {
-        limit = 3
-        grace = "3m"
+        limit           = 3
+        grace           = "3m"
         ignore_warnings = false
       }
     }
 
     volume "postgres" {
-      type = "host"
+      type   = "host"
       source = "postgres"
     }
 
     task "patroni" {
       driver = "docker"
-      user = "999"
+      user   = "999"
 
       kill_signal  = "SIGINT"
       kill_timeout = "90s"
@@ -84,18 +84,18 @@ job "patroni" {
       }
 
       resources {
-        cpu = 300
+        cpu    = 300
         memory = 512
       }
 
       volume_mount {
-        volume = "postgres"
+        volume      = "postgres"
         destination = "/data"
       }
 
       env {
-        PATRONI_NAME = node.unique.name
-        PATRONI_RESTAPI_CONNECT_ADDRESS = "${NOMAD_ADDR_patroni}"
+        PATRONI_NAME                       = node.unique.name
+        PATRONI_RESTAPI_CONNECT_ADDRESS    = "${NOMAD_ADDR_patroni}"
         PATRONI_POSTGRESQL_CONNECT_ADDRESS = "${NOMAD_ADDR_postgres}"
       }
 
@@ -115,7 +115,7 @@ job "patroni" {
       }
 
       template {
-        data = file("patroni.yml")
+        data        = file("patroni.yml")
         destination = "local/patroni.yml"
       }
 
@@ -131,13 +131,13 @@ EOF
 
         destination = "secrets/vars.env"
         change_mode = "noop"
-        env = true
+        env         = true
       }
     }
 
     task "promtail" {
       driver = "docker"
-      user = "nobody"
+      user   = "nobody"
 
       lifecycle {
         hook    = "poststart"
@@ -145,7 +145,7 @@ EOF
       }
 
       resources {
-        cpu = 50
+        cpu    = 50
         memory = 64
       }
 
@@ -162,7 +162,7 @@ EOF
       }
 
       template {
-        data = file("promtail.yml")
+        data        = file("promtail.yml")
         destination = "local/promtail.yml"
       }
     }
@@ -190,14 +190,14 @@ EOF
 
     task "postgres-exporter" {
       driver = "docker"
-      user = "nobody"
+      user   = "nobody"
 
       vault {
         policies = ["postgres"]
       }
 
       resources {
-        cpu = 50
+        cpu    = 50
         memory = 64
       }
 
@@ -219,7 +219,7 @@ EOF
 
         destination = "secrets/vars.env"
         change_mode = "restart"
-        env = true
+        env         = true
       }
     }
   }

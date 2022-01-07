@@ -1,6 +1,6 @@
 variables {
   versions = {
-    sftpgo = "2.2.0-alpine"
+    sftpgo   = "2.2.0-alpine"
     promtail = "2.4.1"
   }
 }
@@ -85,8 +85,8 @@ job "sftpgo" {
       }
 
       env {
-        SFTPGO_CONFIG_DIR="${NOMAD_ALLOC_DIR}/data"
-        SFTPGO_CONFIG_FILE="/local/sftpgo.yml"
+        SFTPGO_CONFIG_DIR  = "${NOMAD_ALLOC_DIR}/data"
+        SFTPGO_CONFIG_FILE = "/local/sftpgo.yml"
       }
 
       config {
@@ -99,7 +99,7 @@ job "sftpgo" {
       }
 
       template {
-        data = file("sftpgo.yml")
+        data        = file("sftpgo.yml")
         destination = "local/sftpgo.yml"
       }
 
@@ -110,7 +110,7 @@ EOF
 
         destination = "secrets/vars.env"
         change_mode = "noop"
-        env = true
+        env         = true
       }
 
       resources {
@@ -129,7 +129,7 @@ EOF
       }
 
       resources {
-        cpu = 50
+        cpu    = 50
         memory = 64
       }
 
@@ -146,7 +146,7 @@ EOF
       }
 
       template {
-        data = file("promtail.yml")
+        data        = file("promtail.yml")
         destination = "local/promtail.yml"
       }
     }

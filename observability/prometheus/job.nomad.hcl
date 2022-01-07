@@ -1,7 +1,7 @@
 variables {
   versions = {
     prometheus = "2.30.3"
-    promtail = "2.4.1"
+    promtail   = "2.4.1"
   }
 }
 
@@ -13,7 +13,7 @@ job "prometheus" {
   group "prometheus" {
     network {
       port "prometheus" {
-        to = 9090
+        to     = 9090
         static = 9090
       }
       port "promtail" {
@@ -61,20 +61,20 @@ job "prometheus" {
     }
 
     volume "prometheus" {
-      type = "host"
+      type   = "host"
       source = "prometheus"
     }
 
     task "prometheus" {
       driver = "docker"
-      user = "nobody"
+      user   = "nobody"
 
       vault {
         policies = ["prometheus"]
       }
 
       volume_mount {
-        volume = "prometheus"
+        volume      = "prometheus"
         destination = "/var/lib/prometheus"
       }
 
@@ -95,7 +95,7 @@ job "prometheus" {
       }
 
       template {
-        data = file("prometheus.yml")
+        data          = file("prometheus.yml")
         change_mode   = "signal"
         change_signal = "SIGHUP"
         destination   = "local/prometheus.yml"
@@ -116,7 +116,7 @@ job "prometheus" {
       }
 
       resources {
-        cpu = 50
+        cpu    = 50
         memory = 64
       }
 
@@ -133,7 +133,7 @@ job "prometheus" {
       }
 
       template {
-        data = file("promtail.yml")
+        data        = file("promtail.yml")
         destination = "local/promtail.yml"
       }
     }
