@@ -6,24 +6,24 @@ on:
       - "master"
 
 concurrency:
-  group: "jobs-pr-${{ github.ref }}"
+  group: "jobs-pr-${{ github.head_ref }}"
   cancel-in-progress: true
 
 jobs:
   infra:
-    uses: nahsi-homelab/nomad/.github/workflows/run.yml@${{ github.ref }}
+    uses: nahsi-homelab/nomad/.github/workflows/run.yml@${{ github.head_ref }}
     with:
       namespace: "infra"
 
   observability:
-    uses: nahsi-homelab/nomad/.github/workflows/run.yml@${{ github.ref }}
+    uses: nahsi-homelab/nomad/.github/workflows/run.yml@${{ github.head_ref }}
     with:
       namespace: "observability"
 
   services:
-    uses: nahsi-homelab/nomad/.github/workflows/run.yml@${{ github.ref }}
+    uses: nahsi-homelab/nomad/.github/workflows/run.yml@${{ github.head_ref }}
     with:
       namespace: "services"
 
   deleted:
-    uses: nahsi-homelab/nomad/.github/workflows/stop.yml@${{ github.ref }}
+    uses: nahsi-homelab/nomad/.github/workflows/stop.yml@${{ github.head_ref }}
