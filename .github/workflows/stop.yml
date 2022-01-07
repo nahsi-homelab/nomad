@@ -1,0 +1,70 @@
+name: "Stop jobs"
+
+on:
+  workflow_call:
+    outputs:
+      matrix:
+        description: "Created job matrix"
+        value: "${{ jobs.matrix.outputs.jobs }}"
+
+jobs:
+  matrix:
+    name: "Create matrix"
+    runs-on: ubuntu-latest
+
+    outputs:
+      jobs: "${{ steps.jobs.outputs.matrix }}"
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: "Get deleted files"
+        id: files
+        uses: tj-actions/changed-files@v13
+        with:
+          files: |
+            !.github/**
+            **
+
+      - name: "Create matrix"
+        if: steps.files.outputs.any_deleted == 'true'
+        id: jobs
+        uses: nahsi/files-to-matrix@v1
+        with:
+          files: "${{ steps.files.outputs.deleted_files }}"
+          settings: >-
+            [
+              {
+                "name": "namespace",
+                "level": 0
+              },
+              {
+                "name": "name",
+                "level": 1
+              }
+            ]
+
+  run:
+    name: "Stop job"
+    if: needs.matrix.outputs.jobs 
+    runs-on: driver-exec
+    needs: matrix
+
+    strategy:
+      fail-fast: false
+      matrix:
+        job: "${{ fromJson(needs.matrix.outputs.jobs) }}"
+
+    env:
+      NOMAD_NAMESPACE: "${{ matrix.job.namespace }}"
+      NOMAD_ADDR: "http://nomad.service.consul:4646"
+
+    steps:
+      - name: "Check connection"
+        run: nomad node status
+
+      - name: "Stop"
+        if: github.event_name == 'push'
+        run: nomad stop "${{ matrix.job.name }}"

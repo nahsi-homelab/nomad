@@ -1,0 +1,29 @@
+name: jobs PR
+
+on:
+  pull_request:
+    branches:
+      - "master"
+
+concurrency:
+  group: "jobs-pr-${{ github.head_ref }}"
+  cancel-in-progress: true
+
+jobs:
+  infra:
+    uses: nahsi-homelab/nomad/.github/workflows/run.yml@master
+    with:
+      namespace: "infra"
+
+  observability:
+    uses: nahsi-homelab/nomad/.github/workflows/run.yml@master
+    with:
+      namespace: "observability"
+
+  services:
+    uses: nahsi-homelab/nomad/.github/workflows/run.yml@master
+    with:
+      namespace: "services"
+
+  deleted:
+    uses: nahsi-homelab/nomad/.github/workflows/stop.yml@master
