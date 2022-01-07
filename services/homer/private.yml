@@ -1,0 +1,104 @@
+title: "nahsi-homelab"
+subtitle: "Dashboard"
+columns: "auto"
+connectivityCheck: true
+footer: ""
+
+colors:
+  dark:
+    highlight-primary: "#373B41"
+    highlight-secondary: "#282A2E"
+    highlight-hover: "#373B41"
+    background: "#1D1F21"
+    card-background: "#373B41"
+  light:
+    highlight-primary: "#373B41"
+    highlight-secondary: "#282A2E"
+    highlight-hover: "#373B41"
+
+links:
+  - name: "GitHub"
+    icon: "fab fa-github"
+    url: "https://github.com/nahsi"
+    target: "_blank"
+
+  - name: "Links"
+    icon: "fa fa-link"
+    url: "https://links.service.consul"
+    target: "_blank"
+
+  - name: "LLPSI"
+    icon: "fa fa-book"
+    url: "https://llpsi.nahsi.dev"
+    target: "_blank"
+
+  - name: "CloudFlare"
+    icon: "fab fa-cloudflare"
+    url: "https://dash.cloudflare.com"
+    target: "_blank"
+
+  - name: "UniFI"
+    icon: "fa fa-network-wired"
+    url: "https://unifi.service.consul"
+    target: "_blank"
+
+services:
+  - name: "HashiStack"
+    icon: "fa fa-cloud"
+    items:
+      - name: "Nomad"
+        logo: "https://s3.nahsi.dev/homer/nomad.png"
+        url: "http://nomad.service.consul:4641"
+
+      - name: "Consul"
+        logo: "https://s3.nahsi.dev/homer/consul.png"
+        url: "http://consul.service.consul:8500"
+
+      - name: "Vault"
+        logo: "https://s3.nahsi.dev/homer/vault.png"
+        url: "http://vault.service.consul:8200"
+
+  - name: "Applications"
+    icon: "fa fa-code-branch"
+    items:
+      - name: "Jellyfin"
+        logo: "https://s3.nahsi.dev/homer/jellyfin.svg"
+        url: "https://jellyfin.nahsi.dev"
+
+      - name: "Audioserve"
+        icon: "fas fa-file-audio"
+        url: "https://audioserve.nahsi.dev"
+
+      - name: "Polaris"
+        logo: "https://s3.nahsi.dev/homer/polaris.png"
+        url: "https://polaris.service.consul"
+
+      - name: "Transmission"
+        logo: "https://s3.nahsi.dev/homer/transmission.png"
+        url: "https://transmission.service.consul"
+
+      - name: "SFTPGo"
+        icon: "fas fa-cloud-download-alt"
+        url: "https://sftpgo.service.consul"
+
+  - name: "Infra"
+    icon: "fa fa-server"
+    items:
+      - name: "Traefik"
+        logo: "https://s3.nahsi.dev/homer/traefik.png"
+        url: "https://traefik-internal.service.consul"
+
+      - name: "MinIO"
+        logo: "https://s3.nahsi.dev/homer/minio.png"
+        url: "https://minio.nahsi.dev"
+
+  - name: "Observability"
+    icon: "fa fa-heartbeat"
+    items:
+      - name: "Grafana"
+        logo: "https://s3.nahsi.dev/homer/grafana.png"
+        url: "https://grafana.service.consul"
+
+      - name: "Prometheus"
+        logo: "https://s3.nahsi.dev/homer/prometheus.png"
+        url: "https://prometheus.service.consul"

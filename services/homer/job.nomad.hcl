@@ -1,3 +1,9 @@
+variables {
+  versions = {
+    homer = "21.09.2"
+  }
+}
+
 job "homer" {
   datacenters = [
     "syria",
@@ -7,7 +13,7 @@ job "homer" {
 
   update {
     max_parallel = 1
-    stagger      = "10s"
+    stagger      = "20s"
     auto_revert  = true
   }
 
@@ -16,9 +22,8 @@ job "homer" {
     value    = "true"
   }
 
-  group "homer" {
+  group "private" {
     count = 2
-
     network {
       port "http" {
         to = 8080
@@ -28,98 +33,97 @@ job "homer" {
     service {
       name = "homer"
       port = "http"
+
       tags = [
         "traefik.enable=true",
+        "traefik.entrypoints=https",
         "traefik.http.routers.homer.rule=Host(`homer.service.consul`)",
         "traefik.http.routers.homer.tls=true"
       ]
+
+      check {
+        name     = "Homer HTTP"
+        type     = "http"
+        path     = "/"
+        interval = "20s"
+        timeout  = "1s"
+      }
     }
 
     task "homer" {
       driver = "docker"
 
-      config {
-        image = "b4bz/homer:21.09.2-amd64"
+      resources {
+        cpu    = 10
+        memory = 10
+      }
 
+      config {
+        image = "b4bz/homer:${var.versions.homer}"
         ports = [
           "http"
         ]
-
         volumes = [
           "local/config.yml:/www/assets/config.yml"
         ]
       }
 
       template {
-        data = <<-EOH
-        ---
-        title: "Dashboard"
-        subtitle: "Homelab"
-        columns: "auto"
-        connectivityCheck: false
-
-        links:
-          - name: "Homelab"
-            icon: "fab fa-github"
-            url: "https://github.com/nahsi-homelab"
-
-        services:
-          - name: "Applications"
-            icon: "fas fa-code-branch"
-            items:
-              - name: "Jellyfin"
-                icon: "fas fa-film"
-                url: "https://jellyfin.service.consul"
-              - name: "Audioserve"
-                icon: "fas fa-book"
-                url: "https://audioserve.service.consul"
-              - name: "Polaris"
-                icon: "fas fa-music"
-                url: "https://polaris.service.consul"
-              - name: "Linkding"
-                icon: "fas fa-link"
-                url: "https://links.service.consul"
-              - name: "Podgrab"
-                icon: "fas fa-podcast"
-                url: "https://podgrab.service.consul"
-              - name: "Transmission"
-                icon: "fas fa-download"
-                url: "https://transmission.service.consul"
-              - name: "LLPSI"
-                url: "https://llpsi.service.consul"
-
-          - name: "Operations"
-            icon: "fas fa-server"
-            items:
-              - name: "Unifi"
-                url: "https://unifi.service.consul"
-              - name: "Grafana"
-                url: "https://grafana.service.consul"
-              - name: "Prometheus"
-                url: "https://prometheus.service.consul"
-              - name: "Traefik"
-                url: "https://traefik-internal.service.consul"
-              - name: "SFTPGO"
-                url: "https://sftpgo.service.consul"
-              - name: "minio"
-                url: "https://minio.nahsi.dev"
-
-          - name: "HashiStack"
-            icon: "fas fa-cloud"
-            items:
-              - name: "Nomad"
-                url: "http://nomad.service.consul:4646"
-              - name: "Consul"
-                url: "http://consul.service.consul:8500"
-              - name: "Vault"
-              url: "http://vault.service.consul:8200"
-        EOH
-
+        data        = file("private.yml")
         destination = "local/config.yml"
       }
+    }
+  }
+
+  group "public" {
+    count = 2
+    network {
+      port "http" {
+        to = 8080
+      }
+    }
+
+    service {
+      name = "homer"
+      port = "http"
+
+      tags = [
+        "ingress.enable=true",
+        "ingress.entrypoints=https",
+        "ingress.http.routers.homer.rule=Host(`nahsi.dev`)",
+        "ingress.http.routers.homer.tls=true"
+      ]
+
+      check {
+        name     = "Homer HTTP"
+        type     = "http"
+        path     = "/"
+        interval = "20s"
+        timeout  = "1s"
+      }
+    }
+
+    task "homer" {
+      driver = "docker"
 
       resources {
-        memory = 64
+        cpu    = 10
+        memory = 10
+      }
+
+      config {
+        image = "b4bz/homer:${var.versions.homer}"
+        ports = [
+          "http"
+        ]
+        volumes = [
+          "local/config.yml:/www/assets/config.yml"
+        ]
+      }
+
+      template {
+        data        = file("public.yml")
+        destination = "local/config.yml"
       }
     }
   }
