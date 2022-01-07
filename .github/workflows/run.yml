@@ -59,7 +59,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        job: "${{ needs.matrix.outputs.jobs }}"
+        job: "${{ fromJson(needs.matrix.outputs.jobs) }}"
 
     env:
       NOMAD_ADDR: "http://nomad.service.consul:4646"
