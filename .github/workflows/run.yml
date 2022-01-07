@@ -3,10 +3,6 @@ name: "Run jobs"
 on:
   workflow_call:
     inputs:
-      ref:
-        description: "Branch, tag or SHA to checkout to"
-        type: string
-        default: "${{ github.ref }}"
       namespace:
         description: "Nomad namespace"
         type: string
