@@ -73,50 +73,50 @@ job "mongo" {
       }
 
       template {
-        data =<<-EOH
+        data = <<-EOH
         {{- with secret "pki/issue/internal" "ttl=90d" "common_name=*.service.consul" -}}
         {{ .Data.issuing_ca }}{{ end }}
         EOH
 
-        destination   = "secrets/certs/CA.pem"
-        change_mode   = "restart"
-        splay         = "1m"
+        destination = "secrets/certs/CA.pem"
+        change_mode = "restart"
+        splay       = "1m"
       }
 
       template {
-        data =<<-EOH
+        data = <<-EOH
         {{- with secret "pki/issue/internal" "ttl=90d" "common_name=mongo.service.consul" "alt_names=mongo-primary.service.consul" -}}
         {{ .Data.private_key }}
         {{ .Data.certificate }}{{ end }}
         EOH
 
-        destination   = "secrets/certs/primary.pem"
-        change_mode   = "restart"
-        splay         = "1m"
+        destination = "secrets/certs/primary.pem"
+        change_mode = "restart"
+        splay       = "1m"
       }
 
       template {
-        data =<<-EOH
+        data = <<-EOH
         {{- with secret "pki/issue/internal" "ttl=90d" "common_name=mongo.service.consul" "alt_names=mongo-secondary.service.consul" -}}
         {{ .Data.private_key }}
         {{ .Data.certificate }}{{ end }}
         EOH
 
-        destination   = "secrets/certs/secondary.pem"
-        change_mode   = "restart"
-        splay         = "1m"
+        destination = "secrets/certs/secondary.pem"
+        change_mode = "restart"
+        splay       = "1m"
       }
 
       template {
-        data =<<-EOH
+        data = <<-EOH
         {{- with secret "pki/issue/internal" "ttl=90d" "common_name=mongo.service.consul" "alt_names=mongo-arbiter.service.consul" -}}
         {{ .Data.private_key }}
         {{ .Data.certificate }}{{ end }}
         EOH
 
-        destination   = "secrets/certs/arbiter.pem"
-        change_mode   = "restart"
-        splay         = "1m"
+        destination = "secrets/certs/arbiter.pem"
+        change_mode = "restart"
+        splay       = "1m"
       }
     }
   }
@@ -147,7 +147,7 @@ job "mongo" {
       }
 
       config {
-        image    = "percona/mongodb_exporter:${var.versions.exporter}"
+        image = "percona/mongodb_exporter:${var.versions.exporter}"
 
         ports = ["exporter"]
 
@@ -160,36 +160,36 @@ job "mongo" {
       }
 
       template {
-        data =<<-EOH
+        data = <<-EOH
         MONGODB_URI=mongodb://{{- with secret "mongo/creds/exporter" -}}{{ .Data.username }}:{{ .Data.password }}{{ end -}}@mongo-primary.service.consul:27017,mongo-secondary.service.consul:27017,mongo-arbiter.service.consul:27017/admin?tls=true&tlsCertificateKeyFile=/secrets/certs/key.pem&tlsCAFile=/secrets/certs/CA.pem
         EOH
 
-        destination   = "secrets/env"
-        change_mode   = "restart"
-        env           = true
+        destination = "secrets/env"
+        change_mode = "restart"
+        env         = true
       }
 
       template {
-        data =<<-EOH
+        data = <<-EOH
         {{- with secret "pki/issue/internal" "common_name=*.service.consul" -}}
         {{ .Data.issuing_ca }}{{ end }}
         EOH
 
-        destination   = "secrets/certs/CA.pem"
-        change_mode   = "restart"
-        splay         = "1m"
+        destination = "secrets/certs/CA.pem"
+        change_mode = "restart"
+        splay       = "1m"
       }
 
       template {
-        data =<<-EOH
+        data = <<-EOH
         {{- with secret "pki/issue/internal" "common_name=mongo-exporter.service.consul" -}}
         {{ .Data.private_key }}
         {{ .Data.certificate }}{{ end }}
         EOH
 
-        destination   = "secrets/certs/key.pem"
-        change_mode   = "restart"
-        splay         = "1m"
+        destination = "secrets/certs/key.pem"
+        change_mode = "restart"
+        splay       = "1m"
       }
     }
   }

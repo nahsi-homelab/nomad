@@ -3,6 +3,7 @@ job "llpsi" {
     "syria",
     "asia"
   ]
+  namespace = "services"
 
   constraint {
     distinct_property = "${node.datacenter}"

@@ -1,15 +1,17 @@
 variables {
   versions = {
-    kafka = "2.8.1"
-    kminion = "master"
+    kafka    = "2.8.1"
+    kminion  = "master"
     promtail = "2.3.0"
   }
 }
 
 job "kafka" {
-  datacenters = ["syria", "asia"]
-  namespace   = "infra"
-  type        = "service"
+  datacenters = [
+    "syria",
+    "asia"
+  ]
+  namespace = "infra"
 
   update {
     max_parallel = 1
@@ -18,20 +20,19 @@ job "kafka" {
 
   group "kafka" {
     count = 3
-
     network {
       port "client" {
-        to = 9092
+        to     = 9092
         static = 9092
       }
 
       port "internal" {
-        to = 9093
+        to     = 9093
         static = 9093
       }
 
       port "dendrite" {
-        to = 9094
+        to     = 9094
         static = 9094
       }
 
@@ -41,48 +42,48 @@ job "kafka" {
     }
 
     volume "kafka" {
-      type = "host"
+      type   = "host"
       source = "kafka"
     }
 
     task "kafka" {
       driver = "docker"
-      user = "1001"
+      user   = "1001"
 
       vault {
         policies = ["kafka"]
       }
 
       service {
-        name = "kafka"
-        port = "client"
+        name         = "kafka"
+        port         = "client"
         address_mode = "host"
       }
 
       service {
-        name = "kafka-${meta.kafka_node_id}"
-        port = "client"
+        name         = "kafka-${meta.kafka_node_id}"
+        port         = "client"
         address_mode = "host"
       }
 
       resources {
-        cpu = 300
+        cpu    = 300
         memory = 1024
       }
 
       volume_mount {
-        volume = "kafka"
+        volume      = "kafka"
         destination = "/bitnami/kafka"
       }
 
       env {
-        JVMFLAGS = "-Xmx1024m"
-        KAFKA_OPTS="-Djava.security.auth.login.config=/secrets/jaas.conf"
-        ALLOW_PLAINTEXT_LISTENER="yes"
+        JVMFLAGS                 = "-Xmx1024m"
+        KAFKA_OPTS               = "-Djava.security.auth.login.config=/secrets/jaas.conf"
+        ALLOW_PLAINTEXT_LISTENER = "yes"
       }
 
       config {
-        image = "bitnami/kafka:${var.versions.kafka}"
+        image    = "bitnami/kafka:${var.versions.kafka}"
         hostname = "kafka-${meta.kafka_node_id}"
         extra_hosts = [
           "kafka-${meta.kafka_node_id}.service.consul:0.0.0.0"
@@ -100,21 +101,21 @@ job "kafka" {
       }
 
       template {
-        data = file("server.properties")
+        data        = file("server.properties")
         destination = "local/server.properties"
-        splay = "1m"
+        splay       = "1m"
       }
 
       template {
-        data = file("jaas.conf")
+        data        = file("jaas.conf")
         destination = "secrets/jaas.conf"
-        splay = "1m"
+        splay       = "1m"
       }
     }
 
     task "promtail" {
       driver = "docker"
-      user = "nobody"
+      user   = "nobody"
 
       lifecycle {
         hook    = "poststart"
@@ -122,9 +123,9 @@ job "kafka" {
       }
 
       service {
-        name = "promtail"
-        port = "promtail"
-        tags = ["service=kafka"]
+        name         = "promtail"
+        port         = "promtail"
+        tags         = ["service=kafka"]
         address_mode = "host"
 
         check {
@@ -136,7 +137,7 @@ job "kafka" {
       }
 
       resources {
-        cpu = 50
+        cpu    = 50
         memory = 128
       }
 
@@ -153,7 +154,7 @@ job "kafka" {
       }
 
       template {
-        data = file("promtail.yml")
+        data        = file("promtail.yml")
         destination = "local/promtail.yml"
       }
     }
@@ -168,25 +169,25 @@ job "kafka" {
 
     task "kminion" {
       driver = "docker"
-      user = "nobody"
+      user   = "nobody"
 
       vault {
         policies = ["kminion"]
       }
 
       service {
-        name = "kminion"
-        port = "kminion"
+        name         = "kminion"
+        port         = "kminion"
         address_mode = "host"
       }
 
       resources {
-        cpu = 100
+        cpu    = 100
         memory = 128
       }
 
       env {
-        CONFIG_FILEPATH="/local/kminion.yml"
+        CONFIG_FILEPATH = "/local/kminion.yml"
       }
 
       config {
@@ -198,19 +199,19 @@ job "kafka" {
       }
 
       template {
-        data = file("kminion.yml")
+        data        = file("kminion.yml")
         destination = "local/kminion.yml"
       }
 
       template {
-        data =<<EOH
+        data        = <<EOH
         KAFKA_SASL_ENABLED=true
         KAFKA_SASL_USERNAME={{ with secret "secret/kafka/kminion" }}{{ .Data.data.username }}{{ end }}
         KAFKA_SASL_PASSWORD={{ with secret "secret/kafka/kminion" }}{{ .Data.data.password }}{{ end }}
         KAFKA_SASL_MECHANISM=PLAIN
         EOH
         destination = "secrets/kminion.env"
-        env = true
+        env         = true
       }
     }
   }
