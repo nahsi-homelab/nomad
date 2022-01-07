@@ -10,7 +10,7 @@ job "network-exporter" {
     "asia",
     "pontus"
   ]
-  namespace = "infra"
+  namespace = "observability"
 
   constraint {
     distinct_property = node.datacenter
