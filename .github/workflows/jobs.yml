@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - "master"
-    paths:
-      - "!.github"
+    paths-ignore:
+      - ".github/**"
 
 concurrency:
   group: "jobs-${{ github.ref }}"
