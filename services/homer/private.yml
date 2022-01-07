@@ -48,7 +48,7 @@ services:
     items:
       - name: "Nomad"
         logo: "https://s3.nahsi.dev/homer/nomad.png"
-        url: "http://nomad.service.consul:4641"
+        url: "http://nomad.service.consul:4646"
 
       - name: "Consul"
         logo: "https://s3.nahsi.dev/homer/consul.png"
