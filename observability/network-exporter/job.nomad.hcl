@@ -10,7 +10,6 @@ job "network-exporter" {
     "asia",
     "pontus"
   ]
-
   namespace = "infra"
 
   constraint {

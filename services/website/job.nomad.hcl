@@ -4,7 +4,7 @@ variables {
 
 job "website" {
   datacenters = ["syria"]
-  type        = "service"
+  namespace   = "services"
 
   group "website" {
     network {
@@ -26,14 +26,14 @@ job "website" {
 
     task "website" {
       driver = "docker"
-      user = "nobody"
+      user   = "nobody"
 
       vault {
         policies = ["website"]
       }
 
       config {
-        image = "nahsihub/caddy-hugo:${var.version}"
+        image      = "nahsihub/caddy-hugo:${var.version}"
         force_pull = true
 
         ports = [
@@ -46,16 +46,17 @@ job "website" {
       }
 
       template {
-        data = file("Caddyfile")
+        data        = file("Caddyfile")
         destination = "local/Caddyfile"
       }
 
       template {
-        data =<<EOH
+        data = <<-EOH
         WEBHOOK_SECRET={{ with secret "secret/website/webhook" }}{{ .Data.data.secret }}{{ end }}
         EOH
+
         destination = "secrets/webhook.env"
-        env = true
+        env         = true
       }
 
       resources {

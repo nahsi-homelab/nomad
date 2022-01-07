@@ -1,19 +1,18 @@
 variables {
   versions = {
-    loki = "2.4.1"
+    loki     = "2.4.1"
     promtail = "2.4.1"
   }
 }
 
 job "loki" {
   datacenters = ["syria"]
-  namespace   = "infra"
-  type        = "service"
+  namespace   = "observability"
 
   group "loki" {
     network {
       port "loki" {
-        to = 3100
+        to     = 3100
         static = 3100
       }
 
@@ -84,7 +83,7 @@ job "loki" {
       }
 
       template {
-        data = file("loki.yml")
+        data          = file("loki.yml")
         change_mode   = "signal"
         change_signal = "SIGHUP"
         destination   = "local/loki.yml"
@@ -100,7 +99,7 @@ job "loki" {
       }
 
       resources {
-        cpu = 50
+        cpu    = 50
         memory = 64
       }
 
@@ -117,7 +116,7 @@ job "loki" {
       }
 
       template {
-        data = file("promtail.yml")
+        data        = file("promtail.yml")
         destination = "local/promtail.yml"
       }
     }

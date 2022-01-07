@@ -1,10 +1,10 @@
 job "audioserve" {
   datacenters = ["syria"]
-  type        = "service"
+  namespace   = "services"
 
   constraint {
     attribute = attr.unique.hostname
-    value = "antiochia"
+    value     = "antiochia"
   }
 
   group "audioserve" {
@@ -58,15 +58,16 @@ job "audioserve" {
       }
 
       template {
-        data = <<EOH
-AUDIOSERVE_SHARED_SECRET={{ with secret "secret/audioserve/nahsi" }}{{ .Data.data.secret }}{{ end }}
-EOH
+        data = <<-EOH
+        AUDIOSERVE_SHARED_SECRET={{ with secret "secret/audioserve/nahsi" }}{{ .Data.data.secret }}{{ end }}
+        EOH
+
         destination = "secrets/audioserve.env"
-        env = true
+        env         = true
       }
 
       resources {
-        cpu = 100
+        cpu    = 100
         memory = 300
       }
     }

@@ -4,7 +4,7 @@ variables {
 
 job "linkding" {
   datacenters = ["syria"]
-  type        = "service"
+  namespace   = "services"
 
   group "linkding" {
     network {
@@ -25,7 +25,7 @@ job "linkding" {
     }
 
     volume "linkding" {
-      type = "host"
+      type   = "host"
       source = "linkding"
     }
 
@@ -33,7 +33,7 @@ job "linkding" {
       driver = "docker"
 
       volume_mount {
-        volume = "linkding"
+        volume      = "linkding"
         destination = "/etc/linkding/data"
       }
 
@@ -42,7 +42,7 @@ job "linkding" {
       }
 
       env {
-        LD_DISABLE_BACKGROUND_TASKS="True"
+        LD_DISABLE_BACKGROUND_TASKS = "True"
       }
 
       config {

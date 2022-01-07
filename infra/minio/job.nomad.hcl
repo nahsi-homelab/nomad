@@ -9,7 +9,6 @@ job "minio" {
     "syria",
     "asia"
   ]
-
   namespace = "infra"
 
   constraint {
@@ -120,7 +119,7 @@ job "minio" {
 
         MINIO_SITE_NAME   = "homelab"
         MINIO_SITE_REGION = "homelab"
-          
+
         MINIO_SERVER_URL           = "https://minio.service.consul:9000"
         MINIO_BROWSER_REDIRECT_URL = "https://minio.nahsi.dev"
         MINIO_PROMETHEUS_URL       = "http://prometheus.service.consul:9090"
@@ -145,7 +144,7 @@ job "minio" {
       }
 
       template {
-        data =<<-EOF
+        data = <<-EOF
         MINIO_ROOT_USER={{ with secret "secret/minio/root" }}{{ .Data.data.username }}{{ end }}
         MINIO_ROOT_PASSWORD={{ with secret "secret/minio/root" }}{{ .Data.data.password }}{{ end }}
         EOF
@@ -156,7 +155,7 @@ job "minio" {
       }
 
       template {
-        data =<<-EOH
+        data = <<-EOH
         {{- with secret "pki/issue/internal" "common_name=minio.service.consul" "alt_names=*.service.consul" -}}
         {{ .Data.issuing_ca }}{{ end }}
         EOH
@@ -167,7 +166,7 @@ job "minio" {
       }
 
       template {
-        data =<<-EOH
+        data = <<-EOH
         {{- with secret "pki/issue/internal" "common_name=minio.service.consul" "alt_names=minio.service.consul,*.service.consul,localhost" "ip_sans=127.0.0.1" -}}
         {{ .Data.certificate }}{{ end }}
         EOH
@@ -178,7 +177,7 @@ job "minio" {
       }
 
       template {
-        data =<<-EOH
+        data = <<-EOH
         {{- with secret "pki/issue/internal" "common_name=minio.service.consul" "alt_names=minio.service.consul,*.service.consul,localhost" "ip_sans=127.0.0.1" -}}
         {{ .Data.private_key }}{{ end }}
         EOH

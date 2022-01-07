@@ -1,6 +1,6 @@
 variables {
   versions = {
-    traefik = "2.5.4"
+    traefik  = "2.5.4"
     promtail = "2.4.1"
   }
 }
@@ -32,14 +32,14 @@ job "ingress" {
       }
 
       port "http" {
-        static = 80
-        to = 80
+        static       = 80
+        to           = 80
         host_network = "public"
       }
 
       port "https" {
-        static = 443
-        to = 443
+        static       = 443
+        to           = 443
         host_network = "public"
       }
 
@@ -53,12 +53,12 @@ job "ingress" {
       port = "traefik"
 
       check {
-        type = "http"
+        type     = "http"
         protocol = "http"
-        path = "/ping"
-        port = "traefik"
+        path     = "/ping"
+        port     = "traefik"
         interval = "20s"
-        timeout = "2s"
+        timeout  = "2s"
       }
     }
 
@@ -97,46 +97,46 @@ job "ingress" {
       }
 
       template {
-        data = <<EOH
-tls:
-  certificates:
-    - certFile: "secrets/cert.pem"
-      keyFile: "secrets/key.pem"
+        data = <<-EOH
+        tls:
+          certificates:
+            - certFile: "secrets/cert.pem"
+              keyFile: "secrets/key.pem"
 
-http:
-  serversTransports:
-    skipverify:
-      insecureSkipVerify: true
-EOH
+        http:
+          serversTransports:
+            skipverify:
+              insecureSkipVerify: true
+        EOH
 
         destination = "local/traefik/tls.yml"
         change_mode = "noop"
       }
 
       template {
-        data = <<EOH
-{{- with secret "secret/certificate" -}}
-{{ .Data.data.ca_bundle }}{{ end }}
-EOH
+        data = <<-EOH
+        {{- with secret "secret/certificate" -}}
+        {{ .Data.data.ca_bundle }}{{ end }}
+        EOH
 
-        destination   = "secrets/cert.pem"
-        change_mode   = "restart"
-        splay         = "1m"
+        destination = "secrets/cert.pem"
+        change_mode = "restart"
+        splay       = "1m"
       }
 
       template {
-        data = <<EOH
-{{- with secret "secret/certificate" -}}
-{{ .Data.data.key }}{{ end }}
-EOH
+        data = <<-EOH
+        {{- with secret "secret/certificate" -}}
+        {{ .Data.data.key }}{{ end }}
+        EOH
 
-        destination   = "secrets/key.pem"
-        change_mode   = "restart"
-        splay         = "1m"
+        destination = "secrets/key.pem"
+        change_mode = "restart"
+        splay       = "1m"
       }
 
       resources {
-        cpu = 100
+        cpu    = 100
         memory = 128
       }
     }
@@ -150,9 +150,9 @@ EOH
       }
 
       service {
-        name = "promtail"
-        port = "promtail"
-        tags = ["service=ingress"]
+        name         = "promtail"
+        port         = "promtail"
+        tags         = ["service=ingress"]
         address_mode = "host"
 
         check {
@@ -164,7 +164,7 @@ EOH
       }
 
       resources {
-        cpu = 50
+        cpu    = 50
         memory = 128
       }
 
@@ -181,7 +181,7 @@ EOH
       }
 
       template {
-        data = file("promtail.yml")
+        data        = file("promtail.yml")
         destination = "local/promtail.yml"
       }
     }

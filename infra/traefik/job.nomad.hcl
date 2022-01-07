@@ -1,6 +1,6 @@
 variables {
   versions = {
-    traefik = "2.5.4"
+    traefik  = "2.5.4"
     promtail = "2.3.0"
   }
 }
@@ -11,7 +11,6 @@ job "traefik" {
     "asia",
     "pontus"
   ]
-
   namespace = "infra"
   type      = "system"
 
@@ -29,12 +28,12 @@ job "traefik" {
 
       port "http" {
         static = 80
-        to = 80
+        to     = 80
       }
 
       port "https" {
         static = 443
-        to = 443
+        to     = 443
       }
 
       port "promtail" {
@@ -59,12 +58,12 @@ job "traefik" {
       ]
 
       check {
-        type = "http"
+        type     = "http"
         protocol = "http"
-        path = "/ping"
-        port = "traefik"
+        path     = "/ping"
+        port     = "traefik"
         interval = "20s"
-        timeout = "2s"
+        timeout  = "2s"
       }
     }
 
@@ -103,47 +102,47 @@ job "traefik" {
       }
 
       template {
-        data = <<EOH
-tls:
-  certificates:
-    - certFile: "secrets/cert.pem"
-      keyFile: "secrets/key.pem"
+        data = <<-EOH
+        tls:
+          certificates:
+            - certFile: "secrets/cert.pem"
+              keyFile: "secrets/key.pem"
 
-http:
-  serversTransports:
-    skipverify:
-      insecureSkipVerify: true
-EOH
+        http:
+          serversTransports:
+            skipverify:
+              insecureSkipVerify: true
+        EOH
 
         destination = "local/traefik/tls.yml"
         change_mode = "noop"
       }
 
       template {
-        data = <<EOH
-{{- with secret "pki/issue/internal" "common_name=*.service.consul" -}}
-{{ .Data.certificate }}
-{{ .Data.issuing_ca }}{{ end }}
-EOH
+        data = <<-EOH
+        {{- with secret "pki/issue/internal" "common_name=*.service.consul" -}}
+        {{ .Data.certificate }}
+        {{ .Data.issuing_ca }}{{ end }}
+        EOH
 
-        destination   = "secrets/cert.pem"
-        change_mode   = "restart"
-        splay         = "1m"
+        destination = "secrets/cert.pem"
+        change_mode = "restart"
+        splay       = "1m"
       }
 
       template {
-        data = <<EOH
-{{- with secret "pki/issue/internal" "common_name=*.service.consul" -}}
-{{ .Data.private_key }}{{ end }}
-EOH
+        data = <<-EOH
+        {{- with secret "pki/issue/internal" "common_name=*.service.consul" -}}
+        {{ .Data.private_key }}{{ end }}
+        EOH
 
-        change_mode   = "restart"
-        destination   = "secrets/key.pem"
-        splay         = "1m"
+        change_mode = "restart"
+        destination = "secrets/key.pem"
+        splay       = "1m"
       }
 
       resources {
-        cpu = 100
+        cpu    = 100
         memory = 128
       }
     }
@@ -157,9 +156,9 @@ EOH
       }
 
       service {
-        name = "promtail"
-        port = "promtail"
-        tags = ["service=traefik"]
+        name         = "promtail"
+        port         = "promtail"
+        tags         = ["service=traefik"]
         address_mode = "host"
 
         check {
@@ -171,7 +170,7 @@ EOH
       }
 
       resources {
-        cpu = 50
+        cpu    = 50
         memory = 128
       }
 
@@ -188,7 +187,7 @@ EOH
       }
 
       template {
-        data = file("promtail.yml")
+        data        = file("promtail.yml")
         destination = "local/promtail.yml"
       }
     }
