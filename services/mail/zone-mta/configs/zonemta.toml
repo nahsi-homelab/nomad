@@ -1,0 +1,31 @@
+# https://github.com/zone-eu/zone-mta/blob/master/config/default.js
+name="ZoneMTA"
+ident="zone-mta"
+
+user="nobody"
+group="nobody"
+
+[log]
+level="info"
+
+[dbs]
+# @include "/secrets/config/dbs.toml"
+
+[queue]
+instanceId='{{ env "NOMAD_ALLOC_NAME" }}'
+
+collection="zone-queue"
+gfs="mail"
+
+[dns]
+caching=false
+nameservers=["1.1.1.1", "8.8.8.8"]
+
+[api]
+port=12080
+
+[plugins]
+# @include "plugins/*.toml"
+
+[smtpInterfaces]
+# @include "interfaces/*.toml"

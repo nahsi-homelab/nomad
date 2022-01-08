@@ -1,0 +1,3 @@
+mongodb='mongodb://{{- with secret "mongo/creds/wildduck-webmail" -}}{{ .Data.username }}:{{ .Data.password }}{{ end -}}@mongo.service.consul:27017/wildduck-webmail?tls=true&tlsCertificateKeyFile=/secrets/certs/wildduck.pem&tlsCAFile=/secrets/certs/CA.pem'
+
+redis="redis://redis.service.consul:6379/5"

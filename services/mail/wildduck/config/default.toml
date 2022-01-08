@@ -1,0 +1,129 @@
+user="nobody"
+group="nobody"
+
+# process title
+ident="wildduck"
+
+# how many processes to start
+processes=1
+
+# default quota storage in MB (can be overriden per user)
+maxStorage=1024
+
+# default smtp recipients for 24h (can be overriden per user)
+maxRecipients=2000
+
+# default forwarded messages for 24h (can be overriden per user)
+maxForwards=2000
+
+# If usernames are not email addresses then use this domain as hostname part
+#emailDomain="mydomain.info"
+
+[acme]
+# @include "acme.toml"
+
+[dbs]
+# @include "/secrets/config/dbs.toml"
+
+[totp]
+    # If enabled then encrypt TOTP seed tokens with the secret password. By default TOTP seeds
+    # are not encrypted and stored as cleartext. Once set up do not change these values,
+    # otherwise decrypting totp seeds is going to fail
+    #cipher="aes192"
+    #secret="a secret cat"
+
+[u2f]
+    # Fully qualified URL of your website (must use HTTPS!)
+    appId="https://localhost:3000"
+
+[attachments]
+# For now there's only a single option for attachment storage
+type="gridstore"
+bucket="attachments"
+
+# If true then decodes base64 encoded attachments to binary before storing to DB.
+# Decoding base64 attachments expects consistent line length and default base64 alphabet
+decodeBase64=true
+
+[log]
+  level="info"
+
+  skipFetchLog=false # if true, then does not output individual * FETCH responses to log
+
+  # delete authentication log entries after 30 days
+  # changing this value only affects new entries
+  # set to false to not log authentication events
+  # set to 0 to keep the logs infinitely
+  authlogExpireDays=30
+
+[imap]
+# @include "imap.toml"
+
+[pop3]
+enabled=false
+
+[lmtp]
+enabled=false
+
+[tls]
+# key="/secrets/certs/key.pem"
+# ca=["/secrets/certs/CA.pem"]
+# cert="/secrets/certs/cert.pem"
+
+[api]
+# @include "api.toml"
+
+[sender]
+# which ZoneMTA queue to use by default
+zone="default"
+
+# Collection name for GridFS storage
+gfs="mail"
+
+# Collection name for the queue
+# see [dbs].sender option for choosing correct database to use for ZoneMTA queues
+# by default the main wildduck database is used
+collection="zone-queue"
+
+# Hashing secret for loop detection
+# Must be shared with haraka-plugin-wildduck
+# If not set then looping is not tracked
+#loopSecret="secret value"
+
+[dkim]
+# If enabled then encrypt DKIM keys with the secret password. By default DKIM keys
+# are not encrypted and stored as cleartext. Once set up do not change these values,
+# otherwise decrypting DKIM keys is going to fail
+#cipher="aes192"
+#secret="a secret cat"
+
+# If true then spwans openssl command line executable for generating DKIM keys
+# Otherwise forge library is used which is cross-environment but slower
+useOpenSSL=true
+# Define path to openssl if not in default path
+#pathOpenSSL="/usr/local/bin/openssl"
+
+# If true then also adds a signature for the outbound domain
+# Affects WildDuck ZoneMTA plugin only
+signTransportDomain=false
+
+# do not change this
+hashAlgo="sha256"
+
+[plugins]
+# @include "plugins/*.toml"
+
+[tasks]
+# if enabled then process jobs like deleting expired messages etc
+enabled=true
+
+[smtp.setup]
+# Public configuration for SMTP MDA, needed for mobileconfig files
+hostname="localhost"
+secure=true
+port=465
+
+[webhooks]
+# At least one server must have webhook processing enabled,
+# otherwise events would pile up in the Redis queue.
+enabled = true
