@@ -1,0 +1,3 @@
+user {{ with secret "secret/data/redis/sentinel/admin" }}{{ .Data.data.username }}{{ end }} >{{ with secret "secret/data/redis/sentinel/admin" }}{{ .Data.data.password }}{{ end }} {{ with secret "secret/data/redis/sentinel/admin" }}{{ .Data.data.rules }}{{ end }}
+
+user default off
