@@ -1,39 +1,22 @@
+variables {
+  versions = {
+    wildduck = "1.34.0"
+    haraka   = "latest"
+    zone-mta = "latest"
+
+    redis = "6.2"
+    resec = "latest"
+  }
+}
+
 job "mail" {
   datacenters = [
     "syria",
-    "asia"
   ]
-
-  group "redis" {
-    network {
-      port "db" {
-        to     = 6379
-        static = 6379
-      }
-    }
-
-    service {
-      name = "redis"
-      port = "db"
-    }
-
-    task "redis" {
-      driver = "docker"
-
-      config {
-        image = "redis:3.2"
-        ports = ["db"]
-      }
-
-      resources {
-        cpu    = 500
-        memory = 256
-      }
-    }
-  }
+  namespace = "services"
 
   group "wildduck" {
-    count = 1
+    count = 2
 
     vault {
       policies = ["wildduck"]
@@ -64,7 +47,7 @@ job "mail" {
       }
 
       config {
-        image = "nodemailer/wildduck:v1.34.0"
+        image = "nodemailer/wildduck:v${var.versions.wildduck}"
 
         ports = [
           "api"
@@ -99,7 +82,7 @@ job "mail" {
         splay       = "1m"
       }
 
-      # mongo client
+      # bundle
       template {
         data = <<-EOH
         {{- with secret "pki/issue/internal" "ttl=30d" "common_name=wildduck.service.consul" -}}
@@ -107,7 +90,7 @@ job "mail" {
         {{ .Data.certificate }}{{ end }}
         EOH
 
-        destination = "secrets/certs/mongo.pem"
+        destination = "secrets/certs/bundle.pem"
         change_mode = "restart"
         splay       = "1m"
       }
@@ -167,7 +150,7 @@ job "mail" {
       # CA
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=30d" "common_name=*.service.consul" -}}
+        {{- with secret "pki/issue/internal" "ttl=30d" "common_name=wildduck-webmail.service.consul" -}}
         {{ .Data.issuing_ca }}{{ end }}
         EOH
 
@@ -176,15 +159,15 @@ job "mail" {
         splay       = "1m"
       }
 
-      # mongo client
+      # bundle
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=30d" "common_name=wildduck.service.consul" -}}
+        {{- with secret "pki/issue/internal" "ttl=30d" "common_name=wildduck-webmail.service.consul" -}}
         {{ .Data.private_key }}
         {{ .Data.certificate }}{{ end }}
         EOH
 
-        destination = "secrets/certs/mongo.pem"
+        destination = "secrets/certs/bundle.pem"
         change_mode = "restart"
         splay       = "1m"
       }
@@ -200,8 +183,7 @@ job "mail" {
 
     network {
       port "smtp" {
-        to     = 587
-        static = 587
+        to = 587
       }
     }
 
@@ -224,7 +206,7 @@ job "mail" {
       }
 
       config {
-        image = "nahsihub/haraka-wildduck:latest"
+        image = "nahsihub/haraka-wildduck:${var.versions.haraka}"
 
         ports = [
           "smtp"
@@ -253,15 +235,15 @@ job "mail" {
         splay       = "1m"
       }
 
-      # mongo client
+      # bundle 
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=30d" "common_name=mongo.service.consul" -}}
+        {{- with secret "pki/issue/internal" "ttl=30d" "common_name=haraka.service.consul" -}}
         {{ .Data.private_key }}
         {{ .Data.certificate }}{{ end }}
         EOH
 
-        destination = "secrets/certs/mongo.pem"
+        destination = "secrets/certs/bundle.pem"
         change_mode = "restart"
         splay       = "1m"
       }
@@ -281,7 +263,6 @@ job "mail" {
       }
       port "smtp" {
         to     = 587
-        static = 587
       }
     }
 
@@ -296,6 +277,7 @@ job "mail" {
       resources {
         cpu    = 500
         memory = 256
+        memory_max = 350
       }
 
       env {
@@ -304,7 +286,7 @@ job "mail" {
       }
 
       config {
-        image = "nahsihub/zone-mta-wildduck:latest"
+        image = "nahsihub/zone-mta-wildduck:${var.versions.zone-mta}"
 
         ports = [
           "api",
@@ -340,7 +322,7 @@ job "mail" {
         splay       = "1m"
       }
 
-      # mongo client
+      # bundle 
       template {
         data = <<-EOH
         {{- with secret "pki/issue/internal" "ttl=30d" "common_name=zone-mta.service.consul" -}}
@@ -348,7 +330,129 @@ job "mail" {
         {{ .Data.certificate }}{{ end }}
         EOH
 
-        destination = "secrets/certs/mongo.pem"
+        destination = "secrets/certs/bundle.pem"
+        change_mode = "restart"
+        splay       = "1m"
+      }
+    }
+  }
+
+  group "redis" {
+    count = 2
+    update {
+      max_parallel = 1
+      stagger      = "1m"
+    }
+
+    network {
+      mode = "bridge"
+      port "redis" {
+        to     = 6379
+        static = 6379
+      }
+
+      port "resec" {
+        to = 8080
+      }
+    }
+
+    vault {
+      policies = ["redis-mail"]
+    }
+
+    volume "mail" {
+      type   = "host"
+      source = "redis-mail"
+    }
+
+    task "redis" {
+      driver = "docker"
+      user   = "nobody"
+
+      volume_mount {
+        volume      = "mail"
+        destination = "/data"
+      }
+
+      resources {
+        cpu    = 100
+        memory = 64
+      }
+
+      config {
+        image   = "redis:${var.versions.redis}-alpine"
+        ports   = ["redis"]
+        command = "redis-server"
+        args = [
+          "/local/redis.conf"
+        ]
+      }
+
+      template {
+        data        = file("redis/redis.conf")
+        destination = "/local/redis.conf"
+        change_mode = "restart"
+        splay       = "1m"
+      }
+
+      template {
+        data        = file("redis/auth.conf")
+        destination = "/secrets/auth.conf"
+        change_mode = "restart"
+        splay       = "1m"
+      }
+
+      template {
+        data        = file("redis/users.acl")
+        destination = "/secrets/users.acl"
+        change_mode = "restart"
+        splay       = "1m"
+      }
+    }
+
+    task "resec" {
+      driver = "docker"
+
+      resources {
+        cpu    = 100
+        memory = 64
+      }
+
+      service {
+        name = "resec"
+        port = "resec"
+
+        check {
+          type     = "http"
+          path     = "/health"
+          interval = "20s"
+          timeout  = "2s"
+        }
+      }
+
+      env {
+        CONSUL_HTTP_ADDR    = "http://${attr.unique.network.ip-address}:8500"
+        CONSUL_SERVICE_NAME = "redis-mail"
+        CONSUL_LOCK_KEY     = "resec/mail/.lock"
+        MASTER_TAGS         = "master"
+        SLAVE_TAGS          = "replica"
+        REDIS_ADDR          = "127.0.0.1:6379"
+        ANNOUNCE_ADDR       = "${NOMAD_ADDR_redis}"
+        STATE_SERVER        = "true"
+      }
+
+      config {
+        image = "nahsihub/resec:${var.versions.resec}"
+        ports = ["resec"]
+      }
+
+      template {
+        data = <<-EOH
+        REDIS_PASSWORD={{ with secret "secret/data/redis/mail/users/default" }}{{ .Data.data.password }}{{ end }}
+        EOH
+
+        destination = "secrets/password"
+        env         = true
         change_mode = "restart"
         splay       = "1m"
       }

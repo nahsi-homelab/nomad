@@ -1,5 +1,0 @@
-user {{ with secret "secret/data/redis/mail/users/sentinel" }}{{ .Data.data.username }}{{ end }} >{{ with secret "secret/data/redis/mail/users/sentinel" }}{{ .Data.data.password }}{{ end }} {{ with secret "secret/data/redis/mail/users/sentinel" }}{{ .Data.data.rules }}{{ end }}
-
-user {{ with secret "secret/data/redis/mail/users/replication" }}{{ .Data.data.username }}{{ end }} >{{ with secret "secret/data/redis/mail/users/replication" }}{{ .Data.data.password }}{{ end }} {{ with secret "secret/data/redis/mail/users/replication" }}{{ .Data.data.rules }}{{ end }}
-
-user default off

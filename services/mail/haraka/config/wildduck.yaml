@@ -1,74 +1,76 @@
 # https://github.com/nodemailer/haraka-plugin-wildduck/blob/master/config/wildduck.yaml
 redis:
-    port: 6379
-    host: "redis.service.consul"
-    db: 3
+  port: 6379
+  host: "master.redis-mail.service.consul"
+  db: 3
+  username: '{{ with secret "secret/redis/mail/users/wildduck" }}{{ .Data.data.username }}{{ end }}'
+  password: '{{ with secret "secret/redis/mail/users/wildduck" }}{{ .Data.data.password }}{{ end }}'
 
 mongo:
-  url: 'mongodb://{{- with secret "mongo/creds/haraka" -}}{{ .Data.username }}:{{ .Data.password }}{{ end -}}@mongo-primary.service.consul:27017,@mongo-secondary.service.consul:27017/wildduck?tls=true&tlsCertificateKeyFile=/secrets/certs/mongo.pem&tlsCAFile=/secrets/certs/CA.pem'
+  url: 'mongodb://{{- with secret "mongo/creds/haraka" -}}{{ .Data.username }}:{{ .Data.password }}{{ end -}}@mongo-primary.service.consul:27017,@mongo-secondary.service.consul:27017/wildduck?tls=true&tlsCertificateKeyFile=/secrets/certs/bundle.pem&tlsCAFile=/secrets/certs/CA.pem'
 
-    ## database name or connection string for the users db
-    users: "wildduck-users"
+  ## database name or connection string for the users db
+  users: "wildduck-users"
 
-    ## database name or connection string for the attachments db
-    gridfs: "wildduck-attachments"
+  ## database name or connection string for the attachments db
+  gridfs: "wildduck-attachments"
 
-    ## database name or connection string for the outbound queue
-    sender: "zone-mta"
+  ## database name or connection string for the outbound queue
+  sender: "zone-mta"
 
 sender:
-    # Push messages to ZoneMTA queue for delivery
-    # if `false` then no messages are sent
-    enabled: true
+  # Push messages to ZoneMTA queue for delivery
+  # if `false` then no messages are sent
+  enabled: true
 
-    # which ZoneMTA queue to use by default. This mostly affects forwarded messages
-    zone: "default"
+  # which ZoneMTA queue to use by default. This mostly affects forwarded messages
+  zone: "default"
 
-    # Collection name for GridFS storage
-    gfs: "mail"
+  # Collection name for GridFS storage
+  gfs: "mail"
 
-    # Collection name for the queue
-    # see [dbs].sender option for choosing correct database to use for ZoneMTA queues
-    # by default the main wildduck database is used
-    collection: "zone-queue"
+  # Collection name for the queue
+  # see [dbs].sender option for choosing correct database to use for ZoneMTA queues
+  # by default the main wildduck database is used
+  collection: "zone-queue"
 
-    # Hashing secret for loop detection
-    # Must be shared with wildduck
-    # If not set then looping is not tracked
-    #loopSecret: "secret value"
+  # Hashing secret for loop detection
+  # Must be shared with wildduck
+  # If not set then looping is not tracked
+  #loopSecret: "secret value"
 
 srs:
-    # must be shared with ZoneMTA SRS config, otherwise messages sent from ZoneMTA are not recognized by Haraka
-    secret: "secret value"
+  # must be shared with ZoneMTA SRS config, otherwise messages sent from ZoneMTA are not recognized by Haraka
+  secret: "secret value"
 
 attachments:
-    type: "gridstore"
-    bucket: "attachments"
-    decodeBase64: true
+  type: "gridstore"
+  bucket: "attachments"
+  decodeBase64: true
 
 limits:
-    windowSize: 3600 # 1 hour
-    rcptIp: 100 # allowed messages for the same recipient from same IP during window size
-    rcptWindowSize: 60 # 1 minute
-    rcpt: 60 # allowed messages for the same recipient during window size
+  windowSize: 3600 # 1 hour
+  rcptIp: 100 # allowed messages for the same recipient from same IP during window size
+  rcptWindowSize: 60 # 1 minute
+  rcpt: 60 # allowed messages for the same recipient during window size
 
 gelf:
-    enabled: false
-    component: 'mx'
+  enabled: false
+  component: 'mx'
 
 rspamd:
-    # do not process forwarding addresses for messages with the following spam score
-    forwardSkip: 10
+  # do not process forwarding addresses for messages with the following spam score
+  forwardSkip: 10
 
-    # if a message has one of the tags listed here with positive score, the message will be rejected
-    blacklist:
-        - DMARC_POLICY_REJECT
+  # if a message has one of the tags listed here with positive score, the message will be rejected
+  blacklist:
+    - DMARC_POLICY_REJECT
 
-    # if a message has one of the tags listed here with positive score, the message will be soft rejected
-    softlist:
-        - RBL_ZONE
+  # if a message has one of the tags listed here with positive score, the message will be soft rejected
+  softlist:
+    - RBL_ZONE
 
-    # define special responses
-    responses:
-        DMARC_POLICY_REJECT: "Unauthenticated email from {host} is not accepted due to domain's DMARC policy"
-        RBL_ZONE: '[{host}] was found from Zone RBL'
+  # define special responses
+  responses:
+    DMARC_POLICY_REJECT: "Unauthenticated email from {host} is not accepted due to domain's DMARC policy"
+    RBL_ZONE: '[{host}] was found from Zone RBL'
