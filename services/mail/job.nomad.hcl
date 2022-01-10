@@ -258,25 +258,32 @@ job "mail" {
     }
 
     network {
-      port "api" {
-        to = 12080
-      }
+      port "api" {}
       port "smtp" {
-        to     = 587
+        to = 587
       }
     }
 
     service {
       name = "zone-mta"
       port = "api"
+
+      /* check { */
+      /*   name     = "zone-mta HTTP" */
+      /*   type     = "http" */
+      /*   method   = "HEAD" */
+      /*   path     = "/metrics" */
+      /*   interval = "20s" */
+      /*   timeout  = "2s" */
+      /* } */
     }
 
     task "zone-mta" {
       driver = "docker"
 
       resources {
-        cpu    = 500
-        memory = 256
+        cpu        = 500
+        memory     = 256
         memory_max = 350
       }
 
@@ -423,6 +430,7 @@ job "mail" {
         port = "resec"
 
         check {
+          name     = "Redis readiness"
           type     = "http"
           path     = "/health"
           interval = "20s"

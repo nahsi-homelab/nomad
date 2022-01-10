@@ -6,7 +6,7 @@ user="nobody"
 group="nobody"
 
 [log]
-level="info"
+level="debug"
 
 [dbs]
 # @include "/secrets/config/dbs.toml"
@@ -22,7 +22,10 @@ caching=false
 nameservers=["1.1.1.1", "8.8.8.8"]
 
 [api]
-port=12080
+host="0.0.0.0"
+port={{ env "NOMAD_PORT_api" }}
+hostname="zone-mta.service.consul"
+maildrop=false
 
 [plugins]
 # @include "plugins/*.toml"

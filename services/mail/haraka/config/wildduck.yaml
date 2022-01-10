@@ -7,7 +7,7 @@ redis:
   password: '{{ with secret "secret/redis/mail/users/wildduck" }}{{ .Data.data.password }}{{ end }}'
 
 mongo:
-  url: 'mongodb://{{- with secret "mongo/creds/haraka" -}}{{ .Data.username }}:{{ .Data.password }}{{ end -}}@mongo-primary.service.consul:27017,@mongo-secondary.service.consul:27017/wildduck?tls=true&tlsCertificateKeyFile=/secrets/certs/bundle.pem&tlsCAFile=/secrets/certs/CA.pem'
+  url: 'mongodb://{{- with secret "mongo/creds/haraka" -}}{{ .Data.username }}:{{ .Data.password }}{{ end -}}@mongo-primary.service.consul:27017,mongo-secondary.service.consul:27017/wildduck?tls=true&tlsCertificateKeyFile=/secrets/certs/bundle.pem&tlsCAFile=/secrets/certs/CA.pem'
 
   ## database name or connection string for the users db
   users: "wildduck-users"
