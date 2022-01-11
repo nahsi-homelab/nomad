@@ -1,12 +1,11 @@
 variables {
   versions = {
     patroni  = "latest"
-    promtail = "2.4.1"
     exporter = "0.10.0"
   }
 }
 
-job "patroni" {
+job "postgres" {
   datacenters = [
     "syria",
     "asia"
@@ -25,26 +24,6 @@ job "patroni" {
 
       port "patroni" {
         to = 8008
-      }
-
-      port "promtail" {
-        to = 3000
-      }
-    }
-
-    service {
-      name = "promtail"
-      port = "promtail"
-
-      meta {
-        sidecar_to = "postgres"
-      }
-
-      check {
-        type     = "http"
-        path     = "/ready"
-        interval = "10s"
-        timeout  = "2s"
       }
     }
 
@@ -132,38 +111,6 @@ job "patroni" {
         destination = "secrets/vars.env"
         change_mode = "noop"
         env         = true
-      }
-    }
-
-    task "promtail" {
-      driver = "docker"
-      user   = "nobody"
-
-      lifecycle {
-        hook    = "poststart"
-        sidecar = true
-      }
-
-      resources {
-        cpu    = 50
-        memory = 64
-      }
-
-      config {
-        image = "grafana/promtail:${var.versions.promtail}"
-
-        args = [
-          "-config.file=local/promtail.yml"
-        ]
-
-        ports = [
-          "promtail"
-        ]
-      }
-
-      template {
-        data        = file("promtail.yml")
-        destination = "local/promtail.yml"
       }
     }
   }
