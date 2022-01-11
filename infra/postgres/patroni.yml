@@ -1,0 +1,28 @@
+scope: postgres
+
+bootstrap:
+  dcs:
+    ttl: 30
+    loop_wait: 10
+    retry_timeout: 10
+    maximum_lag_on_failover: 1048576
+
+  pg_hba:
+    - "host replication repl 0.0.0.0/0 md5"
+    - "host all all 0.0.0.0/0 md5"
+
+  initdb:
+    - encoding: UTF8
+    - data-checksums
+
+restapi:
+  listen: "0.0.0.0:8008"
+
+consul:
+  host: "172.17.0.1"
+  port: 8500
+  register_service: true
+
+postgresql:
+  listen: "0.0.0.0:5432"
+  data_dir: "/data/patroni/"
