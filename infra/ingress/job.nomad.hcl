@@ -98,7 +98,9 @@ job "ingress" {
         ports = [
           "traefik",
           "http",
-          "https"
+          "https",
+          "smtp",
+          "imap"
         ]
 
         args = [

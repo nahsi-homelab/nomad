@@ -34,7 +34,7 @@ maxForwards=2000
 
 [u2f]
     # Fully qualified URL of your website (must use HTTPS!)
-    appId="https://localhost:3000"
+    appId="https://nahsi.dev"
 
 [attachments]
 # For now there's only a single option for attachment storage

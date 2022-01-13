@@ -32,6 +32,13 @@ job "mail" {
     service {
       name = "wildduck"
       port = "api"
+
+      tags = [
+        "ingress.enable=true",
+        "ingress.tcp.routers.wildduck-imap.entrypoints=imap",
+        "ingress.tcp.routers.wildduck-imap.rule=HostSNI(`mail.nahsi.dev`)",
+        "ingress.tcp.routers.wildduck-imap.tls=true",
+      ]
     }
 
     task "wildduck" {
@@ -113,6 +120,13 @@ job "mail" {
     service {
       name = "wildduck-webmail"
       port = "http"
+
+      tags = [
+        "ingress.enable=true",
+        "ingress.http.routers.wildduck-webmail.entrypoints=https",
+        "ingress.http.routers.wildduck-webmail.rule=Host(`mail.nahsi.dev`)",
+        "ingress.http.routers.wildduck-webmail.tls=true",
+      ]
     }
 
     task "wildduck-webmail" {
@@ -175,7 +189,7 @@ job "mail" {
   }
 
   group "haraka" {
-    count = 2
+    count = 1
 
     vault {
       policies = ["haraka"]
@@ -183,7 +197,9 @@ job "mail" {
 
     network {
       port "smtp" {
-        to = 587
+        to           = 25
+        static       = 25
+        host_network = "public"
       }
     }
 
@@ -235,7 +251,7 @@ job "mail" {
         splay       = "1m"
       }
 
-      # bundle 
+      # bundle
       template {
         data = <<-EOH
         {{- with secret "pki/issue/internal" "ttl=30d" "common_name=haraka.service.consul" -}}
@@ -244,6 +260,28 @@ job "mail" {
         EOH
 
         destination = "secrets/certs/bundle.pem"
+        change_mode = "restart"
+        splay       = "1m"
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "secret/certificate" -}}
+        {{ .Data.data.ca_bundle }}{{ end }}
+        EOH
+
+        destination = "secrets/starttls/cert.pem"
+        change_mode = "restart"
+        splay       = "1m"
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "secret/certificate" -}}
+        {{ .Data.data.key }}{{ end }}
+        EOH
+
+        destination = "secrets/starttls/key.pem"
         change_mode = "restart"
         splay       = "1m"
       }
@@ -267,15 +305,6 @@ job "mail" {
     service {
       name = "zone-mta"
       port = "api"
-
-      /* check { */
-      /*   name     = "zone-mta HTTP" */
-      /*   type     = "http" */
-      /*   method   = "HEAD" */
-      /*   path     = "/metrics" */
-      /*   interval = "20s" */
-      /*   timeout  = "2s" */
-      /* } */
     }
 
     task "zone-mta" {
@@ -329,7 +358,7 @@ job "mail" {
         splay       = "1m"
       }
 
-      # bundle 
+      # bundle
       template {
         data = <<-EOH
         {{- with secret "pki/issue/internal" "ttl=30d" "common_name=zone-mta.service.consul" -}}

@@ -11,7 +11,7 @@ title="wildduck-www"
   forwards=2000
   identities=10
   allowIdentityEdit=true
-  allowJoin=true
+  allowJoin=false
   enableSpecial=false # if true the allow creating addresses with special usernames
   # allowed domains for new addresses
   domains=["nahsi.dev"]
