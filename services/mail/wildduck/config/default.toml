@@ -23,7 +23,7 @@ maxForwards=2000
 # @include "acme.toml"
 
 [dbs]
-# @include "/secrets/config/dbs.toml"
+# @include "/secrets/wildduck/secrets/dbs.toml"
 
 [totp]
     # If enabled then encrypt TOTP seed tokens with the secret password. By default TOTP seeds
@@ -74,21 +74,7 @@ enabled=false
 # @include "api.toml"
 
 [sender]
-# which ZoneMTA queue to use by default
-zone="default"
-
-# Collection name for GridFS storage
-gfs="mail"
-
-# Collection name for the queue
-# see [dbs].sender option for choosing correct database to use for ZoneMTA queues
-# by default the main wildduck database is used
-collection="zone-queue"
-
-# Hashing secret for loop detection
-# Must be shared with haraka-plugin-wildduck
-# If not set then looping is not tracked
-#loopSecret="secret value"
+# @include "/secrets/wildduck/secrets/sender.toml"
 
 [dkim]
 # If enabled then encrypt DKIM keys with the secret password. By default DKIM keys
@@ -119,7 +105,7 @@ enabled=true
 
 [smtp.setup]
 # Public configuration for SMTP MDA, needed for mobileconfig files
-hostname="localhost"
+hostname="nahsi.dev"
 secure=true
 port=465
 

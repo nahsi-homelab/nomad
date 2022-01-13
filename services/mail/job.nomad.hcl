@@ -61,10 +61,14 @@ job "mail" {
         ]
       }
 
-      template {
-        data        = file("wildduck/secrets/dbs.toml")
-        destination = "secrets/config/dbs.toml"
-        change_mode = "noop"
+      dynamic "template" {
+        for_each = fileset(".", "wildduck/secrets/**")
+
+        content {
+          data        = file(template.value)
+          destination = "secrets/${template.value}"
+          change_mode = "noop"
+        }
       }
 
       dynamic "template" {
@@ -289,7 +293,7 @@ job "mail" {
   }
 
   group "zone-mta" {
-    count = 2
+    count = 1
 
     vault {
       policies = ["zone-mta"]
@@ -330,10 +334,14 @@ job "mail" {
         ]
       }
 
-      template {
-        data        = file("zone-mta/secrets/dbs.toml")
-        destination = "secrets/config/dbs.toml"
-        change_mode = "noop"
+      dynamic "template" {
+        for_each = fileset(".", "zone-mta/secrets/**")
+
+        content {
+          data        = file(template.value)
+          destination = "secrets/${template.value}"
+          change_mode = "noop"
+        }
       }
 
       dynamic "template" {
@@ -367,6 +375,17 @@ job "mail" {
         EOH
 
         destination = "secrets/certs/bundle.pem"
+        change_mode = "restart"
+        splay       = "1m"
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "secret/mail" -}}
+        {{ .Data.data.dkin }}{{ end }}
+        EOH
+
+        destination = "secrets/dkim.pem"
         change_mode = "restart"
         splay       = "1m"
       }

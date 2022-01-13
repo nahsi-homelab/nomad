@@ -1,6 +1,6 @@
 # If enabled then WildDuck exposes an IMAP interface for listing and fetching emails
 enabled=true
-port=143
+port=994
 host="0.0.0.0"
 
 # Use `true` for port 993 and `false` for 143. If connection is not secured
@@ -58,7 +58,7 @@ autoExpunge=true
 [setup]
 # Public configuration for IMAP
 hostname="nahsi.dev"
-secure=false
+secure=true
 # port defaults to imap.port
 port=993
 
