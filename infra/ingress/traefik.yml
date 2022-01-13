@@ -8,8 +8,8 @@ entryPoints:
     http:
       redirections:
         entryPoint:
-          to: https
-          scheme: https
+          to: "https"
+          scheme: "https"
 
   https:
     address: ":443"
@@ -24,19 +24,38 @@ entryPoints:
             sans:
               - "*.nahsi.dev"
 
+  smtp:
+    address: ":465"
+    http:
+      tls:
+        domains:
+          - main: "nahsi.dev"
+            sans:
+              - "*.nahsi.dev"
+
+  imap:
+    address: ":993"
+    http:
+      tls:
+        domains:
+          - main: "nahsi.dev"
+            sans:
+              - "*.nahsi.dev"
+
+
   traefik:
     address: ":8080"
 
 ping:
-  entrypoint: traefik
+  entrypoint: "traefik"
 
 metrics:
   prometheus:
-    entrypoint: traefik
+    entrypoint: "traefik"
 
 accessLog:
   filePath: "/alloc/data/access.log"
-  format: json
+  format: "json"
 
 providers:
   consulCatalog:
@@ -45,4 +64,4 @@ providers:
     endpoint:
       address: "host.docker.internal:8500"
   file:
-    filename: "local/traefik/tls.yml"
+    filename: "local/traefik/file.yml"

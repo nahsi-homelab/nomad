@@ -1,7 +1,7 @@
 variables {
   versions = {
-    traefik  = "2.5.4"
-    promtail = "2.4.1"
+    traefik  = "2.5.6"
+    promtail = "2.4.2"
   }
 }
 
@@ -43,32 +43,49 @@ job "ingress" {
         host_network = "public"
       }
 
+      port "smtp" {
+        static       = 465
+        to           = 465
+        host_network = "public"
+      }
+
+      port "imap" {
+        static       = 993
+        to           = 993
+        host_network = "public"
+      }
+
       port "promtail" {
         to = 3000
       }
     }
 
-    service {
-      name = "ingress"
-      port = "traefik"
-
-      check {
-        type     = "http"
-        protocol = "http"
-        path     = "/ping"
-        port     = "traefik"
-        interval = "20s"
-        timeout  = "2s"
-      }
-    }
-
     task "traefik" {
-      driver = "docker"
-
+      driver       = "docker"
       kill_timeout = "30s"
 
       vault {
         policies = ["public-cert"]
+      }
+
+      resources {
+        cpu        = 50
+        memory     = 32
+        memory_max = 64
+      }
+
+      service {
+        name = "ingress"
+        port = "traefik"
+
+        check {
+          type     = "http"
+          protocol = "http"
+          path     = "/ping"
+          port     = "traefik"
+          interval = "20s"
+          timeout  = "2s"
+        }
       }
 
       config {
@@ -92,25 +109,11 @@ job "ingress" {
       template {
         data        = file("traefik.yml")
         destination = "local/traefik.yml"
-        change_mode = "restart"
-        splay       = "1m"
       }
 
       template {
-        data = <<-EOH
-        tls:
-          certificates:
-            - certFile: "secrets/cert.pem"
-              keyFile: "secrets/key.pem"
-
-        http:
-          serversTransports:
-            skipverify:
-              insecureSkipVerify: true
-        EOH
-
-        destination = "local/traefik/tls.yml"
-        change_mode = "noop"
+        data        = file("file.yml")
+        destination = "local/traefik/file.yml"
       }
 
       template {
@@ -134,11 +137,6 @@ job "ingress" {
         change_mode = "restart"
         splay       = "1m"
       }
-
-      resources {
-        cpu    = 100
-        memory = 128
-      }
     }
 
     task "promtail" {
@@ -149,23 +147,25 @@ job "ingress" {
         sidecar = true
       }
 
+      resources {
+        cpu    = 50
+        memory = 32
+      }
+
       service {
-        name         = "promtail"
-        port         = "promtail"
-        tags         = ["service=ingress"]
-        address_mode = "host"
+        name = "promtail"
+        port = "promtail"
+
+        meta {
+          sidecar_to = "traefik"
+        }
 
         check {
           type     = "http"
           path     = "/ready"
-          interval = "10s"
+          interval = "20s"
           timeout  = "2s"
         }
-      }
-
-      resources {
-        cpu    = 50
-        memory = 128
       }
 
       config {
