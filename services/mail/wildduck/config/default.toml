@@ -19,9 +19,6 @@ maxForwards=2000
 # If usernames are not email addresses then use this domain as hostname part
 #emailDomain="mydomain.info"
 
-[acme]
-# @include "acme.toml"
-
 [dbs]
 # @include "/secrets/wildduck/secrets/dbs.toml"
 

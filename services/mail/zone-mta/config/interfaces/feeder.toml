@@ -4,9 +4,11 @@ enabled=true
 processes=2
 
 host="0.0.0.0"
-port=587
+port=465
 
 authentication=true
 
 starttls=false
-secure=false
+secure=true
+key="/secrets/tls/key.pem"
+cert="/secrets/tls/cert.pem"

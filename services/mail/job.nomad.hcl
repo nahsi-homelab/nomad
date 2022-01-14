@@ -21,8 +21,10 @@ job "mail" {
 
     network {
       port "wildduck" {
-        to     = 8080
-        static = 8888
+        to = 8080
+      }
+      port "imap" {
+        to = 993
       }
       port "ducky" {}
     }
@@ -32,10 +34,22 @@ job "mail" {
       port = "wildduck"
 
       tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.wildduck.entrypoints=https",
+        "traefik.http.routers.wildduck.rule=Host(`wildduck.service.consul`)",
+        "traefik.http.routers.wildduck.tls=true",
+      ]
+    }
+
+    service {
+      name = "wildduck-imap"
+      port = "imap"
+
+      tags = [
         "ingress.enable=true",
         "ingress.tcp.routers.wildduck-imap.entrypoints=imap",
         "ingress.tcp.routers.wildduck-imap.rule=HostSNI(`mail.nahsi.dev`)",
-        "ingress.tcp.routers.wildduck-imap.tls=true",
+        "ingress.tcp.routers.wildduck-imap.tls.passthrough=true"
       ]
     }
 
@@ -59,7 +73,8 @@ job "mail" {
         image = "nodemailer/wildduck:v${var.versions.wildduck}"
 
         ports = [
-          "wildduck"
+          "wildduck",
+          "imap"
         ]
       }
 
@@ -104,6 +119,28 @@ job "mail" {
         EOH
 
         destination = "secrets/certs/bundle.pem"
+        change_mode = "restart"
+        splay       = "1m"
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "secret/certificate" -}}
+        {{ .Data.data.ca_bundle }}{{ end }}
+        EOH
+
+        destination = "secrets/tls/cert.pem"
+        change_mode = "restart"
+        splay       = "1m"
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "secret/certificate" -}}
+        {{ .Data.data.key }}{{ end }}
+        EOH
+
+        destination = "secrets/tls/key.pem"
         change_mode = "restart"
         splay       = "1m"
       }
@@ -363,13 +400,25 @@ job "mail" {
     network {
       port "api" {}
       port "smtp" {
-        to = 587
+        to = 465
       }
     }
 
     service {
       name = "zone-mta"
       port = "api"
+    }
+
+    service {
+      name = "zone-mta-smtp"
+      port = "smtp"
+
+      tags = [
+        "ingress.enable=true",
+        "ingress.tcp.routers.zone-mta-smtp.entrypoints=smtp",
+        "ingress.tcp.routers.zone-mta-smtp.rule=HostSNI(`mail.nahsi.dev`)",
+        "ingress.tcp.routers.zone-mta-smtp.tls.passthrough=true"
+      ]
     }
 
     task "zone-mta" {
@@ -436,6 +485,28 @@ job "mail" {
         EOH
 
         destination = "secrets/certs/bundle.pem"
+        change_mode = "restart"
+        splay       = "1m"
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "secret/certificate" -}}
+        {{ .Data.data.ca_bundle }}{{ end }}
+        EOH
+
+        destination = "secrets/tls/cert.pem"
+        change_mode = "restart"
+        splay       = "1m"
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "secret/certificate" -}}
+        {{ .Data.data.key }}{{ end }}
+        EOH
+
+        destination = "secrets/tls/key.pem"
         change_mode = "restart"
         splay       = "1m"
       }
