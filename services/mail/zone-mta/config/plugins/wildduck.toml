@@ -26,7 +26,7 @@ uploadAll=false # if false then messages from Outlook are not uploaded to Sent M
     enabled=true
 
     # SRS secret value. Must be the same as in the MX side
-    secret='{{ with secret "secret/mail" }}{{ .Data.data.srs }}{{ end }}'
+    secret='{{ with secret "secret/mail/srs" }}{{ .Data.data.key }}{{ end }}'
 
     # SRS domain, must resolve back to MX
     rewriteDomain="nahsi.dev"
@@ -36,7 +36,7 @@ uploadAll=false # if false then messages from Outlook are not uploaded to Sent M
 
 ["modules/zonemta-wildduck".dkim]
     # If true then also adds a signature for the outbound domain
-    signTransportDomain=true
+    signTransportDomain=false
 
     # If set then decrypt encrypted DKIM keys using this password
     #secret="a secret cat"

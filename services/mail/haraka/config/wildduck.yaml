@@ -41,7 +41,7 @@ sender:
 
 srs:
   # must be shared with ZoneMTA SRS config, otherwise messages sent from ZoneMTA are not recognized by Haraka
-  secret: '{{ with secret "secret/mail" }}{{ .Data.data.zonemta }}{{ end }}'
+  secret: '{{ with secret "secret/mail/srs" }}{{ .Data.data.srs }}{{ end }}'
 
 attachments:
   type: "gridstore"

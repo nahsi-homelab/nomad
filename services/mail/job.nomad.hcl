@@ -1,8 +1,9 @@
 variables {
   versions = {
-    wildduck = "1.34.0"
-    haraka   = "latest"
-    zone-mta = "latest"
+    wildduck  = "1.34.0"
+    haraka    = "latest"
+    zone-mta  = "latest"
+    ducky-api = "latest"
 
     redis = "6.2"
     resec = "latest"
@@ -18,20 +19,17 @@ job "mail" {
   group "wildduck" {
     count = 2
 
-    vault {
-      policies = ["wildduck"]
-    }
-
     network {
-      port "api" {
+      port "wildduck" {
         to     = 8080
         static = 8888
       }
+      port "ducky" {}
     }
 
     service {
       name = "wildduck"
-      port = "api"
+      port = "wildduck"
 
       tags = [
         "ingress.enable=true",
@@ -43,6 +41,10 @@ job "mail" {
 
     task "wildduck" {
       driver = "docker"
+
+      vault {
+        policies = ["wildduck"]
+      }
 
       resources {
         cpu    = 500
@@ -57,7 +59,7 @@ job "mail" {
         image = "nodemailer/wildduck:v${var.versions.wildduck}"
 
         ports = [
-          "api"
+          "wildduck"
         ]
       }
 
@@ -106,6 +108,65 @@ job "mail" {
         splay       = "1m"
       }
     }
+
+    /* task "ducky-api" { */
+    /*   driver = "docker" */
+
+    /*   vault { */
+    /*     policies = ["ducky-api"] */
+    /*   } */
+
+    /*   lifecycle { */
+    /*     sidecar = true */
+    /*   } */
+
+    /*   resources { */
+    /*     cpu    = 500 */
+    /*     memory = 256 */
+    /*   } */
+
+    /*   config { */
+    /*     image = "nahsihub/ducky-api:${var.versions.ducky-api}" */
+
+    /*     ports = [ */
+    /*       "ducky" */
+    /*     ] */
+
+    /*     volumes = [ */
+    /*       "secrets/config.env:/usr/local/ducky-api/config/production.env" */
+    /*     ] */
+    /*   } */
+
+    /*   template { */
+    /*     data        = file("ducky-api/config.env") */
+    /*     destination = "secrets/config.env" */
+    /*   } */
+
+    /*   # CA */
+    /*   template { */
+    /*     data = <<-EOH */
+    /*     {{- with secret "pki/issue/internal" "ttl=30d" "common_name=*.service.consul" -}} */
+    /*     {{ .Data.issuing_ca }}{{ end }} */
+    /*     EOH */
+
+    /*     destination = "secrets/certs/CA.pem" */
+    /*     change_mode = "restart" */
+    /*     splay       = "1m" */
+    /*   } */
+
+    /*   # bundle */
+    /*   template { */
+    /*     data = <<-EOH */
+    /*     {{- with secret "pki/issue/internal" "ttl=30d" "common_name=ducky.service.consul" -}} */
+    /*     {{ .Data.private_key }} */
+    /*     {{ .Data.certificate }}{{ end }} */
+    /*     EOH */
+
+    /*     destination = "secrets/certs/bundle.pem" */
+    /*     change_mode = "restart" */
+    /*     splay       = "1m" */
+    /*   } */
+    /* } */
   }
 
   group "wildduck-webmail" {
@@ -381,8 +442,8 @@ job "mail" {
 
       template {
         data = <<-EOH
-        {{- with secret "secret/mail" -}}
-        {{ .Data.data.dkin }}{{ end }}
+        {{- with secret "secret/mail/dkim" -}}
+        {{ .Data.data.private_key }}{{ end }}
         EOH
 
         destination = "secrets/dkim.pem"

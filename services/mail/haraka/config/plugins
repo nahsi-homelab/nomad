@@ -1,2 +1,6 @@
+spf
+dkim_verify
+helo.checks
+
 tls
 wildduck
