@@ -1,8 +1,0 @@
-mongodb='mongodb://{{- with secret "mongo/creds/wildduck-webmail" -}}{{ .Data.username }}:{{ .Data.password }}{{ end -}}@mongo.service.consul:27017/wildduck-webmail?tls=true&tlsCertificateKeyFile=/secrets/certs/bundle.pem&tlsCAFile=/secrets/certs/CA.pem'
-
-[redis]
-  host="master.redis-mail.service.consul"
-  port=6379
-  db=5
-  username='{{ with secret "secret/redis/mail/users/wildduck" }}{{ .Data.data.username }}{{ end }}'
-  password='{{ with secret "secret/redis/mail/users/wildduck" }}{{ .Data.data.password }}{{ end }}'
