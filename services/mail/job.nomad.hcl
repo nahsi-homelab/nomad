@@ -4,6 +4,8 @@ variables {
     haraka    = "latest"
     zone-mta  = "latest"
     ducky-api = "latest"
+    roundcube = "1.5.x"
+    caddy     = "2.4.6"
 
     redis = "6.2"
     resec = "latest"
@@ -206,86 +208,95 @@ job "mail" {
     /* } */
   }
 
-  group "wildduck-webmail" {
-    count = 2
-
-    vault {
-      policies = ["wildduck-webmail"]
-    }
+  group "webmail" {
+    count = 1
 
     network {
+      mode = "bridge"
       port "http" {
-        to = 3000
+        to = 80
       }
     }
 
     service {
-      name = "wildduck-webmail"
+      name = "roundcube"
       port = "http"
 
       tags = [
         "ingress.enable=true",
-        "ingress.http.routers.wildduck-webmail.entrypoints=https",
-        "ingress.http.routers.wildduck-webmail.rule=Host(`mail.nahsi.dev`)",
-        "ingress.http.routers.wildduck-webmail.tls=true",
+        "ingress.http.routers.roundcube.entrypoints=https",
+        "ingress.http.routers.roundcube.rule=Host(`mail.nahsi.dev`)",
+        "ingress.http.routers.roundcube.tls=true",
       ]
     }
 
-    task "wildduck-webmail" {
+    task "roundcube" {
       driver = "docker"
+
+      vault {
+        policies = ["roundcube"]
+      }
 
       resources {
         cpu    = 500
         memory = 256
       }
 
+      env {
+        ROUNDCUBEMAIL_DEFAULT_HOST = "ssl://mail.nahsi.dev"
+        ROUNDCUBEMAIL_DEFAULT_PORT = "993"
+        ROUNDCUBEMAIL_SMTP_SERVER  = "ssl://mail.nahsi.dev"
+        ROUNDCUBEMAIL_SMTP_PORT    = "465"
+        ROUNDCUBEMAIL_SKIN         = "elastic"
+
+        ROUNDCUBEMAIL_DB_TYPE = "pgsql"
+        ROUNDCUBEMAIL_DB_HOST = "master.postgres.service.consul"
+        ROUNDCUBEMAIL_DB_PORT = 5432
+        ROUNDCUBEMAIL_DB_NAME = "roundcube"
+      }
+
       config {
-        image = "nodemailer/wildduck-webmail:latest"
+        image    = "roundcube/roundcubemail:${var.versions.roundcube}-fpm-alpine"
+        work_dir = "${NOMAD_ALLOC_DIR}/data"
+      }
 
-        ports = [
-          "http"
+      template {
+        data = <<-EOH
+        ROUNDCUBEMAIL_DB_USER=roundcube
+        ROUNDCUBEMAIL_DB_PASSWORD={{- with secret "postgres/static-creds/roundcube" -}}{{ .Data.password }}{{ end -}}
+        EOH
+
+        destination = "secrets/db.env"
+        env         = true
+      }
+    }
+
+    task "caddy" {
+      driver = "docker"
+      user   = "nobody"
+
+      resources {
+        cpu    = 50
+        memory = 64
+      }
+
+      config {
+        image   = "caddy:${var.versions.caddy}-alpine"
+        command = "caddy"
+        args = [
+          "run", "--config", "/local/Caddyfile", "--adapter", "caddyfile"
         ]
-
-        entrypoint = ["node"]
-        command    = "server.js"
-        args       = ["--config=/local/default.toml"]
       }
 
-      template {
-        data        = file("wildduck-webmail/dbs.toml")
-        destination = "secrets/config/dbs.toml"
-        change_mode = "noop"
-      }
-
-      template {
-        data        = file("wildduck-webmail/default.toml")
-        destination = "local/default.toml"
-        change_mode = "noop"
-      }
-
-      # CA
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=30d" "common_name=wildduck-webmail.service.consul" -}}
-        {{ .Data.issuing_ca }}{{ end }}
+        :80
+        root * {{ env "NOMAD_ALLOC_DIR" }}/data
+        php_fastcgi 127.0.0.1:9000
+        file_server
         EOH
 
-        destination = "secrets/certs/CA.pem"
-        change_mode = "restart"
-        splay       = "1m"
-      }
-
-      # bundle
-      template {
-        data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=30d" "common_name=wildduck-webmail.service.consul" -}}
-        {{ .Data.private_key }}
-        {{ .Data.certificate }}{{ end }}
-        EOH
-
-        destination = "secrets/certs/bundle.pem"
-        change_mode = "restart"
-        splay       = "1m"
+        destination = "local/Caddyfile"
       }
     }
   }
