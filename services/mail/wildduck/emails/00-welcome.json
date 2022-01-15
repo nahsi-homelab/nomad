@@ -1,0 +1,13 @@
+{
+  "disabled": false,
+  "flag": true,
+  "from": {
+    "name": "Anatoly Laskaris",
+    "address": "nahsi@nahsi.dev"
+  },
+  "to": {
+    "name": "[NAME]",
+    "address": "[EMAIL]"
+  },
+  "subject": "[FNAME], welcome to nahsi.dev"
+}

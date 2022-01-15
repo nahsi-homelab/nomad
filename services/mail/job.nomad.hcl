@@ -82,6 +82,10 @@ job "mail" {
           "wildduck",
           "imap"
         ]
+
+        volumes = [
+          "local/wildduck/emails:/wildduck/emails:ro"
+        ]
       }
 
       dynamic "template" {
@@ -90,6 +94,15 @@ job "mail" {
         content {
           data        = file(template.value)
           destination = "secrets/${template.value}"
+        }
+      }
+
+      dynamic "template" {
+        for_each = fileset(".", "wildduck/emails/**")
+
+        content {
+          data        = file(template.value)
+          destination = "local/${template.value}"
         }
       }
 
