@@ -1,6 +1,6 @@
 variables {
   versions = {
-    patroni  = "latest"
+    patroni  = "14-2.1.2"
     exporter = "0.10.0"
   }
 }
@@ -37,12 +37,6 @@ job "postgres" {
         path     = "/health"
         interval = "10s"
         timeout  = "2s"
-      }
-
-      check_restart {
-        limit           = 3
-        grace           = "3m"
-        ignore_warnings = false
       }
     }
 
