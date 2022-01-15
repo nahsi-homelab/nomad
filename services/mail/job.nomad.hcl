@@ -20,6 +20,10 @@ job "mail" {
 
   group "wildduck" {
     count = 2
+    update {
+      max_parallel = 1
+      stagger      = "1m"
+    }
 
     network {
       port "wildduck" {
@@ -86,7 +90,6 @@ job "mail" {
         content {
           data        = file(template.value)
           destination = "secrets/${template.value}"
-          change_mode = "noop"
         }
       }
 
@@ -96,7 +99,6 @@ job "mail" {
         content {
           data        = file(template.value)
           destination = "local/${template.value}"
-          change_mode = "noop"
         }
       }
 
@@ -210,6 +212,14 @@ job "mail" {
 
   group "webmail" {
     count = 1
+    update {
+      max_parallel = 1
+      stagger      = "1m"
+    }
+
+    ephemeral_disk {
+      sticky = true
+    }
 
     network {
       mode = "bridge"
@@ -228,6 +238,14 @@ job "mail" {
         "ingress.http.routers.roundcube.rule=Host(`mail.nahsi.dev`)",
         "ingress.http.routers.roundcube.tls=true",
       ]
+
+      check {
+        name     = "Roundcube HTTP"
+        type     = "http"
+        path     = "/"
+        interval = "20s"
+        timeout  = "2s"
+      }
     }
 
     task "roundcube" {
@@ -239,7 +257,7 @@ job "mail" {
 
       resources {
         cpu    = 500
-        memory = 256
+        memory = 64
       }
 
       env {
@@ -253,11 +271,18 @@ job "mail" {
         ROUNDCUBEMAIL_DB_HOST = "master.postgres.service.consul"
         ROUNDCUBEMAIL_DB_PORT = 5432
         ROUNDCUBEMAIL_DB_NAME = "roundcube"
+
+        ROUNDCUBEMAIL_ASPELL_DICTS = "en,ru"
+        ROUNDCUBEMAIL_PLUGINS_PLUGINS = "archive,zipdownload,database_attachments"
       }
 
       config {
         image    = "roundcube/roundcubemail:${var.versions.roundcube}-fpm-alpine"
         work_dir = "${NOMAD_ALLOC_DIR}/data"
+        volumes = [
+          "local/roundcube/config:/var/roundcube/config",
+          "local/roundcube/php.ini:/usr/local/etc/php/conf.d/zzz_custom.ini:ro"
+        ]
       }
 
       template {
@@ -269,11 +294,25 @@ job "mail" {
         destination = "secrets/db.env"
         env         = true
       }
+
+      dynamic "template" {
+        for_each = fileset(".", "roundcube/**")
+
+        content {
+          data        = file(template.value)
+          destination = "local/${template.value}"
+        }
+      }
     }
 
     task "caddy" {
       driver = "docker"
       user   = "nobody"
+
+      lifecycle {
+        hook = "poststart"
+        sidecar = true
+      }
 
       resources {
         cpu    = 50
@@ -348,7 +387,6 @@ job "mail" {
         content {
           data        = file(template.value)
           destination = "local/${template.value}"
-          change_mode = "noop"
         }
       }
 
@@ -461,7 +499,6 @@ job "mail" {
         content {
           data        = file(template.value)
           destination = "secrets/${template.value}"
-          change_mode = "noop"
         }
       }
 
@@ -471,7 +508,6 @@ job "mail" {
         content {
           data        = file(template.value)
           destination = "local/${template.value}"
-          change_mode = "noop"
         }
       }
 

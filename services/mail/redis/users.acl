@@ -7,3 +7,5 @@ user {{ with secret "secret/redis/mail/users/wildduck" }}{{ .Data.data.username 
 user {{ with secret "secret/redis/mail/users/zone-mta" }}{{ .Data.data.username }} >{{ .Data.data.password }} {{ .Data.data.rules }}{{ end }}
 
 user {{ with secret "secret/redis/mail/users/ducky-api" }}{{ .Data.data.username }} >{{ .Data.data.password }} {{ .Data.data.rules }}{{ end }}
+
+user {{ with secret "secret/redis/mail/users/roundcube" }}{{ .Data.data.username }} >{{ .Data.data.password }} {{ .Data.data.rules }}{{ end }}
