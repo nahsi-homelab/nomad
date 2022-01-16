@@ -58,16 +58,27 @@ services:
         logo: "https://s3.nahsi.dev/homer/vault.png"
         url: "http://vault.service.consul:8200"
 
+  - name: "Mail"
+    icon: "fas fa-envelope"
+    items:
+      - name: "Webmail"
+        logo: "https://s3.nahsi.dev/homer/roundcube.svg"
+        url: "https://mail.nahsi.dev"
+
+      - name: "DuckyPanel"
+        logo: "https://s3.nahsi.dev/homer/wildduck.png"
+        url: "https://ducky.service.consul"
+
+      - name: "DuckyAPI"
+        logo: "https://s3.nahsi.dev/homer/swagger.png"
+        url: "https://ducky.service.consul/api/swagger"
+
   - name: "Applications"
     icon: "fa fa-code-branch"
     items:
       - name: "Jellyfin"
         logo: "https://s3.nahsi.dev/homer/jellyfin.svg"
         url: "https://jellyfin.nahsi.dev"
-
-      - name: "Webmail"
-        logo: "https://s3.nahsi.dev/homer/roundcube.svg"
-        url: "https://mail.nahsi.dev"
 
       - name: "Audioserve"
         icon: "fas fa-file-audio"

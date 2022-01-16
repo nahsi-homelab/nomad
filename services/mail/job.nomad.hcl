@@ -32,6 +32,7 @@ job "mail" {
     }
 
     network {
+      mode = "bridge"
       port "wildduck" {
         to = 8080
       }
@@ -70,6 +71,18 @@ job "mail" {
         "ingress.tcp.routers.wildduck-imap.entrypoints=imap",
         "ingress.tcp.routers.wildduck-imap.rule=HostSNI(`mail.nahsi.dev`)",
         "ingress.tcp.routers.wildduck-imap.tls.passthrough=true"
+      ]
+    }
+
+    service {
+      name = "ducky"
+      port = "ducky"
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.ducky-api.entrypoints=https",
+        "traefik.http.routers.ducky-api.rule=Host(`ducky.service.consul`)",
+        "traefik.http.routers.ducky-api.tls=true",
       ]
     }
 
@@ -178,65 +191,89 @@ job "mail" {
       }
     }
 
-    /* task "ducky-api" { */
-    /*   driver = "docker" */
+    task "redis" {
+      driver = "docker"
+      user   = "nobody"
 
-    /*   vault { */
-    /*     policies = ["ducky-api"] */
-    /*   } */
+      config {
+        image   = "redis:6-alpine"
+        command = "redis-server"
+        args = [
+          "--bind", "127.0.0.1",
+          "--maxmemory", "48mb",
+        ]
+      }
 
-    /*   lifecycle { */
-    /*     sidecar = true */
-    /*   } */
+      resources {
+        cpu    = 100
+        memory = 64
+      }
+    }
 
-    /*   resources { */
-    /*     cpu        = 100 */
-    /*     memory     = 32 */
-    /*     memory_max = 64 */
-    /*   } */
+    task "ducky-api" {
+      driver = "docker"
 
-    /*   config { */
-    /*     image = "nahsihub/ducky-api:${var.versions.ducky-api}" */
+      vault {
+        policies = ["ducky-api"]
+      }
 
-    /*     ports = [ */
-    /*       "ducky" */
-    /*     ] */
+      lifecycle {
+        sidecar = true
+      }
 
-    /*     volumes = [ */
-    /*       "secrets/config.env:/usr/local/ducky-api/config/production.env" */
-    /*     ] */
-    /*   } */
+      resources {
+        cpu        = 100
+        memory     = 64
+        memory_max = 256
+      }
 
-    /*   template { */
-    /*     data        = file("ducky-api/config.env") */
-    /*     destination = "secrets/config.env" */
-    /*   } */
+      config {
+        image = "nahsihub/ducky-api:${var.versions.ducky-api}"
 
-    /*   # CA */
-    /*   template { */
-    /*     data = <<-EOH */
-    /*     {{- with secret "pki/issue/internal" "ttl=30d" "common_name=*.service.consul" -}} */
-    /*     {{ .Data.issuing_ca }}{{ end }} */
-    /*     EOH */
+        ports = [
+          "ducky"
+        ]
 
-    /*     destination = "secrets/certs/CA.pem" */
-    /*     change_mode = "restart" */
-    /*     splay       = "1m" */
-    /*   } */
+        volumes = [
+          "secrets/config.env:/usr/local/ducky-api/config/production.env"
+        ]
+      }
 
-    /*   # bundle */
-    /*   template { */
-    /*     data = <<-EOH */
-    /*     {{- with secret "pki/issue/internal" "ttl=30d" "common_name=ducky.service.consul" -}} */
-    /*     {{ .Data.private_key }} */
-    /*     {{ .Data.certificate }}{{ end }} */
-    /*     EOH */
+      template {
+        data        = file("ducky-api/config.env")
+        destination = "secrets/config.env"
+      }
 
-    /*     destination = "secrets/certs/bundle.pem" */
-    /*     change_mode = "restart" */
-    /*     splay       = "1m" */
-    /*   } */
-    /* } */
+      template {
+        data        = file("ducky-api/config.env")
+        destination = "local/config.env"
+      }
+
+      # CA
+      template {
+        data = <<-EOH
+        {{- with secret "pki/issue/internal" "ttl=30d" "common_name=*.service.consul" -}}
+        {{ .Data.issuing_ca }}{{ end }}
+        EOH
+
+        destination = "secrets/certs/CA.pem"
+        change_mode = "restart"
+        splay       = "1m"
+      }
+
+      # bundle
+      template {
+        data = <<-EOH
+        {{- with secret "pki/issue/internal" "ttl=30d" "common_name=ducky.service.consul" -}}
+        {{ .Data.private_key }}
+        {{ .Data.certificate }}{{ end }}
+        EOH
+
+        destination = "secrets/certs/bundle.pem"
+        change_mode = "restart"
+        splay       = "1m"
+      }
+    }
   }
 
   group "webmail" {
