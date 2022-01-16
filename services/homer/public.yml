@@ -24,7 +24,7 @@ links:
 
   - name: "Mail"
     icon: "fas fa-envelope"
-    url: "mailto:nahsi@airmail.cc"
+    url: "mailto:nahsi@nahsi.dev"
     target: "_blank"
 
 services:
@@ -33,6 +33,10 @@ services:
       - name: "Jellyfin"
         logo: "https://s3.nahsi.dev/homer/jellyfin.svg"
         url: "https://jellyfin.nahsi.dev"
+
+      - name: "Webmail"
+        logo: "https://s3.nahsi.dev/homer/roundcube.svg"
+        url: "https://mail.nahsi.dev"
 
       - name: "MinIO"
         logo: "https://s3.nahsi.dev/homer/minio.png"

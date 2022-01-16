@@ -8,8 +8,8 @@ entryPoints:
     http:
       redirections:
         entryPoint:
-          to: https
-          scheme: https
+          to: "https"
+          scheme: "https"
 
   https:
     address: ":443"
@@ -24,25 +24,62 @@ entryPoints:
             sans:
               - "*.nahsi.dev"
 
+  smtp:
+    address: ":465"
+    transport:
+      lifeCycle:
+        requestAcceptGraceTimeout: 15
+        graceTimeOut: 10
+    http:
+      tls:
+        domains:
+          - main: "nahsi.dev"
+            sans:
+              - "*.nahsi.dev"
+
+  imap:
+    address: ":993"
+    transport:
+      lifeCycle:
+        requestAcceptGraceTimeout: 15
+        graceTimeOut: 10
+    http:
+      tls:
+        domains:
+          - main: "nahsi.dev"
+            sans:
+              - "*.nahsi.dev"
+
+  smtp-relay:
+    address: ":25"
+    transport:
+      lifeCycle:
+        requestAcceptGraceTimeout: 15
+        graceTimeOut: 10
+
   traefik:
     address: ":8080"
 
+api:
+  insecure: true
+
 ping:
-  entrypoint: traefik
+  entrypoint: "traefik"
 
 metrics:
   prometheus:
-    entrypoint: traefik
+    entrypoint: "traefik"
 
 accessLog:
   filePath: "/alloc/data/access.log"
-  format: json
+  format: "json"
 
 providers:
   consulCatalog:
+    refreshInterval: "5s"
     prefix: "ingress"
     exposedByDefault: false
     endpoint:
       address: "host.docker.internal:8500"
   file:
-    filename: "local/traefik/tls.yml"
+    filename: "local/traefik/file.yml"

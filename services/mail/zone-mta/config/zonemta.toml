@@ -1,0 +1,38 @@
+# https://github.com/zone-eu/zone-mta/blob/master/config/default.js
+name="ZoneMTA"
+ident="zone-mta"
+
+user="nobody"
+group="nobody"
+
+[pools]
+# @include "pools.toml"
+
+[dbs]
+# @include "/secrets/zone-mta/secrets/dbs.toml"
+
+[log]
+# @include "log.toml"
+
+[queue]
+instanceId='{{ env "NOMAD_ALLOC_NAME" }}'
+
+collection="zone-queue"
+gfs="mail"
+
+[dns]
+caching=false
+nameservers=["1.1.1.1", "8.8.8.8"]
+
+[api]
+host="127.0.0.1"
+port={{ env "NOMAD_PORT_api" }}
+hostname="zone-mta-api.service.consul"
+maildrop=false
+
+[plugins]
+# @include "plugins/*.toml"
+# @include "/secrets/zone-mta/secrets/loop-breaker.toml"
+
+[smtpInterfaces]
+# @include "interfaces/*.toml"

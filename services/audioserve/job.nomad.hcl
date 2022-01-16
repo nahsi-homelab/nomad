@@ -23,9 +23,11 @@ job "audioserve" {
 
       tags = [
         "traefik.enable=true",
+        "traefik.http.routers.audioserve.entrypoints=https",
         "traefik.http.routers.audioserve.rule=Host(`audioserve.service.consul`)",
         "traefik.http.routers.audioserve.tls=true",
         "ingress.enable=true",
+        "ingress.http.routers.audioserve.entrypoints=https",
         "ingress.http.routers.audioserve.rule=Host(`audioserve.nahsi.dev`)",
         "ingress.http.routers.audioserve.tls=true",
       ]

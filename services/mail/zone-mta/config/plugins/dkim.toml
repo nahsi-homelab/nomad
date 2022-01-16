@@ -1,0 +1,6 @@
+["core/dkim"]
+  enabled=true
+  domain="nahsi.dev"
+  signTransportDomain=true
+  selector="mail"
+  path="/secrets/dkim.pem"

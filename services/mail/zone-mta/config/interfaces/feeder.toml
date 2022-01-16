@@ -1,0 +1,14 @@
+# Default SMTP interface for accepting mail for delivery
+[feeder]
+enabled=true
+processes=2
+
+host="0.0.0.0"
+port=465
+
+authentication=true
+
+starttls=false
+secure=true
+key="/secrets/tls/key.pem"
+cert="/secrets/tls/cert.pem"

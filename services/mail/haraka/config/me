@@ -1,0 +1,1 @@
+{{- if eq (env "node.datacenter") "syria" -}}nahsi.dev{{ else }}pppoe-150-126.tnpko.ru{{ end -}}
