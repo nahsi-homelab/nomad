@@ -49,6 +49,12 @@ job "ingress" {
         host_network = "public"
       }
 
+      port "smtp-relay" {
+        static       = 25
+        to           = 25
+        host_network = "public"
+      }
+
       port "imap" {
         static       = 993
         to           = 993
@@ -100,6 +106,7 @@ job "ingress" {
           "http",
           "https",
           "smtp",
+          "smtp-relay",
           "imap"
         ]
 

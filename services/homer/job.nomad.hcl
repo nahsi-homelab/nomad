@@ -89,7 +89,7 @@ job "homer" {
 
       tags = [
         "ingress.enable=true",
-        "ingress.entrypoints=https",
+        "ingress.http.routers.homer.entrypoints=https",
         "ingress.http.routers.homer.rule=Host(`nahsi.dev`)",
         "ingress.http.routers.homer.tls=true"
       ]

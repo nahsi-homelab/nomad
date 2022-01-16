@@ -355,23 +355,25 @@ job "mail" {
   }
 
   group "haraka" {
-    count = 1
+    count = 2
 
     vault {
       policies = ["haraka"]
     }
 
     network {
-      port "smtp" {
-        to           = 25
-        static       = 25
-        host_network = "public"
-      }
+      port "smtp" {}
     }
 
     service {
       name = "haraka"
       port = "smtp"
+
+      tags = [
+        "ingress.enable=true",
+        "ingress.tcp.routers.haraka.entrypoints=smtp-relay",
+        "ingress.tcp.routers.haraka.rule=HostSNI(`*`)",
+      ]
     }
 
     task "haraka" {

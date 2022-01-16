@@ -26,6 +26,10 @@ entryPoints:
 
   smtp:
     address: ":465"
+    transport:
+      lifeCycle:
+        requestAcceptGraceTimeout: 15
+        graceTimeOut: 10
     http:
       tls:
         domains:
@@ -35,6 +39,10 @@ entryPoints:
 
   imap:
     address: ":993"
+    transport:
+      lifeCycle:
+        requestAcceptGraceTimeout: 15
+        graceTimeOut: 10
     http:
       tls:
         domains:
@@ -42,6 +50,12 @@ entryPoints:
             sans:
               - "*.nahsi.dev"
 
+  smtp-relay:
+    address: ":25"
+    transport:
+      lifeCycle:
+        requestAcceptGraceTimeout: 15
+        graceTimeOut: 10
 
   traefik:
     address: ":8080"
