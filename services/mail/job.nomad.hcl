@@ -15,6 +15,7 @@ variables {
 job "mail" {
   datacenters = [
     "syria",
+    "asia"
   ]
   namespace = "services"
 
@@ -23,6 +24,11 @@ job "mail" {
     update {
       max_parallel = 1
       stagger      = "1m"
+    }
+
+    spread {
+      attribute = "${node.datacener}"
+      weight    = 100
     }
 
     network {
@@ -230,6 +236,11 @@ job "mail" {
       stagger      = "1m"
     }
 
+    spread {
+      attribute = "${node.datacener}"
+      weight    = 100
+    }
+
     ephemeral_disk {
       sticky = true
     }
@@ -357,6 +368,11 @@ job "mail" {
   group "haraka" {
     count = 2
 
+    spread {
+      attribute = "${node.datacener}"
+      weight    = 100
+    }
+
     vault {
       policies = ["haraka"]
     }
@@ -457,6 +473,11 @@ job "mail" {
 
   group "zone-mta" {
     count = 1
+
+    constraint {
+      attribute = "${node.datacenter}"
+      value     = "syria"
+    }
 
     vault {
       policies = ["zone-mta"]
@@ -592,6 +613,11 @@ job "mail" {
     update {
       max_parallel = 1
       stagger      = "1m"
+    }
+
+    spread {
+      attribute = "${node.datacener}"
+      weight    = 100
     }
 
     network {
