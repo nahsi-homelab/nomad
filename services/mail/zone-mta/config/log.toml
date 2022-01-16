@@ -1,0 +1,6 @@
+level="info" # "silly" "info" "error"
+
+[remote]
+  protocol="udp4"
+  host="127.0.0.1"
+  port=31239
