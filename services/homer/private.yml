@@ -73,6 +73,9 @@ services:
         logo: "https://s3.nahsi.dev/homer/swagger.png"
         url: "https://ducky.service.consul/api/swagger"
 
+      - name: "ZoneMTA"
+        url: "https://zone-mta.service.consul"
+
   - name: "Applications"
     icon: "fa fa-code-branch"
     items:

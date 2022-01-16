@@ -1,15 +1,15 @@
 variables {
   versions = {
-    wildduck  = "1.34.0"
-    haraka    = "latest"
-    zone-mta  = "latest"
-    ducky-api = "latest"
-    roundcube = "1.5.x"
-    caddy     = "2.4.6"
+    wildduck          = "1.34.0"
+    haraka            = "latest"
+    zone-mta          = "latest"
+    zone-mta-webadmin = "latest"
+    ducky-api         = "latest"
+    roundcube         = "1.5.x"
+    caddy             = "2.4.6"
 
     redis = "6.2"
-    resec = "latest"
-  }
+  resec = "latest" }
 }
 
 job "mail" {
@@ -529,12 +529,10 @@ job "mail" {
       value     = "syria"
     }
 
-    vault {
-      policies = ["zone-mta"]
-    }
-
     network {
+      mode = "bridge"
       port "api" {}
+      port "webadmin" {}
       port "smtp" {
         to = 465
       }
@@ -542,6 +540,27 @@ job "mail" {
 
     service {
       name = "zone-mta"
+      port = "webadmin"
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.zone-mta.entrypoints=https",
+        "traefik.http.routers.zone-mta.rule=Host(`zone-mta.service.consul`)",
+        "traefik.http.routers.zone-mta.tls=true",
+      ]
+
+      check {
+        name     = "zone-mta webadmin"
+        type     = "http"
+        path     = "/"
+        port     = "webadmin"
+        interval = "20s"
+        timeout  = "2s"
+      }
+    }
+
+    service {
+      name = "zone-mta-api"
       port = "api"
 
       check {
@@ -567,6 +586,10 @@ job "mail" {
 
     task "zone-mta" {
       driver = "docker"
+
+      vault {
+        policies = ["zone-mta"]
+      }
 
       resources {
         cpu        = 300
@@ -660,6 +683,61 @@ job "mail" {
         EOH
 
         destination = "secrets/dkim.pem"
+        change_mode = "restart"
+        splay       = "1m"
+      }
+    }
+
+    task "webadmin" {
+      driver = "docker"
+
+      lifecycle {
+        sidecar = true
+      }
+
+      vault {
+        policies = ["zone-mta-webadmin"]
+      }
+
+      resources {
+        cpu    = 50
+        memory = 64
+      }
+
+      config {
+        image = "nahsihub/zone-mta-webadmin:${var.versions.zone-mta-webadmin}"
+        ports = [ "webadmin" ]
+        volumes = [
+          "secrets/default.toml:/usr/local/zone-mta-webadmin/config/default.toml"
+        ]
+      }
+
+      template {
+        data        = file("zone-mta-webadmin/default.toml")
+        destination = "secrets/default.toml"
+      }
+
+      # CA
+      template {
+        data = <<-EOH
+        {{- with secret "pki/issue/internal" "ttl=30d" "common_name=*.service.consul" -}}
+        {{ .Data.issuing_ca }}{{ end }}
+        EOH
+
+        destination = "secrets/certs/CA.pem"
+        change_mode = "restart"
+        splay       = "1m"
+      }
+
+      # bundle
+      template {
+        data = <<-EOH
+        {{- with secret "pki/issue/internal" "ttl=30d" "common_name=zone-mta-webadmin.service.consul" -}}
+        {{ .Data.private_key }}
+        {{ .Data.certificate }}{{ end }}
+        EOH
+
+        destination = "secrets/certs/bundle.pem"
         change_mode = "restart"
         splay       = "1m"
       }

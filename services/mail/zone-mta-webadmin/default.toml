@@ -1,0 +1,34 @@
+auth=true
+user='{{ with secret "secret/mail/zone-mta" }}{{ .Data.data.username }}{{ end }}'
+pass='{{ with secret "secret/mail/zone-mta" }}{{ .Data.data.password }}{{ end }}'
+
+port='{{ env "NOMAD_PORT_webadmin" }}'
+host="0.0.0.0"
+proxy=1
+
+httplog="dev"
+
+secret='{{ with secret "secret/mail/zone-mta" }}{{ .Data.data.secret }}{{ end }}'
+maxPostSize="5MB"
+apiServer='http://127.0.0.1:{{ env "NOMAD_PORT_api" }}'
+counterPrefix="zmta"
+
+logsdb="zone-mta-logs"
+retention=2592000000 # 30 days
+mongo='mongodb://{{- with secret "mongo/creds/zone-mta-webadmin" -}}{{ .Data.username }}:{{ .Data.password }}{{ end -}}@mongo-primary.service.consul:27017,mongo-secondary.service.consul:27017/zone-mta-logs?replicaSet=main&tls=true&tlsCertificateKeyFile=/secrets/certs/bundle.pem&tlsCAFile=/secrets/certs/CA.pem'
+
+[log]
+level="info"
+
+[logserver]
+enabled=true
+protocol="udp4"
+host="127.0.0.1"
+port=31239
+
+[redis]
+  host="master.redis-mail.service.consul"
+  port=6379
+  db=2
+  username='{{ with secret "secret/redis/mail/users/zone-mta" }}{{ .Data.data.username }}{{ end }}'
+  password='{{ with secret "secret/redis/mail/users/zone-mta" }}{{ .Data.data.password }}{{ end }}'
