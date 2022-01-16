@@ -73,8 +73,9 @@ job "mail" {
       }
 
       resources {
-        cpu    = 500
-        memory = 256
+        cpu        = 300
+        memory     = 64
+        memory_max = 128
       }
 
       env {
@@ -281,8 +282,9 @@ job "mail" {
       }
 
       resources {
-        cpu    = 500
-        memory = 64
+        cpu        = 100
+        memory     = 16
+        memory_max = 64
       }
 
       env {
@@ -341,7 +343,7 @@ job "mail" {
 
       resources {
         cpu    = 50
-        memory = 64
+        memory = 32
       }
 
       config {
@@ -396,8 +398,9 @@ job "mail" {
       driver = "docker"
 
       resources {
-        cpu    = 500
-        memory = 256
+        cpu        = 500
+        memory     = 150
+        memory_max = 256
       }
 
       env {
@@ -511,7 +514,7 @@ job "mail" {
       driver = "docker"
 
       resources {
-        cpu        = 500
+        cpu        = 300
         memory     = 256
         memory_max = 350
       }
