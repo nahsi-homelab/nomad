@@ -46,6 +46,9 @@ entryPoints:
   traefik:
     address: ":8080"
 
+api:
+  insecure: true
+
 ping:
   entrypoint: "traefik"
 
@@ -59,7 +62,6 @@ accessLog:
 
 providers:
   consulCatalog:
-    cache: true
     refreshInterval: "5s"
     prefix: "ingress"
     exposedByDefault: false

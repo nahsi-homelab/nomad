@@ -43,7 +43,6 @@ accessLog:
 
 providers:
   consulCatalog:
-    cache: true
     refreshInterval: "5s"
     prefix: "traefik"
     exposedByDefault: false
