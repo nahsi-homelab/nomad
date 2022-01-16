@@ -285,7 +285,7 @@ job "mail" {
         ROUNDCUBEMAIL_DB_PORT = 5432
         ROUNDCUBEMAIL_DB_NAME = "roundcube"
 
-        ROUNDCUBEMAIL_ASPELL_DICTS = "en,ru"
+        ROUNDCUBEMAIL_ASPELL_DICTS    = "en,ru"
         ROUNDCUBEMAIL_PLUGINS_PLUGINS = "archive,zipdownload,database_attachments"
       }
 
@@ -323,7 +323,7 @@ job "mail" {
       user   = "nobody"
 
       lifecycle {
-        hook = "poststart"
+        hook    = "poststart"
         sidecar = true
       }
 
@@ -665,6 +665,8 @@ job "mail" {
         memory = 64
       }
 
+      kill_timeout = "10s"
+
       service {
         name = "resec"
         port = "resec"
@@ -675,6 +677,11 @@ job "mail" {
           path     = "/health"
           interval = "20s"
           timeout  = "2s"
+        }
+
+        check_restart {
+          limit = 2
+          grace = "5s"
         }
       }
 
