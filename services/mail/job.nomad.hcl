@@ -224,7 +224,7 @@ job "mail" {
   }
 
   group "webmail" {
-    count = 1
+    count = 2
     update {
       max_parallel = 1
       stagger      = "1m"
@@ -249,6 +249,7 @@ job "mail" {
         "ingress.enable=true",
         "ingress.http.routers.roundcube.entrypoints=https",
         "ingress.http.routers.roundcube.rule=Host(`mail.nahsi.dev`)",
+        "ingress.http.services.roundcube.loadBalancer.sticky.cookie=true",
         "ingress.http.routers.roundcube.tls=true",
       ]
 
