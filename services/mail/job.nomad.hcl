@@ -19,16 +19,16 @@ job "mail" {
   ]
   namespace = "services"
 
+  spread {
+    attribute = "${node.datacenter}"
+    weight    = 100
+  }
+
   group "wildduck" {
     count = 2
     update {
       max_parallel = 1
       stagger      = "1m"
-    }
-
-    spread {
-      attribute = "${node.datacener}"
-      weight    = 100
     }
 
     network {
@@ -190,8 +190,9 @@ job "mail" {
     /*   } */
 
     /*   resources { */
-    /*     cpu    = 500 */
-    /*     memory = 256 */
+    /*     cpu        = 100 */
+    /*     memory     = 32 */
+    /*     memory_max = 64 */
     /*   } */
 
     /*   config { */
@@ -243,11 +244,6 @@ job "mail" {
     update {
       max_parallel = 1
       stagger      = "1m"
-    }
-
-    spread {
-      attribute = "${node.datacener}"
-      weight    = 100
     }
 
     ephemeral_disk {
@@ -380,11 +376,6 @@ job "mail" {
     update {
       max_parallel = 1
       stagger      = "1m"
-    }
-
-    spread {
-      attribute = "${node.datacener}"
-      weight    = 100
     }
 
     vault {
@@ -648,11 +639,6 @@ job "mail" {
     update {
       max_parallel = 1
       stagger      = "1m"
-    }
-
-    spread {
-      attribute = "${node.datacener}"
-      weight    = 100
     }
 
     network {
