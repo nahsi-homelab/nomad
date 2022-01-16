@@ -51,6 +51,14 @@ job "mail" {
         "traefik.http.routers.wildduck.rule=Host(`wildduck.service.consul`)",
         "traefik.http.routers.wildduck.tls=true",
       ]
+
+      check {
+        name     = "Wildduck TCP"
+        type     = "tcp"
+        port     = "imap"
+        interval = "20s"
+        timeout  = "2s"
+      }
     }
 
     service {
@@ -283,7 +291,7 @@ job "mail" {
 
       resources {
         cpu        = 100
-        memory     = 16
+        memory     = 32
         memory_max = 64
       }
 
@@ -369,6 +377,10 @@ job "mail" {
 
   group "haraka" {
     count = 2
+    update {
+      max_parallel = 1
+      stagger      = "1m"
+    }
 
     spread {
       attribute = "${node.datacener}"
@@ -392,6 +404,14 @@ job "mail" {
         "ingress.tcp.routers.haraka.entrypoints=smtp-relay",
         "ingress.tcp.routers.haraka.rule=HostSNI(`*`)",
       ]
+
+      check {
+        name     = "Haraka TCP"
+        type     = "tcp"
+        port     = "smtp"
+        interval = "20s"
+        timeout  = "2s"
+      }
     }
 
     task "haraka" {
@@ -476,6 +496,10 @@ job "mail" {
 
   group "zone-mta" {
     count = 1
+    update {
+      max_parallel = 1
+      stagger      = "1m"
+    }
 
     constraint {
       attribute = "${node.datacenter}"
@@ -496,6 +520,14 @@ job "mail" {
     service {
       name = "zone-mta"
       port = "api"
+
+      check {
+        name     = "zone-mta TCP"
+        type     = "tcp"
+        port     = "smtp"
+        interval = "20s"
+        timeout  = "2s"
+      }
     }
 
     service {
