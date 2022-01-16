@@ -244,11 +244,6 @@ job "mail" {
         destination = "secrets/config.env"
       }
 
-      template {
-        data        = file("ducky-api/config.env")
-        destination = "local/config.env"
-      }
-
       # CA
       template {
         data = <<-EOH
