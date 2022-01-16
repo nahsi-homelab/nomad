@@ -606,7 +606,6 @@ job "mail" {
         image = "nahsihub/zone-mta-wildduck:${var.versions.zone-mta}"
 
         ports = [
-          "api",
           "smtp"
         ]
       }

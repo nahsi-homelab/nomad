@@ -25,9 +25,9 @@ caching=false
 nameservers=["1.1.1.1", "8.8.8.8"]
 
 [api]
-host="0.0.0.0"
+host="127.0.0.1"
 port={{ env "NOMAD_PORT_api" }}
-hostname="zone-mta.service.consul"
+hostname="zone-mta-api.service.consul"
 maildrop=false
 
 [plugins]
