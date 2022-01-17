@@ -25,6 +25,11 @@ job "mail" {
   }
 
   group "wildduck" {
+    ephemeral_disk {
+      sticky  = true
+      migrate = true
+    }
+
     count = 2
     update {
       max_parallel = 1
@@ -201,6 +206,7 @@ job "mail" {
         args = [
           "--bind", "127.0.0.1",
           "--maxmemory", "48mb",
+          "--dir", "${NOMAD_ALLOC_DIR}/data"
         ]
       }
 
@@ -218,6 +224,7 @@ job "mail" {
       }
 
       lifecycle {
+        hook = "poststart"
         sidecar = true
       }
 
@@ -705,7 +712,7 @@ job "mail" {
 
       config {
         image = "nahsihub/zone-mta-webadmin:${var.versions.zone-mta-webadmin}"
-        ports = [ "webadmin" ]
+        ports = ["webadmin"]
         volumes = [
           "secrets/default.toml:/usr/local/zone-mta-webadmin/config/default.toml"
         ]
