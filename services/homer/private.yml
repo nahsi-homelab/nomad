@@ -17,6 +17,11 @@ colors:
     highlight-hover: "#373B41"
 
 links:
+  - name: "Home Assistant"
+    icon: "fas fa-laptop-house"
+    url: "https://home-assistant.service.consul"
+    target: "_blank"
+
   - name: "GitHub"
     icon: "fab fa-github"
     url: "https://github.com/nahsi"
