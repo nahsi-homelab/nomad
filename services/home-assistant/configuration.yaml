@@ -1,0 +1,25 @@
+homeassistant:
+  name: "asia"
+  latitude: !env_var LATITUDE
+  longitude: !env_var LONGITUDE
+  elevation: !env_var ELEVATION
+  unit_system: "metric"
+  time_zone: "Europe/Moscow"
+
+recorder: !include /secrets/recorder.yml
+
+my:
+sun:
+system_health:
+
+logger:
+  default: info
+
+frontend:
+
+http:
+  server_port: [[ env "NOMAD_PORT_http" ]]
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 192.168.230.0/24
+    - 172.17.0.0/16

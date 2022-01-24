@@ -88,6 +88,10 @@ services:
         logo: "https://s3.nahsi.dev/homer/jellyfin.svg"
         url: "https://jellyfin.nahsi.dev"
 
+      - name: "Hyperion"
+        logo: "https://s3.nahsi.dev/homer/hyperion.png"
+        url: "https://hyperion.service.consul"
+
       - name: "Audioserve"
         icon: "fas fa-file-audio"
         url: "https://audioserve.nahsi.dev"
