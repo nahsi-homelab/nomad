@@ -8,14 +8,8 @@ homeassistant:
 
 recorder: !include /secrets/recorder.yml
 
-my:
-sun:
-system_health:
-
 logger:
   default: info
-
-frontend:
 
 http:
   server_port: [[ env "NOMAD_PORT_http" ]]
@@ -23,3 +17,14 @@ http:
   trusted_proxies:
     - 192.168.230.0/24
     - 172.17.0.0/16
+
+my:
+frontend:
+system_health:
+webhook:
+sun:
+
+[[ range safeLs "configs/home-assistant/configs" ]]
+[[ .Key ]]:
+[[ .Value | indent 2 ]]
+[[ end -]]
