@@ -1,7 +1,7 @@
 variables {
   github-runner = {
-    version = "2.286.0"
-    sha     = "855b84fe96fda84b22bb9efa2088652d785ed856a7af484b5f4c44f650d7eecf"
+    version = "2.286.1"
+    sha     = "7b1509c353ea4e6561b2ed2e916dcbf2a0d8ce21172edd9f8c846a20b6462cd6"
   }
 }
 
