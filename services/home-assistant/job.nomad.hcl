@@ -85,9 +85,16 @@ job "home-assistant" {
 
       template {
         data = <<-EOH
-        LATITUDE="59"
-        LONGITUDE="49"
-        ELEVATION="57"
+        {{ with secret "secret/home-assistant/location" -}}
+        LATITUDE={{ .Data.data.latitude }}
+        LONGITUDE={{ .Data.data.longitude }}
+        ELEVATION={{ .Data.data.elevation }}
+        {{- end }}
+
+        {{ with secret "secret/home-assistant/spotify" -}}
+        SPOTIFY_CLIENT_ID={{ .Data.data.client_id }}
+        SPOTIFY_CLIENT_SECRET={{ .Data.data.client_secret }}
+        {{- end }}
         EOH
 
         destination = "secrets/secrets.env"

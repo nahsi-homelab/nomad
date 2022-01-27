@@ -24,6 +24,10 @@ system_health:
 webhook:
 sun:
 
+spotify:
+  client_id: !env_var SPOTIFY_CLIENT_ID
+  client_secret: !env_var SPOTIFY_CLIENT_SECRET
+
 [[ range safeLs "configs/home-assistant/configs" ]]
 [[ .Key ]]:
 [[ .Value | indent 2 ]]
