@@ -17,6 +17,11 @@ colors:
     highlight-hover: "#373B41"
 
 links:
+  - name: "Home Assistant"
+    icon: "fas fa-laptop-house"
+    url: "https://home-assistant.service.consul"
+    target: "_blank"
+
   - name: "GitHub"
     icon: "fab fa-github"
     url: "https://github.com/nahsi"
@@ -82,6 +87,10 @@ services:
       - name: "Jellyfin"
         logo: "https://s3.nahsi.dev/homer/jellyfin.svg"
         url: "https://jellyfin.nahsi.dev"
+
+      - name: "Hyperion"
+        logo: "https://s3.nahsi.dev/homer/hyperion.png"
+        url: "https://hyperion.service.consul"
 
       - name: "Audioserve"
         icon: "fas fa-file-audio"
