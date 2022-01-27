@@ -29,7 +29,7 @@ job "spotifyd" {
       }
 
       env = {
-        PULSE_SERVER="tcp:172.17.0.1:4713"
+        PULSE_SERVER = "tcp:172.17.0.1:4713"
       }
 
       config {
@@ -39,20 +39,13 @@ job "spotifyd" {
           "--device-name", "${node.unique.name}",
 
           "--bitrate", "320",
+          "--volume-normalisation",
           "--volume-controller", "softvol",
-          "--backend", "pulseaudio",
+          "--backend", "alsa",
           "--cache-path", "${NOMAD_ALLOC_DIR}/data/",
 
           "--username-cmd", "cat ${NOMAD_SECRETS_DIR}/username",
           "--password-cmd", "cat ${NOMAD_SECRETS_DIR}/password",
-        ]
-
-        privileged = true
-        devices = [
-          {
-            host_path          = "/dev/snd"
-            cgroup_permissions = "rw"
-          }
         ]
       }
 
