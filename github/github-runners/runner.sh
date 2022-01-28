@@ -23,30 +23,29 @@ for var in ${required_vars[@]}; do
 done
 
 case $RUNNER_TYPE in
-  org)
-    if [[ -z $GITHUB_ORG ]]; then
-      log "GITHUB_ORG must be defined when GITHUB_TYPE=org"
-      exit 1
-    else
-      url="https://api.github.com/orgs/$GITHUB_ORG/actions/runners"
-      RUNNER_URL="https://github.com/$GITHUB_ORG"
-    fi
-  ;;
-  repo)
-    if [[ -z $GITHUB_REPO ]]; then
-      log "GITHUB_REPO must be defined when RUNNER_TYPE=repo"
-      exit 1
-    else
-      url="https://api.github.com/repos/$GITHUB_REPO/actions/runners"
-      RUNNER_URL="https://github.com/$GITHUB_REPO"
-    fi
-  ;;
-  *)
-    log "No such RUNNER_TYPE $RUNNER_TYPE"
+org)
+  if [[ -z $GITHUB_ORG ]]; then
+    log "GITHUB_ORG must be defined when GITHUB_TYPE=org"
     exit 1
+  else
+    url="https://api.github.com/orgs/$GITHUB_ORG/actions/runners"
+    RUNNER_URL="https://github.com/$GITHUB_ORG"
+  fi
+  ;;
+repo)
+  if [[ -z $GITHUB_REPO ]]; then
+    log "GITHUB_REPO must be defined when RUNNER_TYPE=repo"
+    exit 1
+  else
+    url="https://api.github.com/repos/$GITHUB_REPO/actions/runners"
+    RUNNER_URL="https://github.com/$GITHUB_REPO"
+  fi
+  ;;
+*)
+  log "No such RUNNER_TYPE $RUNNER_TYPE"
+  exit 1
   ;;
 esac
-
 
 api() {
   local url="$1"
@@ -56,15 +55,15 @@ api() {
 
   if code=$(curl -sS -X POST -H "$accept_header" -H "$auth_header" -w '%{http_code}\n' --output /tmp/output "$url" 2>&1); then
     case $code in
-      20*)
-        cat /tmp/output
-        rm /tmp/output
-        return 0
+    20*)
+      cat /tmp/output
+      rm /tmp/output
+      return 0
       ;;
-      *)
-        cat /tmp/output
-        rm /tmp/output
-        return 1
+    *)
+      cat /tmp/output
+      rm /tmp/output
+      return 1
       ;;
     esac
   else
@@ -77,8 +76,8 @@ api() {
 
 get_token() {
   case $1 in
-    register) local url="${url}/registration-token" ;;
-    remove) local url="${url}/remove-token" ;;
+  register) local url="${url}/registration-token" ;;
+  remove) local url="${url}/remove-token" ;;
   esac
 
   if out="$(api ${url})"; then
@@ -95,6 +94,7 @@ register_runner() {
   get_token register
   ${RUNNER_DIR}/config.sh \
     --unattended \
+    --disableupdate \
     --token "$RUNNER_TOKEN" \
     --url "$RUNNER_URL" \
     --work ${RUNNER_DIR}/_work \
