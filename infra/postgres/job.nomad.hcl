@@ -73,8 +73,8 @@ job "postgres" {
       }
 
       config {
-        image = "nahsihub/patroni:${var.versions.patroni}"
-
+        image   = "nahsihub/patroni:${var.versions.patroni}"
+        init    = true
         command = "/local/patroni.yml"
 
         extra_hosts = [
