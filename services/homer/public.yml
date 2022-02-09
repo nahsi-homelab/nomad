@@ -27,6 +27,11 @@ links:
     url: "mailto:nahsi@nahsi.dev"
     target: "_blank"
 
+  - name: "Hire me"
+    icon: "fa fa-briefcase"
+    url: "https://resume.nahsi.dev"
+    target: "_blank"
+
 services:
   - icon: "fas fa-globe"
     items:
