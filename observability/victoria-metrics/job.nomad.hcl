@@ -30,9 +30,12 @@ job "victoria-metrics" {
       check {
         name     = "VictoriaMetrics HTTP"
         type     = "http"
-        path     = "/-/healthy"
+        protocol = "https"
+        path     = "/-/ready"
         interval = "20s"
         timeout  = "2s"
+
+        tls_skip_verify = true
       }
     }
 
@@ -62,7 +65,7 @@ job "victoria-metrics" {
       }
 
       config {
-        image = "victoriametrics/victoria-metrics:v${var.versions.victoria}"
+        image = "victoriametrics/victoria-metrics:v${var.versions.vm}"
 
         ports = [
           "http"
@@ -73,18 +76,18 @@ job "victoria-metrics" {
           "-dedup.minScrapeInterval=10s",
 
           "-tls",
-          "-tlsCertfile=/secrets/certs/cert.pem",
+          "-tlsCertFile=/secrets/certs/cert.pem",
           "-tlsKeyFile=/secrets/certs/key.pem",
         ]
       }
 
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=7d" "common_name=vicrotia-metrics.service.consul" -}}
+        {{- with secret "pki/issue/internal" "ttl=7d" "common_name=victoria-metrics.service.consul" -}}
         {{ .Data.private_key }}{{ end }}
         EOH
 
-        destination = "secrets/certs/cert.pem"
+        destination = "secrets/certs/key.pem"
         change_mode = "restart"
         splay       = "1m"
       }
@@ -95,7 +98,7 @@ job "victoria-metrics" {
         {{ .Data.certificate }}{{ end }}
         EOH
 
-        destination = "secrets/certs/key.pem"
+        destination = "secrets/certs/cert.pem"
         change_mode = "restart"
         splay       = "1m"
       }
@@ -105,7 +108,7 @@ job "victoria-metrics" {
   group "vmagent" {
     count = 2
     constraint {
-      distinct_value = node.datacenter
+      distinct_property = node.datacenter
     }
 
     ephemeral_disk {
@@ -177,7 +180,7 @@ job "victoria-metrics" {
       }
 
       template {
-        data          = "{{ key \"configs/vmagent\" }}"
+        data          = "{{ key \"configs/vmagent/config.yml\" }}"
         destination   = "local/config.yml"
         change_mode   = "signal"
         change_signal = "SIGHUP"
