@@ -84,6 +84,10 @@ job "ingress" {
         name = "ingress"
         port = "traefik"
 
+        meta {
+          alloc_id = NOMAD_ALLOC_ID
+        }
+
         check {
           type     = "http"
           protocol = "http"

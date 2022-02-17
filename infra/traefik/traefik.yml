@@ -49,6 +49,6 @@ providers:
     endpoint:
       address: "host.docker.internal:8500"
     connectAware: true
-    serviceName: "traefik-internal"
+    serviceName: "traefik"
   file:
     filename: "local/traefik/tls.yml"

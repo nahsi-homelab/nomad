@@ -81,5 +81,7 @@ providers:
     exposedByDefault: false
     endpoint:
       address: "host.docker.internal:8500"
+    connectAware: true
+    serviceName: "ingress"
   file:
     filename: "local/traefik/file.yml"

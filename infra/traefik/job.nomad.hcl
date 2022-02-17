@@ -42,9 +42,13 @@ job "traefik" {
     }
 
     service {
-      name = "traefik-internal"
+      name = "traefik"
       port = "traefik"
       task = "traefik"
+
+      meta {
+        alloc_id = NOMAD_ALLOC_ID
+      }
 
       connect {
         native = true
@@ -52,7 +56,7 @@ job "traefik" {
 
       tags = [
         "traefik.enable=true",
-        "traefik.http.routers.api.rule=Host(`traefik-internal.service.consul`)",
+        "traefik.http.routers.api.rule=Host(`traefik.service.consul`)",
         "traefik.http.routers.api.service=api@internal",
         "traefik.http.routers.api.tls=true"
       ]
