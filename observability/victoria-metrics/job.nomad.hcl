@@ -175,7 +175,10 @@ job "victoria-metrics" {
           "-remoteWrite.tmpDataPath=${NOMAD_ALLOC_DIR}/data/vmagent-queue",
           "-remoteWrite.maxDiskUsagePerURL=500MB",
 
-          "-remoteWrite.url=https://victoria-metrics.service.consul:8428/vm/api/v1/write",
+          "-remoteWrite.url=https://victoria-metrics.service.consul:8428/api/v1/write",
+          "-remoteWrite.tlsCAFile=/secrets/certs/CA.pem",
+          "-remoteWrite.tlsCertFile=/secrets/certs/cert.pem",
+          "-remoteWrite.tlsKeyFile=/secrets/certs/key.pem",
         ]
       }
 
@@ -184,6 +187,39 @@ job "victoria-metrics" {
         destination   = "local/config.yml"
         change_mode   = "signal"
         change_signal = "SIGHUP"
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "pki/issue/internal" "ttl=7d" "common_name=*.service.consul" -}}
+        {{ .Data.issuing_ca }}{{ end }}
+        EOH
+
+        destination = "secrets/certs/CA.pem"
+        change_mode = "restart"
+        splay       = "1m"
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "pki/issue/internal" "ttl=7d" "common_name=vmagent.service.consul" -}}
+        {{ .Data.private_key }}{{ end }}
+        EOH
+
+        destination = "secrets/certs/key.pem"
+        change_mode = "restart"
+        splay       = "1m"
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "pki/issue/internal" "ttl=7d" "common_name=vmagent.service.consul" -}}
+        {{ .Data.certificate }}{{ end }}
+        EOH
+
+        destination = "secrets/certs/cert.pem"
+        change_mode = "restart"
+        splay       = "1m"
       }
     }
   }
