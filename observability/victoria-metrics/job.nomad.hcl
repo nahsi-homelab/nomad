@@ -13,29 +13,28 @@ job "victoria-metrics" {
 
   group "victoria-metrics" {
     network {
-      port "http" {
-        to     = 8428
-        static = 8428
-      }
+      mode = "bridge"
     }
 
     service {
       name = "victoria-metrics"
-      port = "http"
+      port = 8428
 
       meta {
         alloc_id = NOMAD_ALLOC_ID
       }
 
+      connect {
+        sidecar_service {}
+      }
+
       check {
+        expose   = true
         name     = "VictoriaMetrics HTTP"
         type     = "http"
-        protocol = "https"
         path     = "/-/ready"
-        interval = "20s"
+        interval = "10s"
         timeout  = "2s"
-
-        tls_skip_verify = true
       }
     }
 
@@ -67,40 +66,11 @@ job "victoria-metrics" {
       config {
         image = "victoriametrics/victoria-metrics:v${var.versions.vm}"
 
-        ports = [
-          "http"
-        ]
-
         args = [
+          "-httpListenAddr=127.0.0.1:8428",
           "-storageDataPath=/data",
           "-dedup.minScrapeInterval=10s",
-
-          "-tls",
-          "-tlsCertFile=/secrets/certs/cert.pem",
-          "-tlsKeyFile=/secrets/certs/key.pem",
         ]
-      }
-
-      template {
-        data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=7d" "common_name=victoria-metrics.service.consul" -}}
-        {{ .Data.private_key }}{{ end }}
-        EOH
-
-        destination = "secrets/certs/key.pem"
-        change_mode = "restart"
-        splay       = "1m"
-      }
-
-      template {
-        data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=7d" "common_name=victoria-metrics.service.consul" -}}
-        {{ .Data.certificate }}{{ end }}
-        EOH
-
-        destination = "secrets/certs/cert.pem"
-        change_mode = "restart"
-        splay       = "1m"
       }
     }
   }
@@ -117,6 +87,7 @@ job "victoria-metrics" {
     }
 
     network {
+      mode = "bridge"
       port "http" {
         to = 8429
       }
@@ -130,6 +101,17 @@ job "victoria-metrics" {
         alloc_id = NOMAD_ALLOC_ID
       }
 
+      connect {
+        sidecar_service {
+          proxy {
+            upstreams {
+              destination_name = "victoria-metrics"
+              local_bind_port  = 8428
+            }
+          }
+        }
+      }
+
       tags = [
         "traefik.enable=true",
         "traefik.http.routers.vmagent.entrypoints=https",
@@ -139,8 +121,8 @@ job "victoria-metrics" {
       check {
         name     = "vmagent HTTP"
         type     = "http"
-        path     = "/-/healthy"
-        interval = "20s"
+        path     = "/-/ready"
+        interval = "10s"
         timeout  = "2s"
       }
     }
@@ -148,10 +130,6 @@ job "victoria-metrics" {
     task "vmagent" {
       driver = "docker"
       user   = "nobody"
-
-      vault {
-        policies = ["vmagent"]
-      }
 
       resources {
         cpu        = 50
@@ -162,10 +140,6 @@ job "victoria-metrics" {
       config {
         image = "victoriametrics/vmagent:v${var.versions.vm}"
 
-        extra_hosts = [
-          "host.docker.internal:host-gateway"
-        ]
-
         ports = [
           "http"
         ]
@@ -175,51 +149,15 @@ job "victoria-metrics" {
           "-remoteWrite.tmpDataPath=${NOMAD_ALLOC_DIR}/data/vmagent-queue",
           "-remoteWrite.maxDiskUsagePerURL=500MB",
 
-          "-remoteWrite.url=https://victoria-metrics.service.consul:8428/api/v1/write",
-          "-remoteWrite.tlsCAFile=/secrets/certs/CA.pem",
-          "-remoteWrite.tlsCertFile=/secrets/certs/cert.pem",
-          "-remoteWrite.tlsKeyFile=/secrets/certs/key.pem",
+          "-remoteWrite.url=http://localhost:8428/api/v1/write",
         ]
       }
 
       template {
-        data          = "{{ key \"configs/vmagent/config.yml\" }}"
+        data          = file("vmagent.yml")
         destination   = "local/config.yml"
         change_mode   = "signal"
         change_signal = "SIGHUP"
-      }
-
-      template {
-        data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=7d" "common_name=*.service.consul" -}}
-        {{ .Data.issuing_ca }}{{ end }}
-        EOH
-
-        destination = "secrets/certs/CA.pem"
-        change_mode = "restart"
-        splay       = "1m"
-      }
-
-      template {
-        data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=7d" "common_name=vmagent.service.consul" -}}
-        {{ .Data.private_key }}{{ end }}
-        EOH
-
-        destination = "secrets/certs/key.pem"
-        change_mode = "restart"
-        splay       = "1m"
-      }
-
-      template {
-        data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=7d" "common_name=vmagent.service.consul" -}}
-        {{ .Data.certificate }}{{ end }}
-        EOH
-
-        destination = "secrets/certs/cert.pem"
-        change_mode = "restart"
-        splay       = "1m"
       }
     }
   }
