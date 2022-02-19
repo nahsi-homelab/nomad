@@ -1,7 +1,7 @@
 variables {
   versions = {
-    patroni  = "14-2.1.2"
-    exporter = "0.10.0"
+    patroni  = "14-2.1.3"
+    exporter = "0.10.1"
   }
 }
 
