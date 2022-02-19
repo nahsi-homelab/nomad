@@ -24,7 +24,8 @@ jobs:
         id: files
         uses: tj-actions/changed-files@v13
         with:
-          files: **/job.nomad.hcl
+          files: |
+            **/job.nomad.hcl
 
       - name: "Create matrix"
         if: steps.files.outputs.any_deleted == 'true'
