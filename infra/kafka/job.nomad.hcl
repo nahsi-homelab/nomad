@@ -2,7 +2,6 @@ variables {
   versions = {
     kafka    = "2.8.1"
     kminion  = "master"
-    promtail = "2.3.0"
   }
 }
 
@@ -34,10 +33,6 @@ job "kafka" {
       port "dendrite" {
         to     = 9094
         static = 9094
-      }
-
-      port "promtail" {
-        to = 3000
       }
     }
 
@@ -110,52 +105,6 @@ job "kafka" {
         data        = file("jaas.conf")
         destination = "secrets/jaas.conf"
         splay       = "1m"
-      }
-    }
-
-    task "promtail" {
-      driver = "docker"
-      user   = "nobody"
-
-      lifecycle {
-        hook    = "poststart"
-        sidecar = true
-      }
-
-      service {
-        name         = "promtail"
-        port         = "promtail"
-        tags         = ["service=kafka"]
-        address_mode = "host"
-
-        check {
-          type     = "http"
-          path     = "/ready"
-          interval = "10s"
-          timeout  = "2s"
-        }
-      }
-
-      resources {
-        cpu    = 50
-        memory = 128
-      }
-
-      config {
-        image = "grafana/promtail:${var.versions.promtail}"
-
-        args = [
-          "-config.file=local/promtail.yml"
-        ]
-
-        ports = [
-          "promtail"
-        ]
-      }
-
-      template {
-        data        = file("promtail.yml")
-        destination = "local/promtail.yml"
       }
     }
   }
