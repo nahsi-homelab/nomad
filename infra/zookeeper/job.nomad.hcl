@@ -1,7 +1,6 @@
 variables {
   versions = {
     zookeeper = "3.7.0"
-    promtail  = "2.4.1"
   }
 }
 
@@ -47,10 +46,6 @@ job "zookeeper" {
       port "metrics" {
         to = 7070
       }
-
-      port "promtail" {
-        to = 3000
-      }
     }
 
     service {
@@ -74,22 +69,6 @@ job "zookeeper" {
         ]
         interval = "60s"
         timeout  = "1s"
-      }
-    }
-
-    service {
-      name = "promtail"
-      port = "promtail"
-
-      meta {
-        sidecar_to = "zookeeper"
-      }
-
-      check {
-        type     = "http"
-        path     = "/ready"
-        interval = "10s"
-        timeout  = "2s"
       }
     }
 
@@ -156,38 +135,6 @@ job "zookeeper" {
         data        = file("jaas.conf")
         destination = "secrets/jaas.conf"
         change_mode = "restart"
-      }
-    }
-
-    task "promtail" {
-      driver = "docker"
-      user   = "nobody"
-
-      lifecycle {
-        hook    = "poststart"
-        sidecar = true
-      }
-
-      resources {
-        cpu    = 50
-        memory = 128
-      }
-
-      config {
-        image = "grafana/promtail:${var.versions.promtail}"
-
-        args = [
-          "-config.file=local/promtail.yml"
-        ]
-
-        ports = [
-          "promtail"
-        ]
-      }
-
-      template {
-        data        = file("promtail.yml")
-        destination = "local/promtail.yml"
       }
     }
   }

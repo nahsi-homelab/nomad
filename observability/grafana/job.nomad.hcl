@@ -1,7 +1,6 @@
 variables {
   versions = {
     grafana  = "8.2.3"
-    promtail = "2.4.1"
   }
 }
 
@@ -13,25 +12,6 @@ job "grafana" {
     network {
       port "grafana" {
         to = 3000
-      }
-      port "promtail" {
-        to = 3000
-      }
-    }
-
-    service {
-      name = "promtail"
-      port = "promtail"
-
-      meta {
-        sidecar_to = "grafana"
-      }
-
-      check {
-        type     = "http"
-        path     = "/ready"
-        interval = "10s"
-        timeout  = "2s"
       }
     }
 
@@ -126,51 +106,6 @@ job "grafana" {
 
       resources {
         memory = 256
-      }
-    }
-
-    task "promtail" {
-      driver = "docker"
-
-      lifecycle {
-        hook    = "poststart"
-        sidecar = true
-      }
-
-      service {
-        name         = "promtail"
-        port         = "promtail"
-        tags         = ["service=grafana"]
-        address_mode = "host"
-
-        check {
-          type     = "http"
-          path     = "/ready"
-          interval = "10s"
-          timeout  = "2s"
-        }
-      }
-
-      resources {
-        cpu    = 50
-        memory = 64
-      }
-
-      config {
-        image = "grafana/promtail:${var.versions.promtail}"
-
-        args = [
-          "-config.file=local/promtail.yml"
-        ]
-
-        ports = [
-          "promtail"
-        ]
-      }
-
-      template {
-        data        = file("promtail.yml")
-        destination = "local/promtail.yml"
       }
     }
   }
