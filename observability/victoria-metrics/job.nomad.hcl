@@ -104,12 +104,16 @@ job "victoria-metrics" {
 
   group "vmagent" {
     count = 2
+    update {
+      min_healthy_time = "30s"
+    }
+
     constraint {
       distinct_property = node.datacenter
     }
 
     ephemeral_disk {
-      size   = 500
+      size   = 1100
       sticky = true
     }
 
@@ -190,10 +194,10 @@ job "victoria-metrics" {
         args = [
           "-httpListenAddr=127.0.0.1:8429",
           "-promscrape.config=${NOMAD_TASK_DIR}/config.yml",
+          "-promscrape.consulSDCheckInterval=10s",
+          "-remoteWrite.url=http://localhost:8428/api/v1/write",
           "-remoteWrite.tmpDataPath=${NOMAD_ALLOC_DIR}/data/vmagent-queue",
           "-remoteWrite.maxDiskUsagePerURL=500MB",
-
-          "-remoteWrite.url=http://localhost:8428/api/v1/write",
         ]
       }
 
