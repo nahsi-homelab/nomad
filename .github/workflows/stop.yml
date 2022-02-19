@@ -24,9 +24,7 @@ jobs:
         id: files
         uses: tj-actions/changed-files@v13
         with:
-          files: |
-            !.github/**
-            **
+          files: job.nomad.hcl
 
       - name: "Create matrix"
         if: steps.files.outputs.any_deleted == 'true'
@@ -48,7 +46,7 @@ jobs:
 
   run:
     name: "Stop job"
-    if: needs.matrix.outputs.jobs 
+    if: needs.matrix.outputs.jobs
     runs-on: driver-exec
     needs: matrix
 
