@@ -47,7 +47,7 @@ providers:
     prefix: "traefik"
     exposedByDefault: false
     endpoint:
-      address: "host.docker.internal:8500"
+      address: '{{ env "attr.unique.network.ip-address" }}:8500'
     connectAware: true
     serviceName: "traefik"
   file:
