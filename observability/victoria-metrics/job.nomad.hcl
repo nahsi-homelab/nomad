@@ -131,6 +131,10 @@ job "victoria-metrics" {
       driver = "docker"
       user   = "nobody"
 
+      vault {
+        policies = ["vmagent"]
+      }
+
       resources {
         cpu        = 50
         memory     = 128
