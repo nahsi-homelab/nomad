@@ -80,9 +80,9 @@ job "victoria-metrics" {
       }
 
       resources {
-        cpu        = 100
-        memory     = 128
-        memory_max = 258
+        cpu        = 500
+        memory     = 256
+        memory_max = 512
       }
 
       volume_mount {
