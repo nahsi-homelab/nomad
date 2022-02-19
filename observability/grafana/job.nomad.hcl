@@ -12,6 +12,11 @@ job "grafana" {
   namespace = "observability"
 
   group "grafana" {
+    count = 2
+    constraint {
+      distinct_property = node.datacenter
+    }
+
     network {
       mode = "bridge"
       port "http" {
@@ -88,8 +93,8 @@ job "grafana" {
       }
 
       env {
-        GF_PATHS_CONFIG       = "/local/grafana/grafana.ini"
-        GF_PATHS_PROVISIONING = "/local/grafana/provisioning"
+        GF_PATHS_CONFIG       = "/local/grafana.ini"
+        GF_PATHS_PROVISIONING = "/local/provisioning"
       }
 
       config {
@@ -102,12 +107,12 @@ job "grafana" {
 
       template {
         data        = file("grafana.ini")
-        destination = "local/grafana/grafana.ini"
+        destination = "local/grafana.ini"
       }
 
       template {
         data        = file("provisioning/datasources.yml")
-        destination = "local/grafana/provisioning/datasources/datasources.yml"
+        destination = "local/provisioning/datasources/datasources.yml"
       }
 
       template {
@@ -129,6 +134,18 @@ job "grafana" {
         {{ with secret "secret/grafana/users/admin" }}{{ .Data.data.password }}{{ end }}
         EOH
         destination = "secrets/admin_password"
+      }
+
+      template {
+        data        = <<-EOH
+        {{ with secret "postgres/creds/grafana" }}
+        GF_DATABASE_USER='{{ .Data.username }}'
+        GF_DATABASE_PASSWORD='{{ .Data.password }}'
+        {{- end }}
+        EOH
+        destination = "secrets/db.env"
+        env         = true
+        splay       = "3m"
       }
     }
   }
