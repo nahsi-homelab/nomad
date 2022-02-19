@@ -13,10 +13,9 @@ job "victoria-metrics" {
 
   group "victoria-metrics" {
     network {
-      port "http" {
-        to     = 8428
-        static = 8428
-      }
+      mode = "bridge"
+      port "http" {}
+      port "health" {}
     }
 
     service {
@@ -27,15 +26,42 @@ job "victoria-metrics" {
         alloc_id = NOMAD_ALLOC_ID
       }
 
+      tags = [
+        "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
+        "traefik.http.routers.vm.entrypoints=https",
+        "traefik.http.routers.vm.rule=Host(`victoria-metrics.service.consul`)",
+      ]
+
+      connect {
+        sidecar_service {
+          proxy {
+            local_service_port = 8428
+            expose {
+              path {
+                path            = "/metrics"
+                protocol        = "http"
+                local_path_port = 8428
+                listener_port   = "http"
+              }
+              path {
+                path            = "/-/ready"
+                protocol        = "http"
+                local_path_port = 8428
+                listener_port   = "health"
+              }
+            }
+          }
+        }
+      }
+
       check {
         name     = "VictoriaMetrics HTTP"
         type     = "http"
-        protocol = "https"
+        port     = "health"
         path     = "/-/ready"
-        interval = "20s"
+        interval = "10s"
         timeout  = "2s"
-
-        tls_skip_verify = true
       }
     }
 
@@ -67,40 +93,11 @@ job "victoria-metrics" {
       config {
         image = "victoriametrics/victoria-metrics:v${var.versions.vm}"
 
-        ports = [
-          "http"
-        ]
-
         args = [
+          "-httpListenAddr=127.0.0.1:8428",
           "-storageDataPath=/data",
           "-dedup.minScrapeInterval=10s",
-
-          "-tls",
-          "-tlsCertFile=/secrets/certs/cert.pem",
-          "-tlsKeyFile=/secrets/certs/key.pem",
         ]
-      }
-
-      template {
-        data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=7d" "common_name=victoria-metrics.service.consul" -}}
-        {{ .Data.private_key }}{{ end }}
-        EOH
-
-        destination = "secrets/certs/key.pem"
-        change_mode = "restart"
-        splay       = "1m"
-      }
-
-      template {
-        data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=7d" "common_name=victoria-metrics.service.consul" -}}
-        {{ .Data.certificate }}{{ end }}
-        EOH
-
-        destination = "secrets/certs/cert.pem"
-        change_mode = "restart"
-        splay       = "1m"
       }
     }
   }
@@ -117,9 +114,9 @@ job "victoria-metrics" {
     }
 
     network {
-      port "http" {
-        to = 8429
-      }
+      mode = "bridge"
+      port "http" {}
+      port "health" {}
     }
 
     service {
@@ -132,15 +129,43 @@ job "victoria-metrics" {
 
       tags = [
         "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
         "traefik.http.routers.vmagent.entrypoints=https",
         "traefik.http.routers.vmagent.rule=Host(`vmagent.service.consul`)",
       ]
 
+      connect {
+        sidecar_service {
+          proxy {
+            local_service_port = 8429
+            upstreams {
+              destination_name = "victoria-metrics"
+              local_bind_port  = 8428
+            }
+            expose {
+              path {
+                path            = "/metrics"
+                protocol        = "http"
+                local_path_port = 8429
+                listener_port   = "http"
+              }
+              path {
+                path            = "/-/ready"
+                protocol        = "http"
+                local_path_port = 8429
+                listener_port   = "health"
+              }
+            }
+          }
+        }
+      }
+
       check {
         name     = "vmagent HTTP"
         type     = "http"
-        path     = "/-/healthy"
-        interval = "20s"
+        port     = "health"
+        path     = "/-/ready"
+        interval = "10s"
         timeout  = "2s"
       }
     }
@@ -162,64 +187,21 @@ job "victoria-metrics" {
       config {
         image = "victoriametrics/vmagent:v${var.versions.vm}"
 
-        extra_hosts = [
-          "host.docker.internal:host-gateway"
-        ]
-
-        ports = [
-          "http"
-        ]
-
         args = [
+          "-httpListenAddr=127.0.0.1:8429",
           "-promscrape.config=${NOMAD_TASK_DIR}/config.yml",
           "-remoteWrite.tmpDataPath=${NOMAD_ALLOC_DIR}/data/vmagent-queue",
           "-remoteWrite.maxDiskUsagePerURL=500MB",
 
-          "-remoteWrite.url=https://victoria-metrics.service.consul:8428/api/v1/write",
-          "-remoteWrite.tlsCAFile=/secrets/certs/CA.pem",
-          "-remoteWrite.tlsCertFile=/secrets/certs/cert.pem",
-          "-remoteWrite.tlsKeyFile=/secrets/certs/key.pem",
+          "-remoteWrite.url=http://localhost:8428/api/v1/write",
         ]
       }
 
       template {
-        data          = "{{ key \"configs/vmagent/config.yml\" }}"
+        data          = file("vmagent.yml")
         destination   = "local/config.yml"
         change_mode   = "signal"
         change_signal = "SIGHUP"
-      }
-
-      template {
-        data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=7d" "common_name=*.service.consul" -}}
-        {{ .Data.issuing_ca }}{{ end }}
-        EOH
-
-        destination = "secrets/certs/CA.pem"
-        change_mode = "restart"
-        splay       = "1m"
-      }
-
-      template {
-        data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=7d" "common_name=vmagent.service.consul" -}}
-        {{ .Data.private_key }}{{ end }}
-        EOH
-
-        destination = "secrets/certs/key.pem"
-        change_mode = "restart"
-        splay       = "1m"
-      }
-
-      template {
-        data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=7d" "common_name=vmagent.service.consul" -}}
-        {{ .Data.certificate }}{{ end }}
-        EOH
-
-        destination = "secrets/certs/cert.pem"
-        change_mode = "restart"
-        splay       = "1m"
       }
     }
   }
