@@ -10,7 +10,6 @@ job "postgres" {
     "syria",
     "asia"
   ]
-
   namespace = "infra"
 
   group "patroni" {
@@ -50,7 +49,7 @@ job "postgres" {
       user   = "999"
 
       kill_signal  = "SIGINT"
-      kill_timeout = "90s"
+      kill_timeout = "60s"
 
       vault {
         policies = ["postgres"]

@@ -8,7 +8,7 @@ bootstrap:
     maximum_lag_on_failover: 1048576
 
   pg_hba:
-    - "host replication repl 0.0.0.0/0 md5"
+    - "host replication repl 192.168.0.0/16 md5"
     - "host all all 0.0.0.0/0 md5"
 
   initdb:
@@ -19,7 +19,7 @@ restapi:
   listen: "0.0.0.0:8008"
 
 consul:
-  host: "172.17.0.1"
+  host: "host.docker.internal"
   port: 8500
   register_service: true
 
