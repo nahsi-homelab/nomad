@@ -14,24 +14,51 @@ job "victoria-metrics" {
   group "victoria-metrics" {
     network {
       mode = "bridge"
+      port "http" {}
+      port "health" {}
     }
 
     service {
       name = "victoria-metrics"
-      port = 8428
+      port = "http"
 
       meta {
         alloc_id = NOMAD_ALLOC_ID
       }
 
+      tags = [
+        "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
+        "traefik.http.routers.vm.entrypoints=https",
+        "traefik.http.routers.vm.rule=Host(`victoria-metrics.service.consul`)",
+      ]
+
       connect {
-        sidecar_service {}
+        sidecar_service {
+          proxy {
+            local_service_port = 8428
+            expose {
+              path {
+                path            = "/metrics"
+                protocol        = "http"
+                local_path_port = 8428
+                listener_port   = "http"
+              }
+              path {
+                path            = "/-/ready"
+                protocol        = "http"
+                local_path_port = 8428
+                listener_port   = "health"
+              }
+            }
+          }
+        }
       }
 
       check {
-        expose   = true
         name     = "VictoriaMetrics HTTP"
         type     = "http"
+        port     = "health"
         path     = "/-/ready"
         interval = "10s"
         timeout  = "2s"
@@ -88,9 +115,8 @@ job "victoria-metrics" {
 
     network {
       mode = "bridge"
-      port "http" {
-        to = 8429
-      }
+      port "http" {}
+      port "health" {}
     }
 
     service {
@@ -101,26 +127,43 @@ job "victoria-metrics" {
         alloc_id = NOMAD_ALLOC_ID
       }
 
+      tags = [
+        "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
+        "traefik.http.routers.vmagent.entrypoints=https",
+        "traefik.http.routers.vmagent.rule=Host(`vmagent.service.consul`)",
+      ]
+
       connect {
         sidecar_service {
           proxy {
+            local_service_port = 8429
             upstreams {
               destination_name = "victoria-metrics"
               local_bind_port  = 8428
+            }
+            expose {
+              path {
+                path            = "/metrics"
+                protocol        = "http"
+                local_path_port = 8429
+                listener_port   = "http"
+              }
+              path {
+                path            = "/-/ready"
+                protocol        = "http"
+                local_path_port = 8429
+                listener_port   = "health"
+              }
             }
           }
         }
       }
 
-      tags = [
-        "traefik.enable=true",
-        "traefik.http.routers.vmagent.entrypoints=https",
-        "traefik.http.routers.vmagent.rule=Host(`vmagent.service.consul`)",
-      ]
-
       check {
         name     = "vmagent HTTP"
         type     = "http"
+        port     = "health"
         path     = "/-/ready"
         interval = "10s"
         timeout  = "2s"
@@ -144,11 +187,8 @@ job "victoria-metrics" {
       config {
         image = "victoriametrics/vmagent:v${var.versions.vm}"
 
-        ports = [
-          "http"
-        ]
-
         args = [
+          "-httpListenAddr=127.0.0.1:8429",
           "-promscrape.config=${NOMAD_TASK_DIR}/config.yml",
           "-remoteWrite.tmpDataPath=${NOMAD_ALLOC_DIR}/data/vmagent-queue",
           "-remoteWrite.maxDiskUsagePerURL=500MB",
