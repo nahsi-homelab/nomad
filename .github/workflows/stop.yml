@@ -22,7 +22,7 @@ jobs:
 
       - name: "Get deleted files"
         id: files
-        uses: tj-actions/changed-files@v13
+        uses: tj-actions/changed-files@v16
         with:
           files: |
             **/job.nomad.hcl
