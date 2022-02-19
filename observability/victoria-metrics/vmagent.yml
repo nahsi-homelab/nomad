@@ -2,6 +2,29 @@ global:
   scrape_interval: "10s"
 
 scrape_configs:
+  - job_name: "vmagent"
+    metrics_path: "/metrics"
+    consul_sd_configs:
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
+        services:
+          - "vmagent"
+    relabel_configs:
+      - source_labels: ["__meta_consul_service_metadata_alloc_id"]
+        target_label: "instance"
+      - source_labels: ["__address__"]
+        target_label: "__address__"
+        regex: '{{ env "NOMAD_ADDR_http" }}'
+        replacement: "127.0.0.1:8429"
+
+  - job_name: "victoria-metrics"
+    consul_sd_configs:
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
+        services:
+          - "victoria-metrics"
+    relabel_configs:
+      - source_labels: ["__meta_consul_service_metadata_alloc_id"]
+        target_label: "instance"
+
   - job_name: "consul"
     metrics_path: "/v1/agent/metrics"
     params:
@@ -36,30 +59,6 @@ scrape_configs:
       - targets:
         - "active.vault.service.consul:8200"
 
-  - job_name: "vmagent"
-    metrics_path: "/metrics"
-    consul_sd_configs:
-      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
-        services:
-          - "vmagent"
-    relabel_configs:
-      - source_labels: ["__meta_consul_service_metadata_alloc_id"]
-        target_label: "instance"
-      - source_labels: ["__address__"]
-        target_label: "__address__"
-        regex: '{{ env "NOMAD_ADDR_http" }}'
-        replacement: "127.0.0.1:8429"
-
-  - job_name: "victoria-metrics"
-    metrics_path: "/metrics"
-    consul_sd_configs:
-      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
-        services:
-          - "victoria-metrics"
-    relabel_configs:
-      - source_labels: ["__meta_consul_service_metadata_alloc_id"]
-        target_label: "instance"
-
   - job_name: "telegraf-exporter"
     consul_sd_configs:
       - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
@@ -85,4 +84,13 @@ scrape_configs:
           - "ingress"
     relabel_configs:
       - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
+
+  - job_name: "grafana"
+    consul_sd_configs:
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
+        services:
+          - "grafana"
+    relabel_configs:
+      - source_labels: ["__meta_consul_service_metadata_alloc_id"]
         target_label: "instance"
