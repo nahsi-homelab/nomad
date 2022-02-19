@@ -1,33 +1,37 @@
 variables {
   versions = {
-    grafana  = "8.2.3"
+    grafana = "8.4.1"
   }
 }
 
 job "grafana" {
-  datacenters = ["syria"]
-  namespace   = "observability"
+  datacenters = [
+    "syria",
+    "asia"
+  ]
+  namespace = "observability"
 
   group "grafana" {
     network {
-      port "grafana" {
+      mode = "bridge"
+      port "http" {
         to = 3000
       }
     }
 
     service {
       name = "grafana"
-      port = "grafana"
+      port = "http"
 
       tags = [
         "traefik.enable=true",
-        "traefik.http.routers.grafana.rule=Host(`grafana.service.consul`)",
         "traefik.http.routers.grafana.entrypoints=https",
-        "traefik.http.routers.grafana.tls=true",
+        "traefik.http.routers.grafana.rule=Host(`grafana.service.consul`)",
       ]
 
       meta {
         dashboard = "isFoa0z7k"
+        alloc_id  = NOMAD_ALLOC_ID
       }
 
       check {
@@ -39,9 +43,35 @@ job "grafana" {
       }
     }
 
-    volume "grafana" {
-      type   = "host"
-      source = "grafana"
+    service {
+      name = "grafana-connect"
+      port = 3000
+
+      meta {
+        dashboard = "isFoa0z7k"
+        alloc_id  = NOMAD_ALLOC_ID
+      }
+
+      connect {
+        sidecar_service {
+          proxy {
+            local_service_port = 3000
+            upstreams {
+              destination_name = "victoria-metrics"
+              local_bind_port  = 8428
+            }
+          }
+        }
+      }
+
+      check {
+        expose   = true
+        name     = "Grafana HTTP"
+        type     = "http"
+        path     = "/api/health"
+        interval = "10s"
+        timeout  = "2s"
+      }
     }
 
     task "grafana" {
@@ -52,9 +82,9 @@ job "grafana" {
         policies = ["grafana"]
       }
 
-      volume_mount {
-        volume      = "grafana"
-        destination = "/var/lib/grafana"
+      resources {
+        cpu    = 100
+        memory = 128
       }
 
       env {
@@ -66,7 +96,7 @@ job "grafana" {
         image = "grafana/grafana:${var.versions.grafana}"
 
         ports = [
-          "grafana"
+          "http"
         ]
       }
 
@@ -81,31 +111,24 @@ job "grafana" {
       }
 
       template {
-        data = <<-EOH
+        data        = <<-EOH
         {{ with secret "secret/grafana/github" }}{{ .Data.data.client_id }}{{ end }}
         EOH
-
         destination = "secrets/github/client_id"
       }
 
       template {
-        data = <<-EOH
+        data        = <<-EOH
         {{ with secret "secret/grafana/github" }}{{ .Data.data.secret_id }}{{ end }}
         EOH
-
         destination = "secrets/github/secret_id"
       }
 
       template {
-        data = <<-EOH
+        data        = <<-EOH
         {{ with secret "secret/grafana/users/admin" }}{{ .Data.data.password }}{{ end }}
         EOH
-
         destination = "secrets/admin_password"
-      }
-
-      resources {
-        memory = 256
       }
     }
   }
