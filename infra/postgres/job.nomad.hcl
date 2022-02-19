@@ -14,7 +14,7 @@ job "postgres" {
   namespace = "infra"
 
   group "patroni" {
-    count = 3
+    count = 2
 
     network {
       port "postgres" {
@@ -35,7 +35,7 @@ job "postgres" {
         name     = "Patroni HTTP"
         type     = "http"
         path     = "/health"
-        interval = "10s"
+        interval = "20s"
         timeout  = "2s"
       }
     }
@@ -57,8 +57,9 @@ job "postgres" {
       }
 
       resources {
-        cpu    = 300
-        memory = 512
+        cpu        = 100
+        memory     = 128
+        memory_max = 256
       }
 
       volume_mount {
@@ -124,7 +125,7 @@ job "postgres" {
         name     = "postgres-exporter"
         path     = "/"
         type     = "http"
-        interval = "10s"
+        interval = "20s"
         timeout  = "2s"
       }
     }
