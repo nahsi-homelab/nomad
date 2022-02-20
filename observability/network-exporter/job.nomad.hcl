@@ -48,7 +48,7 @@ job "network-exporter" {
       check {
         type     = "http"
         path     = "/"
-        interval = "20s"
+        interval = "10s"
         timeout  = "2s"
       }
     }
@@ -93,7 +93,7 @@ job "network-exporter" {
         check {
           type     = "http"
           path     = "/"
-          interval = "20s"
+          interval = "10s"
           timeout  = "2s"
         }
       }
