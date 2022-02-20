@@ -44,9 +44,6 @@ accessLog:
   filePath: "/alloc/data/access.log"
   format: "json"
 
-log:
-  level: "DEBUG"
-
 providers:
   consulCatalog:
     prefix: "traefik"
