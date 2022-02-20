@@ -94,3 +94,24 @@ scrape_configs:
     relabel_configs:
       - source_labels: ["__meta_consul_service_metadata_alloc_id"]
         target_label: "instance"
+
+  - job_name: "postgres-exporter"
+    consul_sd_configs:
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
+        services:
+          - "postgres-exporter"
+    relabel_configs:
+      - source_labels: ["__meta_consul_service_metadata_alloc_id"]
+        target_label: "instance"
+
+  - job_name: "patroni"
+    scheme: "https"
+    tls_config:
+      insecure_skip_verify: true
+    consul_sd_configs:
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
+        services:
+          - "patroni"
+    relabel_configs:
+      - source_labels: ["__meta_consul_service_metadata_alloc_id"]
+        target_label: "instance"
