@@ -11,40 +11,34 @@ colors:
     highlight-hover: "#373B41"
     background: "#1D1F21"
     card-background: "#373B41"
+    link: "#81A2BE"
+    link-hover: "#5A647E"
   light:
     highlight-primary: "#373B41"
     highlight-secondary: "#282A2E"
     highlight-hover: "#373B41"
+    link: "#81A2BE"
+    link-hover: "#5A647E"
 
 links:
-  - name: "Home Assistant"
-    icon: "fas fa-laptop-house"
-    url: "https://home-assistant.service.consul"
-    target: "_blank"
-
   - name: "GitHub"
     icon: "fab fa-github"
     url: "https://github.com/nahsi"
     target: "_blank"
 
-  - name: "Links"
-    icon: "fa fa-link"
-    url: "https://links.service.consul"
-    target: "_blank"
-
-  - name: "LLPSI"
-    icon: "fa fa-book"
-    url: "https://llpsi.nahsi.dev"
-    target: "_blank"
-
-  - name: "CloudFlare"
-    icon: "fab fa-cloudflare"
-    url: "https://dash.cloudflare.com"
+  - name: "Home Assistant"
+    icon: "fas fa-laptop-house"
+    url: "https://home-assistant.service.consul"
     target: "_blank"
 
   - name: "UniFI"
     icon: "fa fa-network-wired"
     url: "https://unifi.service.consul"
+    target: "_blank"
+
+  - name: "CloudFlare"
+    icon: "fab fa-cloudflare"
+    url: "https://dash.cloudflare.com"
     target: "_blank"
 
 services:
@@ -53,33 +47,37 @@ services:
     items:
       - name: "Nomad"
         logo: "https://s3.nahsi.dev/homer/nomad.png"
-        url: "http://nomad.service.consul:4646"
+        url: "https://nomad.service.consul"
 
       - name: "Consul"
         logo: "https://s3.nahsi.dev/homer/consul.png"
-        url: "http://consul.service.consul:8500"
+        url: "https://consul.service.consul"
 
       - name: "Vault"
         logo: "https://s3.nahsi.dev/homer/vault.png"
-        url: "http://vault.service.consul:8200"
+        url: "https://vault.service.consul"
 
-  - name: "Mail"
-    icon: "fas fa-envelope"
+  - name: "Observability"
+    icon: "fa fa-heartbeat"
     items:
-      - name: "Webmail"
-        logo: "https://s3.nahsi.dev/homer/roundcube.svg"
-        url: "https://mail.nahsi.dev"
+      - name: "Grafana"
+        logo: "https://s3.nahsi.dev/homer/grafana.png"
+        url: "https://grafana.service.consul"
 
-      - name: "DuckyPanel"
-        logo: "https://s3.nahsi.dev/homer/wildduck.png"
-        url: "https://ducky.service.consul"
+      - name: "vmagent"
+        logo: "https://s3.nahsi.dev/homer/vm.png"
+        url: "https://vmagent.service.consul"
 
-      - name: "DuckyAPI"
-        logo: "https://s3.nahsi.dev/homer/swagger.png"
-        url: "https://ducky.service.consul/api/swagger"
+  - name: "Infra"
+    icon: "fa fa-server"
+    items:
+      - name: "Traefik"
+        logo: "https://s3.nahsi.dev/homer/traefik.png"
+        url: "https://traefik.service.consul"
 
-      - name: "ZoneMTA"
-        url: "https://zone-mta.service.consul"
+      - name: "MinIO"
+        logo: "https://s3.nahsi.dev/homer/minio.png"
+        url: "https://minio.nahsi.dev"
 
   - name: "Applications"
     icon: "fa fa-code-branch"
@@ -108,24 +106,20 @@ services:
         icon: "fas fa-cloud-download-alt"
         url: "https://sftpgo.service.consul"
 
-  - name: "Infra"
-    icon: "fa fa-server"
+  - name: "Mail"
+    icon: "fas fa-envelope"
     items:
-      - name: "Traefik"
-        logo: "https://s3.nahsi.dev/homer/traefik.png"
-        url: "https://traefik-internal.service.consul"
+      - name: "Webmail"
+        logo: "https://s3.nahsi.dev/homer/roundcube.svg"
+        url: "https://mail.nahsi.dev"
 
-      - name: "MinIO"
-        logo: "https://s3.nahsi.dev/homer/minio.png"
-        url: "https://minio.nahsi.dev"
+      - name: "DuckyPanel"
+        logo: "https://s3.nahsi.dev/homer/wildduck.png"
+        url: "https://ducky.service.consul"
 
-  - name: "Observability"
-    icon: "fa fa-heartbeat"
-    items:
-      - name: "Grafana"
-        logo: "https://s3.nahsi.dev/homer/grafana.png"
-        url: "https://grafana.service.consul"
+      - name: "DuckyAPI"
+        logo: "https://s3.nahsi.dev/homer/swagger.png"
+        url: "https://ducky.service.consul/api/swagger"
 
-      - name: "Prometheus"
-        logo: "https://s3.nahsi.dev/homer/prometheus.png"
-        url: "https://prometheus.service.consul"
+      - name: "ZoneMTA"
+        url: "https://zone-mta.service.consul"

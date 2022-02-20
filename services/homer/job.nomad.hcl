@@ -1,6 +1,6 @@
 variables {
   versions = {
-    homer = "21.09.2"
+    homer = "22.02.1"
   }
 }
 
