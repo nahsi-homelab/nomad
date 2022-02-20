@@ -134,7 +134,7 @@ job "postgres" {
       user   = "nobody"
 
       vault {
-        policies = ["postgres"]
+        policies = ["postgres-exporter"]
       }
 
       resources {
@@ -154,8 +154,10 @@ job "postgres" {
         data = <<-EOF
         PG_EXPORTER_AUTO_DISCOVER_DATABASES=true
         DATA_SOURCE_URI=master.postgres.service.consul:5432/postgres?sslmode=disable
-        DATA_SOURCE_USER={{ with secret "secret/postgres/superuser" }}{{ .Data.data.username }}{{ end }}
-        DATA_SOURCE_PASS={{ with secret "secret/postgres/superuser" }}{{ .Data.data.password }}{{ end }}
+        {{ with secret "postgres/creds/postgres-exporter" }}
+        DATA_SOURCE_USER='{{ .Data.username }}'
+        DATA_SOURCE_PASS='{{ .Data.password }}'
+        {{- end }}
         EOF
 
         destination = "secrets/vars.env"
