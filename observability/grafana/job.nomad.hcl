@@ -110,9 +110,13 @@ job "grafana" {
         destination = "local/grafana.ini"
       }
 
-      template {
-        data        = file("provisioning/datasources.yml")
-        destination = "local/provisioning/datasources/datasources.yml"
+      dynamic "template" {
+        for_each = fileset(".", "provisioning/**")
+
+        content {
+          data        = file(template.value)
+          destination = "local/${template.value}"
+        }
       }
 
       template {

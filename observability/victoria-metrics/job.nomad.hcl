@@ -80,9 +80,9 @@ job "victoria-metrics" {
       }
 
       resources {
-        cpu        = 100
-        memory     = 128
-        memory_max = 258
+        cpu        = 500
+        memory     = 256
+        memory_max = 512
       }
 
       volume_mount {
@@ -183,7 +183,7 @@ job "victoria-metrics" {
       }
 
       resources {
-        cpu        = 50
+        cpu        = 200
         memory     = 128
         memory_max = 256
       }
@@ -194,7 +194,6 @@ job "victoria-metrics" {
         args = [
           "-httpListenAddr=127.0.0.1:8429",
           "-promscrape.config=${NOMAD_TASK_DIR}/config.yml",
-          "-promscrape.consulSDCheckInterval=10s",
           "-remoteWrite.url=http://localhost:8428/api/v1/write",
           "-remoteWrite.tmpDataPath=${NOMAD_ALLOC_DIR}/data/vmagent-queue",
           "-remoteWrite.maxDiskUsagePerURL=500MB",
@@ -215,6 +214,16 @@ job "victoria-metrics" {
         EOH
 
         destination = "secrets/certs/CA.pem"
+        change_mode = "restart"
+        splay       = "5m"
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "secret/minio/prometheus" }}{{ .Data.data.token }}{{ end -}}
+        EOH
+
+        destination = "secrets/minio-token"
         change_mode = "restart"
         splay       = "5m"
       }

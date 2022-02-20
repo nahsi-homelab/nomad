@@ -17,7 +17,7 @@ restapi:
   verify_client: "optional"
 
 consul:
-  host: "172.17.0.1"
+  host: '{{ env "attr.unique.network.ip-address" }}'
   port: 8500
   register_service: true
 
