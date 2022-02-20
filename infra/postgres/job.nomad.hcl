@@ -14,7 +14,7 @@ job "postgres" {
   namespace = "infra"
 
   group "patroni" {
-    count = 3
+    count = 2
 
     network {
       port "postgres" {
