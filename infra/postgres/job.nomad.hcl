@@ -34,9 +34,12 @@ job "postgres" {
       check {
         name     = "Patroni HTTP"
         type     = "http"
+        protocol = "https"
         path     = "/health"
         interval = "10s"
         timeout  = "2s"
+
+        tls_skip_verify = true
       }
     }
 
@@ -68,8 +71,8 @@ job "postgres" {
 
       env {
         PATRONI_NAME                       = node.unique.name
-        PATRONI_RESTAPI_CONNECT_ADDRESS    = "${NOMAD_ADDR_patroni}"
-        PATRONI_POSTGRESQL_CONNECT_ADDRESS = "${NOMAD_ADDR_postgres}"
+        PATRONI_RESTAPI_CONNECT_ADDRESS    = NOMAD_ADDR_patroni
+        PATRONI_POSTGRESQL_CONNECT_ADDRESS = NOMAD_ADDR_postgres
       }
 
       config {
@@ -105,6 +108,39 @@ job "postgres" {
         destination = "secrets/vars.env"
         change_mode = "noop"
         env         = true
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "pki/issue/internal" "common_name=patroni.service.consul" -}}
+        {{ .Data.issuing_ca }}{{ end }}
+        EOH
+
+        destination = "secrets/certs/CA.pem"
+        change_mode = "restart"
+        splay       = "5m"
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "pki/issue/internal" "common_name=patroni.service.consul" "alt_names=localhost" "ip_sans=127.0.0.1" -}}
+        {{ .Data.certificate }}{{ end }}
+        EOH
+
+        destination = "secrets/certs/cert.pem"
+        change_mode = "restart"
+        splay       = "5m"
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "pki/issue/internal" "common_name=patroni.service.consul" "alt_names=localhost" "ip_sans=127.0.0.1" -}}
+        {{ .Data.private_key }}{{ end }}
+        EOH
+
+        change_mode = "restart"
+        destination = "secrets/certs/key.pem"
+        splay       = "5m"
       }
     }
   }

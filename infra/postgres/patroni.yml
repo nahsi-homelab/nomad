@@ -11,6 +11,10 @@ bootstrap:
 
 restapi:
   listen: "0.0.0.0:8008"
+  cafile: "/secrets/certs/CA.pem"
+  certfile: "/secrets/certs/cert.pem"
+  keyfile: "/secrets/certs/key.pem"
+  verify_client: "optional"
 
 consul:
   host: "172.17.0.1"
