@@ -1,4 +1,7 @@
 entryPoints:
+  traefik:
+    address: ":8080"
+
   http:
     address: ":80"
     transport:
@@ -37,6 +40,13 @@ entryPoints:
             sans:
               - "*.nahsi.dev"
 
+  smtp-relay:
+    address: ":25"
+    transport:
+      lifeCycle:
+        requestAcceptGraceTimeout: 15
+        graceTimeOut: 10
+
   imap:
     address: ":993"
     transport:
@@ -49,16 +59,6 @@ entryPoints:
           - main: "nahsi.dev"
             sans:
               - "*.nahsi.dev"
-
-  smtp-relay:
-    address: ":25"
-    transport:
-      lifeCycle:
-        requestAcceptGraceTimeout: 15
-        graceTimeOut: 10
-
-  traefik:
-    address: ":8080"
 
 api:
   insecure: true
@@ -85,5 +85,7 @@ providers:
       address: '{{ env "attr.unique.network.ip-address" }}:8500'
     # connectAware: true
     serviceName: "ingress"
+
   file:
-    filename: "local/traefik/file.yml"
+    directory: "/local/configs"
+    watch: true

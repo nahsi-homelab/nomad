@@ -1,4 +1,7 @@
 entryPoints:
+  traefik:
+    address: ":8080"
+
   http:
     address: ":80"
     transport:
@@ -8,8 +11,8 @@ entryPoints:
     http:
       redirections:
         entryPoint:
-          to: https
-          scheme: https
+          to: "https"
+          scheme: "https"
 
   https:
     address: ":443"
@@ -24,22 +27,22 @@ entryPoints:
             sans:
               - "*.service.consul"
 
-  traefik:
-    address: ":8080"
-
 api:
   insecure: true
 
 ping:
-  entrypoint: traefik
+  entrypoint: "traefik"
 
 metrics:
   prometheus:
-    entrypoint: traefik
+    entrypoint: "traefik"
+    addEntryPointsLabels: true
+    addRoutersLabels: true
+    addServiceSLabels: true
 
 accessLog:
   filePath: "/alloc/data/access.log"
-  format: json
+  format: "json"
 
 providers:
   consulCatalog:
@@ -49,5 +52,7 @@ providers:
       address: '{{ env "attr.unique.network.ip-address" }}:8500'
     connectAware: true
     serviceName: "traefik"
+
   file:
-    filename: "local/traefik/tls.yml"
+    directory: "/local/configs"
+    watch: true

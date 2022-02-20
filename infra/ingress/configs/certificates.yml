@@ -1,0 +1,6 @@
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: "secrets/certs/nahsi.dev/cert.pem"
+        keyFile: "secrets/certs/nahsi.dev/key.pem"
