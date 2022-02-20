@@ -206,6 +206,17 @@ job "victoria-metrics" {
         change_mode   = "signal"
         change_signal = "SIGHUP"
       }
+
+      template {
+        data = <<-EOH
+        {{- with secret "pki/issue/internal" "common_name=vmagent.service.consul" -}}
+        {{ .Data.issuing_ca }}{{ end }}
+        EOH
+
+        destination = "secrets/certs/CA.pem"
+        change_mode = "restart"
+        splay       = "5m"
+      }
     }
   }
 }
