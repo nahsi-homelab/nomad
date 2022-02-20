@@ -36,7 +36,7 @@ job "homer" {
 
       tags = [
         "traefik.enable=true",
-        "traefik.http.routers.homer.entrypoint=https",
+        "traefik.http.routers.homer.entrypoints=https",
         "traefik.http.routers.homer.rule=Host(`homer.service.consul`)",
       ]
 
