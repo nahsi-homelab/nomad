@@ -51,7 +51,6 @@ job "sftpgo" {
         "traefik.enable=true",
         "traefik.http.routers.sftpgo-http.entrypoints=https",
         "traefik.http.routers.sftpgo-http.rule=Host(`sftpgo.service.consul`)",
-        "traefik.http.routers.sftpgo-http.tls=true",
       ]
 
       check {

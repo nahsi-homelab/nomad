@@ -45,7 +45,6 @@ job "home-assistant" {
           "traefik.enable=true",
           "traefik.entrypoints=https",
           "traefik.http.routers.ha.rule=Host(`home-assistant.service.consul`)",
-          "traefik.http.routers.ha.tls=true"
         ]
       }
 

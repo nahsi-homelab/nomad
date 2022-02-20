@@ -19,8 +19,8 @@ job "linkding" {
 
       tags = [
         "traefik.enable=true",
+        "traefik.http.routers.linkding.entrypoint=https",
         "traefik.http.routers.linkding.rule=Host(`links.service.consul`)",
-        "traefik.http.routers.linkding.tls=true"
       ]
     }
 

@@ -38,7 +38,6 @@ job "unifi" {
       tags = [
         "traefik.enable=true",
         "traefik.http.routers.unifi.entrypoints=https",
-        "traefik.http.routers.unifi.tls=true",
         "traefik.http.routers.unifi.rule=Host(`unifi.service.consul`)",
         "traefik.http.services.unifi.loadbalancer.serverstransport=skipverify@file",
         "traefik.http.services.unifi.loadbalancer.server.scheme=https"

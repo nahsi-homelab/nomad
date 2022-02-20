@@ -25,11 +25,9 @@ job "llpsi" {
         "traefik.enable=true",
         "traefik.http.routers.llpsi.entrypoints=https",
         "traefik.http.routers.llpsi.rule=Host(`llpsi.service.consul`)",
-        "traefik.http.routers.llpsi.tls=true",
         "ingress.enable=true",
         "ingress.http.routers.llpsi.entrypoints=https",
         "ingress.http.routers.llpsi.rule=Host(`llpsi.nahsi.dev`)",
-        "ingress.http.routers.llpsi.tls=true",
       ]
 
       check {

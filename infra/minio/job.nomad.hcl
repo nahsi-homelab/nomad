@@ -40,9 +40,8 @@ job "minio" {
 
       tags = [
         "ingress.enable=true",
-        "ingress.http.routers.minio-ui.rule=Host(`minio.nahsi.dev`)",
         "ingress.http.routers.minio-ui.entrypoints=https",
-        "ingress.http.routers.minio-ui.tls=true",
+        "ingress.http.routers.minio-ui.rule=Host(`minio.nahsi.dev`)",
         "ingress.http.services.minio-ui.loadbalancer.server.scheme=https",
         "ingress.http.services.minio-ui.loadbalancer.serverstransport=skipverify@file",
       ]

@@ -1,7 +1,6 @@
 variables {
   versions = {
-    traefik  = "2.6.1"
-    promtail = "2.4.2"
+    traefik = "2.6.1"
   }
 }
 
@@ -17,7 +16,8 @@ job "ingress" {
 
   update {
     max_parallel = 1
-    stagger      = "1m"
+    stagger      = "2m"
+    auto_revert  = true
   }
 
   constraint {
@@ -60,19 +60,15 @@ job "ingress" {
         to           = 993
         host_network = "public"
       }
-
-      port "promtail" {
-        to = 3000
-      }
     }
 
     service {
       name = "ingress"
       port = "traefik"
-      task = "traefik"
 
       meta {
-        alloc_id = NOMAD_ALLOC_ID
+        dashboard = "qPdAviJmz"
+        alloc_id  = NOMAD_ALLOC_ID
       }
 
       connect {
@@ -80,8 +76,8 @@ job "ingress" {
       }
 
       check {
+        name     = "Traefik HTTP"
         type     = "http"
-        protocol = "http"
         path     = "/ping"
         port     = "traefik"
         interval = "10s"
@@ -91,24 +87,21 @@ job "ingress" {
 
     task "traefik" {
       driver       = "docker"
+      user         = "nobody"
       kill_timeout = "30s"
 
-      vault {
-        policies = ["public-cert"]
+      resources {
+        cpu        = 100
+        memory     = 64
+        memory_max = 128
       }
 
-      resources {
-        cpu        = 50
-        memory     = 32
-        memory_max = 64
+      vault {
+        policies = ["ingress"]
       }
 
       config {
         image = "traefik:${var.versions.traefik}"
-
-        extra_hosts = [
-          "host.docker.internal:host-gateway"
-        ]
 
         ports = [
           "traefik",
@@ -129,9 +122,17 @@ job "ingress" {
         destination = "local/traefik.yml"
       }
 
-      template {
-        data        = file("file.yml")
-        destination = "local/traefik/file.yml"
+      dynamic "template" {
+        for_each = fileset(".", "configs/*.yml")
+
+        content {
+          data        = file(template.value)
+          destination = "local/${template.value}"
+          change_mode = "noop"
+
+          left_delimiter  = "[["
+          right_delimiter = "]]"
+        }
       }
 
       template {
@@ -140,9 +141,9 @@ job "ingress" {
         {{ .Data.data.ca_bundle }}{{ end }}
         EOH
 
-        destination = "secrets/cert.pem"
+        destination = "secrets/certs/nahsi.dev/cert.pem"
         change_mode = "restart"
-        splay       = "1m"
+        splay       = "5m"
       }
 
       template {
@@ -151,56 +152,9 @@ job "ingress" {
         {{ .Data.data.key }}{{ end }}
         EOH
 
-        destination = "secrets/key.pem"
+        destination = "secrets/certs/nahsi.dev/key.pem"
         change_mode = "restart"
-        splay       = "1m"
-      }
-    }
-
-    task "promtail" {
-      driver = "docker"
-
-      lifecycle {
-        hook    = "poststart"
-        sidecar = true
-      }
-
-      resources {
-        cpu    = 50
-        memory = 32
-      }
-
-      service {
-        name = "promtail"
-        port = "promtail"
-
-        meta {
-          sidecar_to = "traefik"
-        }
-
-        check {
-          type     = "http"
-          path     = "/ready"
-          interval = "10s"
-          timeout  = "2s"
-        }
-      }
-
-      config {
-        image = "grafana/promtail:${var.versions.promtail}"
-
-        args = [
-          "-config.file=local/promtail.yml"
-        ]
-
-        ports = [
-          "promtail"
-        ]
-      }
-
-      template {
-        data        = file("promtail.yml")
-        destination = "local/promtail.yml"
+        splay       = "5m"
       }
     }
   }
