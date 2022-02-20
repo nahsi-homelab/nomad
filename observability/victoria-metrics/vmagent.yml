@@ -22,7 +22,7 @@ scrape_configs:
         services:
           - "victoria-metrics"
     relabel_configs:
-      - source_labels: ["__meta_consul_service_metadata_alloc_id"]
+      - source_labels: ["__meta_consul_node"]
         target_label: "instance"
 
   - job_name: "consul"
