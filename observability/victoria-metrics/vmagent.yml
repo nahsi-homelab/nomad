@@ -148,3 +148,36 @@ scrape_configs:
     relabel_configs:
       - source_labels: ["__meta_consul_service_metadata_dc"]
         target_label: "instance"
+
+  - job_name: "envoy"
+    consul_sd_configs:
+      - server: "http://172.26.64.1:8500"
+    relabel_configs:
+      - source_labels: ["job"]
+        target_label: "instance"
+      - source_labels: ["__meta_consul_service"]
+        action: "drop"
+        regex: '(.+)-sidecar-proxy'
+      - source_labels: ["__meta_consul_service_metadata_envoy"]
+        action: "keep"
+        regex: '(.+)'
+      - source_labels: ["__address__, __meta_consul_service_metadata_envoy"]
+        regex: '([^:]+)(?::\d+)?;(\d+)'
+        replacement: '${1}:${2}'
+        target_label: "__address__"
+    metric_relabel_configs:
+      - source_labels: ["__name__"]
+        regex: "(envoy_cluster_upstream_rq_connect_fail|envoy_http_downstream_rq_no_route|envoy_cluster_upstream_rq_completed|envoy_http_downstream_rq_completed|envoy_cluster_upstream_rq_time_bucket|envoy_http_downstream_rq_time_bucket|envoy_cluster_upstream_rq_xx|envoy_http_downstream_rq_xx|envoy_listener_http_downstream_rq_xx|envoy_cluster_upstream_cx_connect_fail|envoy_tcp_downstream_cx_no_route|envoy_cluster_upstream_cx_rx_bytes_total|envoy_cluster_upstream_cx_tx_bytes_total|envoy_tcp_downstream_cx_tx_bytes_total|envoy_tcp_downstream_cx_rx_bytes_total)"
+        action: "keep"
+
+  - job_name: "envoy-vmagent"
+    static_configs:
+      - targets:
+        - "127.0.0.1:9102"
+    relabel_configs:
+      - source_labels: ["job"]
+        target_label: "instance"
+    metric_relabel_configs:
+      - source_labels: ["__name__"]
+        regex: "(envoy_cluster_upstream_rq_connect_fail|envoy_http_downstream_rq_no_route|envoy_cluster_upstream_rq_completed|envoy_http_downstream_rq_completed|envoy_cluster_upstream_rq_time_bucket|envoy_http_downstream_rq_time_bucket|envoy_cluster_upstream_rq_xx|envoy_http_downstream_rq_xx|envoy_listener_http_downstream_rq_xx|envoy_cluster_upstream_cx_connect_fail|envoy_tcp_downstream_cx_no_route|envoy_cluster_upstream_cx_rx_bytes_total|envoy_cluster_upstream_cx_tx_bytes_total|envoy_tcp_downstream_cx_tx_bytes_total|envoy_tcp_downstream_cx_rx_bytes_total)"
+        action: "keep"

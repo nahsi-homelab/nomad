@@ -16,6 +16,9 @@ job "victoria-metrics" {
       mode = "bridge"
       port "http" {}
       port "health" {}
+      port "envoy" {
+        to = 9102
+      }
     }
 
     service {
@@ -23,7 +26,9 @@ job "victoria-metrics" {
       port = "http"
 
       meta {
+        dashboard = "wnf0q_kZk"
         alloc_id = NOMAD_ALLOC_ID
+        envoy = NOMAD_HOST_PORT_envoy
       }
 
       tags = [
@@ -128,6 +133,7 @@ job "victoria-metrics" {
       port = "http"
 
       meta {
+        dashboard = "G7Z29GzMGz"
         alloc_id = NOMAD_ALLOC_ID
       }
 
