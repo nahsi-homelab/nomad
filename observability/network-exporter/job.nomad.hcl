@@ -41,7 +41,6 @@ job "network-exporter" {
       tags = [
         "ingress.enable=true",
         "ingress.http.routers.random-files.entrypoints=https",
-        "ingress.http.routers.random-files.tls=true",
         "ingress.http.routers.random-files.rule=Host(`asia.nahsi.dev`) || Host(`syria.nahsi.dev`) || Host(`pontus.nahsi.dev`)"
       ]
 

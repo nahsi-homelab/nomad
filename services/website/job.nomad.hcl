@@ -21,7 +21,6 @@ job "website" {
         "ingress.enable=true",
         "ingress.http.routers.website.entrypoints=https",
         "ingress.http.routers.website.rule=Host(`blog.nahsi.dev`)",
-        "ingress.http.routers.website.tls=true",
       ]
     }
 

@@ -36,9 +36,8 @@ job "homer" {
 
       tags = [
         "traefik.enable=true",
-        "traefik.entrypoints=https",
+        "traefik.http.routers.homer.entrypoint=https",
         "traefik.http.routers.homer.rule=Host(`homer.service.consul`)",
-        "traefik.http.routers.homer.tls=true"
       ]
 
       check {
@@ -91,7 +90,6 @@ job "homer" {
         "ingress.enable=true",
         "ingress.http.routers.homer.entrypoints=https",
         "ingress.http.routers.homer.rule=Host(`nahsi.dev`)",
-        "ingress.http.routers.homer.tls=true"
       ]
 
       check {

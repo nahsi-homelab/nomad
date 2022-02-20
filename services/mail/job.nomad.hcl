@@ -55,7 +55,6 @@ job "mail" {
         "traefik.enable=true",
         "traefik.http.routers.wildduck.entrypoints=https",
         "traefik.http.routers.wildduck.rule=Host(`wildduck.service.consul`)",
-        "traefik.http.routers.wildduck.tls=true",
       ]
 
       check {
@@ -87,7 +86,6 @@ job "mail" {
         "traefik.enable=true",
         "traefik.http.routers.ducky-api.entrypoints=https",
         "traefik.http.routers.ducky-api.rule=Host(`ducky.service.consul`)",
-        "traefik.http.routers.ducky-api.tls=true",
       ]
     }
 
@@ -305,7 +303,6 @@ job "mail" {
         "ingress.http.routers.roundcube.entrypoints=https",
         "ingress.http.routers.roundcube.rule=Host(`mail.nahsi.dev`)",
         "ingress.http.services.roundcube.loadBalancer.sticky.cookie=true",
-        "ingress.http.routers.roundcube.tls=true",
       ]
 
       check {
@@ -553,7 +550,6 @@ job "mail" {
         "traefik.enable=true",
         "traefik.http.routers.zone-mta.entrypoints=https",
         "traefik.http.routers.zone-mta.rule=Host(`zone-mta.service.consul`)",
-        "traefik.http.routers.zone-mta.tls=true",
       ]
 
       check {

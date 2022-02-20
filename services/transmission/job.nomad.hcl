@@ -23,7 +23,6 @@ job "transmission" {
         "traefik.enable=true",
         "traefik.http.routers.transmission.entrypoints=https",
         "traefik.http.routers.transmission.rule=Host(`transmission.service.consul`)",
-        "traefik.http.routers.transmission.tls=true"
       ]
     }
 
