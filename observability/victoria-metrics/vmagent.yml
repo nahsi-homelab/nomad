@@ -107,7 +107,7 @@ scrape_configs:
   - job_name: "patroni"
     scheme: "https"
     tls_config:
-      insecure_skip_verify: true
+      ca_file: "/secrets/certs/CA.pem"
     consul_sd_configs:
       - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
         services:
@@ -126,8 +126,7 @@ scrape_configs:
         target_label: "instance"
 
   - job_name: "minio-job"
-    authorization:
-      credentials_file: "/secrets/minio-token"
+    bearer_token_file: "/secrets/minio-token"
     metrics_path: "/minio/v2/metrics/cluster"
     scheme: "https"
     static_configs:

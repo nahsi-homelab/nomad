@@ -42,8 +42,6 @@ job "postgres" {
         path     = "/health"
         interval = "10s"
         timeout  = "2s"
-
-        tls_skip_verify = true
       }
     }
 
@@ -127,7 +125,7 @@ job "postgres" {
 
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "common_name=patroni.service.consul" "alt_names=localhost" "ip_sans=127.0.0.1" -}}
+        {{- with secret "pki/issue/internal" "common_name=patroni.service.consul" "alt_names=localhost" "ip_sans=127.0.0.1,192.168.130.20,192.168.230.1" -}}
         {{ .Data.certificate }}{{ end }}
         EOH
 
@@ -138,7 +136,7 @@ job "postgres" {
 
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "common_name=patroni.service.consul" "alt_names=localhost" "ip_sans=127.0.0.1" -}}
+        {{- with secret "pki/issue/internal" "common_name=patroni.service.consul" "alt_names=localhost" "ip_sans=127.0.0.1,192.168.130.20,192.168.230.1" -}}
         {{ .Data.private_key }}{{ end }}
         EOH
 
