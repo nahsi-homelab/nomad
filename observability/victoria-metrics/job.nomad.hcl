@@ -220,7 +220,7 @@ job "victoria-metrics" {
 
       template {
         data = <<-EOH
-        {{- with secret "secret/minio/prometheus" }}{{ .Data.data.token }}{{ end -}}'
+        {{- with secret "secret/minio/prometheus" }}{{ .Data.data.token }}{{ end -}}
         EOH
 
         destination = "secrets/minio-token"
