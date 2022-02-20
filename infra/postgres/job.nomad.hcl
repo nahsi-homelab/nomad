@@ -31,6 +31,10 @@ job "postgres" {
       name = "patroni"
       port = "patroni"
 
+      meta {
+        alloc_id = NOMAD_ALLOC_ID
+      }
+
       check {
         name     = "Patroni HTTP"
         type     = "http"
@@ -155,6 +159,10 @@ job "postgres" {
     service {
       name = "postgres-exporter"
       port = "exporter"
+
+      meta {
+        alloc_id = NOMAD_ALLOC_ID
+      }
 
       check {
         name     = "postgres-exporter"

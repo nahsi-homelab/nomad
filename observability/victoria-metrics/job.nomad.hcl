@@ -217,6 +217,16 @@ job "victoria-metrics" {
         change_mode = "restart"
         splay       = "5m"
       }
+
+      template {
+        data = <<-EOH
+        {{ with secret "secret/minio/prometheus" }}{{ .Data.data.token }}{{ end }}'
+        EOH
+
+        destination = "secrets/minio-token"
+        change_mode = "restart"
+        splay       = "5m"
+      }
     }
   }
 }

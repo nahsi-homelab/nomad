@@ -131,6 +131,10 @@ job "mongo" {
     service {
       name = "mongo-exporter"
       port = "exporter"
+
+      meta {
+        alloc_id = NOMAD_ALLOC_ID
+      }
     }
 
     task "mongo-exporter" {

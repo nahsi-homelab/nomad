@@ -115,3 +115,24 @@ scrape_configs:
     relabel_configs:
       - source_labels: ["__meta_consul_service_metadata_alloc_id"]
         target_label: "instance"
+
+  - job_name: "mongo-exporter"
+    consul_sd_configs:
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
+        services:
+          - "mongo-exporter"
+    relabel_configs:
+      - source_labels: ["__meta_consul_service_metadata_alloc_id"]
+        target_label: "instance"
+
+  - job_name: "minio-job"
+    authorization:
+      credentials_file: "/secrets/minio-token"
+    metrics_path: "/minio/v2/metrics/cluster"
+    scheme: "https"
+    static_configs:
+      - targets:
+         - "s3.nahsi.dev"
+    relabel_configs:
+      - source_labels: ["__address__"]
+        target_label: "instance"
