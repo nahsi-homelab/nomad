@@ -1,4 +1,4 @@
 http:
-￼  serversTransports:
-￼    skipverify:
-￼      insecureSkipVerify: true
+  serversTransports:
+    skipverify:
+      insecureSkipVerify: true
