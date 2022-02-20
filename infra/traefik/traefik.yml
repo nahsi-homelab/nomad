@@ -44,7 +44,7 @@ accessLog:
   filePath: "/alloc/data/access.log"
   format: "json"
 
-[[ with secret "secret/traefik/pilot/ingress" -]]
+[[ with secret "secret/traefik/pilot/traefik" -]]
 pilot:
   token: '[[ .Data.data.token ]]'[[ end ]]
 
