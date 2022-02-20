@@ -183,7 +183,7 @@ job "victoria-metrics" {
       }
 
       resources {
-        cpu        = 50
+        cpu        = 200
         memory     = 128
         memory_max = 256
       }
