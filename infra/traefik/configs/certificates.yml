@@ -2,5 +2,5 @@ tls:
   stores:
     default:
       defaultCertificate:
-        certFile: "secrets/certs/internal/cert.pem"
-        keyFile: "secrets/certs/internal/key.pem"
+        certFile: "/secrets/certs/internal/cert.pem"
+        keyFile: "/secrets/certs/internal/key.pem"

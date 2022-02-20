@@ -115,24 +115,24 @@ job "traefik" {
 
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "common_name=traefik.service.consul" -}}
+        {{- with secret "pki/issue/internal" "common_name=*.service.consul" -}}
         {{ .Data.certificate }}
         {{ .Data.issuing_ca }}{{ end }}
         EOH
 
-        destination = "secrets/cert.pem"
+        destination = "secrets/certs/internal/cert.pem"
         change_mode = "restart"
         splay       = "5m"
       }
 
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "common_name=traefik.service.consul" -}}
+        {{- with secret "pki/issue/internal" "common_name=*.service.consul" -}}
         {{ .Data.private_key }}{{ end }}
         EOH
 
         change_mode = "restart"
-        destination = "secrets/key.pem"
+        destination = "secrets/certs/internal/key.pem"
         splay       = "5m"
       }
     }
