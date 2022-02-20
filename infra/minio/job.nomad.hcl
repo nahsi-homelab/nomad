@@ -67,7 +67,6 @@ job "minio" {
         "ingress.enable=true",
         "ingress.http.routers.minio-api.rule=Host(`s3.nahsi.dev`)",
         "ingress.http.routers.minio-api.entrypoints=https",
-        "ingress.http.routers.minio-api.tls=true",
         "ingress.http.services.minio-api.loadbalancer.server.scheme=https",
         "ingress.http.services.minio-api.loadbalancer.serverstransport=skipverify@file",
       ]
@@ -121,7 +120,7 @@ job "minio" {
 
         MINIO_SERVER_URL           = "https://minio.service.consul:9000"
         MINIO_BROWSER_REDIRECT_URL = "https://minio.nahsi.dev"
-        MINIO_PROMETHEUS_URL       = "http://prometheus.service.consul:9090"
+        MINIO_PROMETHEUS_URL       = "https://victoria-metrics.service.consul"
       }
 
       config {
