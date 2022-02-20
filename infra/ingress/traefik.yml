@@ -83,7 +83,7 @@ providers:
     exposedByDefault: false
     endpoint:
       address: "172.17.0.1:8500"
-    # connectAware: true
+    connectAware: true
     serviceName: "ingress"
 
   file:
