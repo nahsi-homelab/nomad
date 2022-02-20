@@ -69,6 +69,9 @@ ping:
 metrics:
   prometheus:
     entrypoint: "traefik"
+    addEntryPointsLabels: true
+    addRoutersLabels: true
+    addServiceSLabels: true
 
 accessLog:
   filePath: "/alloc/data/access.log"
@@ -76,12 +79,11 @@ accessLog:
 
 providers:
   consulCatalog:
-    refreshInterval: "5s"
     prefix: "ingress"
     exposedByDefault: false
     endpoint:
       address: '{{ env "attr.unique.network.ip-address" }}:8500'
-    connectAware: true
+    # connectAware: true
     serviceName: "ingress"
   file:
     filename: "local/traefik/file.yml"

@@ -21,7 +21,7 @@ job "ingress" {
   }
 
   constraint {
-    distinct_property = "${node.datacenter}"
+    distinct_property = node.datacenter
   }
 
   group "traefik" {
@@ -66,6 +66,29 @@ job "ingress" {
       }
     }
 
+    service {
+      name = "ingress"
+      port = "traefik"
+      task = "traefik"
+
+      meta {
+        alloc_id = NOMAD_ALLOC_ID
+      }
+
+      connect {
+        native = true
+      }
+
+      check {
+        type     = "http"
+        protocol = "http"
+        path     = "/ping"
+        port     = "traefik"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+
     task "traefik" {
       driver       = "docker"
       kill_timeout = "30s"
@@ -78,24 +101,6 @@ job "ingress" {
         cpu        = 50
         memory     = 32
         memory_max = 64
-      }
-
-      service {
-        name = "ingress"
-        port = "traefik"
-
-        meta {
-          alloc_id = NOMAD_ALLOC_ID
-        }
-
-        check {
-          type     = "http"
-          protocol = "http"
-          path     = "/ping"
-          port     = "traefik"
-          interval = "20s"
-          timeout  = "2s"
-        }
       }
 
       config {
@@ -176,7 +181,7 @@ job "ingress" {
         check {
           type     = "http"
           path     = "/ready"
-          interval = "20s"
+          interval = "10s"
           timeout  = "2s"
         }
       }
