@@ -77,6 +77,10 @@ accessLog:
   filePath: "/alloc/data/access.log"
   format: "json"
 
+[[ with secret "secret/traefik/pilot/ingress" -]]
+pilot:
+  token: '[[ .Data.data.token ]]'[[ end ]]
+
 providers:
   consulCatalog:
     prefix: "ingress"

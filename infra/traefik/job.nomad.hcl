@@ -98,6 +98,10 @@ job "traefik" {
       template {
         data        = file("traefik.yml")
         destination = "local/traefik.yml"
+        splay       = "5m"
+
+        left_delimiter  = "[["
+        right_delimiter = "]]"
       }
 
       dynamic "template" {
