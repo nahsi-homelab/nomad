@@ -1,0 +1,6 @@
+[
+  {
+    "mail": "shinobi@nahsi.dev",
+    "pass": "{{ with secret "secret/shinobi/admin" }}{{ .Data.data.password }}{{ end }}"
+  }
+]
