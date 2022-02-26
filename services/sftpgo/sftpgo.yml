@@ -1,22 +1,46 @@
+common:
+  temp_path: {{ env "NOMAD_ALLOC_DIR" }}
+  proxy_protocol: 1
+
 data_provider:
   driver: "postgresql"
   name: "sftpgo"
   host: "master.postgres.service.consul"
   port: "5432"
-  username: "sftpgo"
   sslmode: 0
+  is_shared: 1
+
 httpd:
   bindings:
-    port: 8080
+    port: {{ env "NOMAD_PORT_http" }}
     address: ""
+    proxy_allowed:
+      - "192.168.0.0/16"
+  web_root: "/sftpgo"
+
 webdavd:
   bindings:
     address: ""
-    port: 8088
+    port: {{ env "NOMAD_PORT_webdav" }}
+    proxy_allowed:
+      - "192.168.0.0/16"
   cache:
     expiration_time: "60" # in minutes
+
 sftpd:
+  banner: "nahsi SFTP"
   bindings:
-    port: 0
+    port: {{ env "NOMAD_PORT_sftp" }}
+  host_keys:
+    - "/secrets/ssh/id_rsa"
+    - "/secrets/ssh/id_ecdsa"
+    - "/secrets/ssh/id_ed25519"
+
+ftpd:
+  banner: "nahsi FTP"
+  bindings:
+    port: {{ env "NOMAD_PORT_ftp" }}
+
 telemetry:
   bind_address: ""
+  bind_port: {{ env "NOMAD_PORT_metrics" }}

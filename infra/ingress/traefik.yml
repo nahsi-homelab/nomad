@@ -60,6 +60,13 @@ entryPoints:
             sans:
               - "*.nahsi.dev"
 
+  sftp:
+    address: ":2022"
+    transport:
+      lifeCycle:
+        requestAcceptGraceTimeout: 15
+        graceTimeOut: 10
+
 api:
   insecure: true
 

@@ -60,6 +60,12 @@ job "ingress" {
         to           = 993
         host_network = "public"
       }
+
+      port "sftp" {
+        static       = 2022
+        to           = 2022
+        host_network = "public"
+      }
     }
 
     service {
@@ -109,7 +115,8 @@ job "ingress" {
           "https",
           "smtp",
           "smtp-relay",
-          "imap"
+          "imap",
+          "sftp",
         ]
 
         args = [
