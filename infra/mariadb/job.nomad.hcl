@@ -107,7 +107,7 @@ job "mariadb" {
       template {
         data = <<-EOF
         {{- with secret "mariadb/creds/exporter" }}
-        DATA_SOURCE_NAME='{{ .Data.username }}:{{ .Data.password }}@(mariadb.service.consul:3306/)'
+        DATA_SOURCE_NAME='{{ .Data.username }}:{{ .Data.password }}@(mariadb.service.consul:3306)/'
         {{- end }}
         EOF
 
