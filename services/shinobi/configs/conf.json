@@ -1,0 +1,31 @@
+{
+  "port": 8080,
+  "passwordType": "sha256",
+  "detectorMergePamRegionTriggers": true,
+  "wallClockTimestampAsDefault": true,
+  "db": {
+    "host": "mariadb.service.consul",
+    "user": "shinobi",
+    "password": "{{ with secret "mariadb/static-creds/shinobi" }}{{ .Data.password }}{{ end }}",
+    "database": "ccio",
+    "port": 3306
+  },
+  "mail": {
+    "host": "mail.nahsi.dev",
+    "port": 465,
+    "secure": true,
+    "auth": {
+      "user": "shinobi@nahsi.dev",
+      "pass": "{{ with secret "secret/shinobi/mail" }}{{ .Data.data.password }}{{ end }}"
+    }
+  },
+  "cron": {
+    "key": "{{ with secret "secret/shinobi/cron" }}{{ .Data.data.key }}{{ end }}"
+  },
+  "smtpServer": true,
+  "smtpServerPort": 1338,
+  "smtpServerOptions": {
+    "allowInsecureAuth": true
+  },
+  "telegramBot": true
+}
