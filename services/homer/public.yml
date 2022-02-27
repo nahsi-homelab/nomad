@@ -11,10 +11,14 @@ colors:
     highlight-hover: "#373B41"
     background: "#1D1F21"
     card-background: "#373B41"
+    link: "#81A2BE"
+    link-hover: "#5A647E"
   light:
     highlight-primary: "#373B41"
     highlight-secondary: "#282A2E"
     highlight-hover: "#373B41"
+    link: "#81A2BE"
+    link-hover: "#5A647E"
 
 links:
   - name: "Telegram"
@@ -42,6 +46,14 @@ services:
       - name: "Webmail"
         logo: "https://s3.nahsi.dev/homer/roundcube.svg"
         url: "https://mail.nahsi.dev"
+
+      - name: "SFTPGo"
+        icon: "fas fa-cloud-download-alt"
+        url: "https://files.nahsi.dev/sftpgo"
+
+      - name: "Filestash"
+        logo: "https://s3.nahsi.dev/homer/filestash.png"
+        url: "https://files.nahsi.dev"
 
       - name: "MinIO"
         logo: "https://s3.nahsi.dev/homer/minio.png"
