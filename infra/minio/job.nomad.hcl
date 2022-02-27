@@ -1,6 +1,6 @@
 variables {
   versions = {
-    minio = "RELEASE.2021-12-10T23-03-39Z"
+    minio = "RELEASE.2022-02-26T02-54-46Z"
   }
 }
 
@@ -100,7 +100,7 @@ job "minio" {
       resources {
         cpu        = 300
         memory     = 512
-        memory_max = 1024
+        memory_max = 2048
       }
 
       vault {
