@@ -32,8 +32,9 @@ job "filestash" {
       driver = "docker"
 
       resources {
-        cpu    = 100
-        memory = 128
+        cpu        = 500
+        memory     = 128
+        memory_max = 512
       }
 
       volume_mount {
