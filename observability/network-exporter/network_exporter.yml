@@ -39,12 +39,3 @@ targets:
   - name: asia-http
     host: https://asia.nahsi.dev/512.rand
     type: HTTPGet
-
-  # pontus
-  - name: pontus
-    host: pontus.nahsi.dev
-    type: ICMP+MTR
-
-  - name: pontus-http
-    host: https://pontus.nahsi.dev/512.rand
-    type: HTTPGet

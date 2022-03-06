@@ -8,7 +8,6 @@ job "network-exporter" {
   datacenters = [
     "syria",
     "asia",
-    "pontus"
   ]
   namespace = "observability"
 
@@ -17,7 +16,7 @@ job "network-exporter" {
   }
 
   group "network-exporter" {
-    count = 3
+    count = 2
     ephemeral_disk {
       sticky  = true
       migrate = true
@@ -41,7 +40,7 @@ job "network-exporter" {
       tags = [
         "ingress.enable=true",
         "ingress.http.routers.random-files.entrypoints=https",
-        "ingress.http.routers.random-files.rule=Host(`asia.nahsi.dev`) || Host(`syria.nahsi.dev`) || Host(`pontus.nahsi.dev`)"
+        "ingress.http.routers.random-files.rule=Host(`asia.nahsi.dev`) || Host(`syria.nahsi.dev`)"
       ]
 
       check {
