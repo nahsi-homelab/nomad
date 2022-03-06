@@ -9,13 +9,12 @@ job "mongo" {
   datacenters = [
     "syria",
     "asia",
-    "pontus"
   ]
 
   namespace = "infra"
 
   group "mongod" {
-    count = 3
+    count = 2
     network {
       port "db" {
         to     = 27017
