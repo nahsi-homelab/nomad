@@ -8,7 +8,6 @@ job "zookeeper" {
   datacenters = [
     "syria",
     "asia",
-    "pontus"
   ]
   namespace = "infra"
 
@@ -22,7 +21,7 @@ job "zookeeper" {
   }
 
   group "zookeeper" {
-    count = 5
+    count = 3
     network {
       port "client" {
         to     = 2181
