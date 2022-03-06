@@ -55,7 +55,7 @@ services:
 
       - name: "Vault"
         logo: "https://s3.nahsi.dev/homer/vault.png"
-        url: "https://vault.service.consul"
+        url: "https://vault.nahsi.dev"
 
   - name: "Observability"
     icon: "fa fa-heartbeat"
