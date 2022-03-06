@@ -8,7 +8,6 @@ job "ingress" {
   datacenters = [
     "syria",
     "asia",
-    "pontus"
   ]
 
   namespace = "infra"
@@ -25,7 +24,7 @@ job "ingress" {
   }
 
   group "traefik" {
-    count = 3
+    count = 2
     network {
       port "traefik" {
         to = 8080
