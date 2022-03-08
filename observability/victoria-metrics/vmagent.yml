@@ -108,6 +108,16 @@ scrape_configs:
     relabel_configs:
       - source_labels: ["__meta_consul_node"]
         target_label: "instance"
+
+  - job_name: "tailscale"
+    consul_sd_configs:
+      - server: "http://172.26.64.1:8500"
+        services:
+          - "tailscale"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
+
   - job_name: "traefik"
     consul_sd_configs:
       - server: "http://172.26.64.1:8500"
