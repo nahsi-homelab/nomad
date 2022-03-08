@@ -125,7 +125,7 @@ job "postgres" {
 
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "common_name=patroni.service.consul" "alt_names=localhost" "ip_sans=127.0.0.1,192.168.130.20,192.168.230.1" -}}
+        {{- with secret "pki/issue/internal" "common_name=patroni.service.consul" "alt_names=localhost" "ip_sans=127.0.0.1,100.81.139.12,100.105.155.85" -}}
         {{ .Data.certificate }}{{ end }}
         EOH
 
@@ -136,7 +136,7 @@ job "postgres" {
 
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "common_name=patroni.service.consul" "alt_names=localhost" "ip_sans=127.0.0.1,192.168.130.20,192.168.230.1" -}}
+        {{- with secret "pki/issue/internal" "common_name=patroni.service.consul" "alt_names=localhost" "ip_sans=127.0.0.1,100.81.139.12,100.105.155.85" -}}
         {{ .Data.private_key }}{{ end }}
         EOH
 
