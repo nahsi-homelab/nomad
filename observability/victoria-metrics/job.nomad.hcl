@@ -1,6 +1,6 @@
 variables {
   versions = {
-    vm = "1.73.0"
+    vm = "1.73.1"
   }
 }
 

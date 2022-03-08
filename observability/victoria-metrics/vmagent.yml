@@ -110,6 +110,7 @@ scrape_configs:
         target_label: "instance"
 
   - job_name: "tailscale"
+    metrics_path: "/debug/metrics"
     consul_sd_configs:
       - server: "http://172.26.64.1:8500"
         services:
