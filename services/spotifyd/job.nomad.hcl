@@ -5,15 +5,19 @@ variables {
 }
 
 job "spotifyd" {
-  datacenters = ["asia"]
+  datacenters = [
+    "asia",
+    "cosmos"
+  ]
   namespace   = "services"
 
   constraint {
-    attribute = node.unique.name
-    value     = "pergamon"
+    attribute = meta.workstation
+    value     = true
   }
 
   group "spotifyd" {
+    count = 2
     ephemeral_disk {}
 
     task "spotifyd" {
@@ -41,7 +45,7 @@ job "spotifyd" {
           "--bitrate", "320",
           "--volume-normalisation",
           "--volume-controller", "softvol",
-          "--backend", "alsa",
+          "--backend", "pulseaudio",
           "--cache-path", "${NOMAD_ALLOC_DIR}/data/",
 
           "--username-cmd", "cat ${NOMAD_SECRETS_DIR}/username",
