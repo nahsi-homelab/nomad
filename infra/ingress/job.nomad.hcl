@@ -8,10 +8,10 @@ job "ingress" {
   datacenters = [
     "syria",
     "asia",
+    "pontus",
   ]
-
   namespace = "infra"
-  type      = "service"
+  type      = "system"
 
   update {
     max_parallel = 1
@@ -19,12 +19,7 @@ job "ingress" {
     auto_revert  = true
   }
 
-  constraint {
-    distinct_property = node.datacenter
-  }
-
   group "traefik" {
-    count = 2
     network {
       port "traefik" {
         to = 8080
