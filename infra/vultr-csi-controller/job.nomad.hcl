@@ -34,16 +34,16 @@ job "vultr-csi-controller" {
 
           args = [
             "-endpoint=unix:///csi/csi.sock",
-            "-token=$VULTR_API_TOKEN",
+            "-token=${VULTR_API_KEY}",
           ]
         }
 
         template {
           data = <<-EOF
-          VULTR_API_TOKEN={{ with secret "secret/vultr/csi" }}{{ .Data.data.token }}{{ end }}
+          VULTR_API_KEY={{ with secret "secret/vultr/csi" }}{{ .Data.data.key }}{{ end }}
           EOF
 
-          destination = "secrets/token.env"
+          destination = "secrets/api.env"
           change_mode = "restart"
           env         = true
         }
