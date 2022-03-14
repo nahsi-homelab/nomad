@@ -9,7 +9,8 @@ job "spotifyd" {
     "asia",
     "cosmos"
   ]
-  namespace   = "services"
+  namespace = "services"
+  type      = "system"
 
   constraint {
     attribute = meta.workstation
@@ -17,7 +18,6 @@ job "spotifyd" {
   }
 
   group "spotifyd" {
-    count = 2
     ephemeral_disk {}
 
     task "spotifyd" {
