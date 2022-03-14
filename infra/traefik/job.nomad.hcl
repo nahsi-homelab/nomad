@@ -8,6 +8,7 @@ job "traefik" {
   datacenters = [
     "syria",
     "asia",
+    "pontus",
   ]
   namespace = "infra"
   type      = "system"
