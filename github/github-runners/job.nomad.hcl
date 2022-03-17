@@ -26,16 +26,6 @@ job "github-runners" {
       source = "docker-socket"
     }
 
-    volume "vboxdrv" {
-      type   = "host"
-      source = "vboxdrv"
-    }
-
-    volume "vboxnetctl" {
-      type   = "host"
-      source = "vboxnetctl"
-    }
-
     task "download-runner" {
       driver = "raw_exec"
 
@@ -84,16 +74,6 @@ job "github-runners" {
       volume_mount {
         volume      = "docker-socket"
         destination = "/var/run/docker.sock"
-      }
-
-      volume_mount {
-        volume      = "vboxdrv"
-        destination = "/dev/vboxdrv"
-      }
-
-      volume_mount {
-        volume      = "vboxnetctl"
-        destination = "/dev/vboxnetctl"
       }
 
       env {
