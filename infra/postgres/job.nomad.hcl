@@ -41,6 +41,8 @@ job "postgres" {
         path     = "/health"
         interval = "10s"
         timeout  = "2s"
+
+        tls_skip_verify = true
       }
     }
 
@@ -73,7 +75,7 @@ job "postgres" {
       }
 
       env {
-        PATRONI_NAME                       = node.unique.name
+        PATRONI_NAME                       = "pontus"
         PATRONI_RESTAPI_CONNECT_ADDRESS    = NOMAD_ADDR_patroni
         PATRONI_POSTGRESQL_CONNECT_ADDRESS = NOMAD_ADDR_postgres
       }
@@ -174,6 +176,8 @@ job "postgres" {
         path     = "/health"
         interval = "10s"
         timeout  = "2s"
+
+        tls_skip_verify = true
       }
     }
 
