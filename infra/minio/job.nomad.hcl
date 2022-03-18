@@ -1,6 +1,6 @@
 variables {
   versions = {
-    minio = "RELEASE.2022-02-26T02-54-46Z"
+    minio = "RELEASE.2022-03-17T06-34-49Z"
   }
 }
 
@@ -124,7 +124,7 @@ job "minio" {
       }
 
       config {
-        image    = "minio/minio:${var.versions.minio}"
+        image    = "quay.io/minio/minio:${var.versions.minio}"
         hostname = "minio-${meta.minio_node_id}.service.consul"
 
         ports = [
