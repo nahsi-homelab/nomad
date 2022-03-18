@@ -46,52 +46,48 @@ services:
     icon: "fa fa-cloud"
     items:
       - name: "Nomad"
-        logo: "https://s3.nahsi.dev/homer/nomad.png"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/nomad.png"
         url: "https://nomad.service.consul"
 
       - name: "Consul"
-        logo: "https://s3.nahsi.dev/homer/consul.png"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/consul.png"
         url: "https://consul.service.consul"
 
       - name: "Vault"
-        logo: "https://s3.nahsi.dev/homer/vault.png"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/vault.png"
         url: "https://vault.nahsi.dev"
 
   - name: "Observability"
     icon: "fa fa-heartbeat"
     items:
       - name: "Grafana"
-        logo: "https://s3.nahsi.dev/homer/grafana.png"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/grafana.png"
         url: "https://grafana.service.consul"
 
       - name: "vmagent"
-        logo: "https://s3.nahsi.dev/homer/vm.png"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/vm.png"
         url: "https://vmagent.service.consul"
 
   - name: "Infra"
     icon: "fa fa-server"
     items:
       - name: "Traefik"
-        logo: "https://s3.nahsi.dev/homer/traefik.png"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/traefik.png"
         url: "https://traefik.service.consul"
 
       - name: "MinIO"
-        logo: "https://s3.nahsi.dev/homer/minio.png"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/minio.png"
         url: "https://minio.nahsi.dev"
 
   - name: "Applications"
     icon: "fa fa-code-branch"
     items:
       - name: "Jellyfin"
-        logo: "https://s3.nahsi.dev/homer/jellyfin.svg"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/jellyfin.svg"
         url: "https://jellyfin.nahsi.dev"
 
-      - name: "Shinobi"
-        logo: "https://s3.nahsi.dev/homer/shinobi.png"
-        url: "https://shinobi.service.consul"
-
       - name: "Hyperion"
-        logo: "https://s3.nahsi.dev/homer/hyperion.png"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/hyperion.png"
         url: "https://hyperion.service.consul"
 
       - name: "Audioserve"
@@ -99,11 +95,11 @@ services:
         url: "https://audioserve.nahsi.dev"
 
       - name: "Polaris"
-        logo: "https://s3.nahsi.dev/homer/polaris.png"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/polaris.png"
         url: "https://polaris.service.consul"
 
       - name: "Transmission"
-        logo: "https://s3.nahsi.dev/homer/transmission.png"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/transmission.png"
         url: "https://transmission.service.consul"
 
       - name: "SFTPGo"
@@ -111,22 +107,22 @@ services:
         url: "https://files.nahsi.dev/sftpgo"
 
       - name: "Filestash"
-        logo: "https://s3.nahsi.dev/homer/filestash.png"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/filestash.png"
         url: "https://files.nahsi.dev"
 
   - name: "Mail"
     icon: "fas fa-envelope"
     items:
       - name: "Webmail"
-        logo: "https://s3.nahsi.dev/homer/roundcube.svg"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/roundcube.svg"
         url: "https://mail.nahsi.dev"
 
       - name: "DuckyPanel"
-        logo: "https://s3.nahsi.dev/homer/wildduck.png"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/wildduck.png"
         url: "https://ducky.service.consul"
 
       - name: "DuckyAPI"
-        logo: "https://s3.nahsi.dev/homer/swagger.png"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/swagger.png"
         url: "https://ducky.service.consul/api/swagger"
 
       - name: "ZoneMTA"

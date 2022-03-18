@@ -40,11 +40,11 @@ services:
   - icon: "fas fa-globe"
     items:
       - name: "Jellyfin"
-        logo: "https://s3.nahsi.dev/homer/jellyfin.svg"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/jellyfin.svg"
         url: "https://jellyfin.nahsi.dev"
 
       - name: "Webmail"
-        logo: "https://s3.nahsi.dev/homer/roundcube.svg"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/roundcube.svg"
         url: "https://mail.nahsi.dev"
 
       - name: "SFTPGo"
@@ -52,11 +52,11 @@ services:
         url: "https://files.nahsi.dev/sftpgo"
 
       - name: "Filestash"
-        logo: "https://s3.nahsi.dev/homer/filestash.png"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/filestash.png"
         url: "https://files.nahsi.dev"
 
       - name: "MinIO"
-        logo: "https://s3.nahsi.dev/homer/minio.png"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/minio.png"
         url: "https://minio.nahsi.dev"
 
       - name: "LLPSI"
