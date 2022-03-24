@@ -1,6 +1,6 @@
 variables {
   versions = {
-    vm = "1.74.0"
+    vm = "1.75.0"
   }
 }
 
@@ -86,8 +86,8 @@ job "victoria-metrics" {
 
       resources {
         cpu        = 500
-        memory     = 256
-        memory_max = 512
+        memory     = 512
+        memory_max = 1024
       }
 
       volume_mount {
