@@ -55,6 +55,11 @@ job "loki" {
       name = "loki-compactor"
       port = "http"
 
+      meta {
+        alloc_id  = NOMAD_ALLOC_ID
+        component = "compactor"
+      }
+
       check {
         name     = "Loki compactor"
         port     = "health"
@@ -164,6 +169,11 @@ job "loki" {
       name = "loki-distibutor"
       port = "http"
 
+      meta {
+        alloc_id  = NOMAD_ALLOC_ID
+        component = "distributor"
+      }
+
       check {
         name     = "Loki distibutor"
         port     = "health"
@@ -265,6 +275,11 @@ job "loki" {
     service {
       name = "loki-ingester"
       port = "http"
+
+      meta {
+        alloc_id  = NOMAD_ALLOC_ID
+        component = "ingestor"
+      }
 
       check {
         name     = "Loki ingester"
@@ -375,6 +390,11 @@ job "loki" {
       name = "loki-querier"
       port = "http"
 
+      meta {
+        alloc_id  = NOMAD_ALLOC_ID
+        component = "querier"
+      }
+
       check {
         name     = "Loki querier"
         port     = "health"
@@ -470,6 +490,11 @@ job "loki" {
     service {
       name = "loki-query-scheduler"
       port = "http"
+
+      meta {
+        alloc_id  = NOMAD_ALLOC_ID
+        component = "query-scheduler"
+      }
 
       check {
         name     = "Loki query-scheduler"
@@ -573,6 +598,11 @@ job "loki" {
     service {
       name = "loki-query-frontend"
       port = "http"
+
+      meta {
+        alloc_id  = NOMAD_ALLOC_ID
+        component = "query-frontend"
+      }
 
       check {
         name     = "Loki query-frontend"
@@ -683,6 +713,11 @@ job "loki" {
     service {
       name = "loki-index-gateway"
       port = "http"
+
+      meta {
+        alloc_id  = NOMAD_ALLOC_ID
+        component = "index-gateway"
+      }
 
       check {
         name     = "Loki index-gateway"
