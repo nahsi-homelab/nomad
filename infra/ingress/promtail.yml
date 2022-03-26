@@ -15,7 +15,7 @@ scrape_configs:
   - job_name: "traefik"
     static_configs:
     - labels:
-        source: "traefik"
+        source: "ingress"
         __path__: {{ env "NOMAD_ALLOC_DIR" }}/data/access.log
     pipeline_stages:
       - json:
