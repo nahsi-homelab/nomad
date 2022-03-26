@@ -41,7 +41,7 @@ metrics:
     addServiceSLabels: true
 
 accessLog:
-  filePath: "/alloc/data/access.log"
+  filePath: [[ env "NOMAD_ALLOC_DIR" ]]/data/access.log
   format: "json"
 
 [[ with secret "secret/traefik/pilot/traefik" -]]
@@ -53,7 +53,7 @@ providers:
     prefix: "traefik"
     exposedByDefault: false
     endpoint:
-      address: "172.17.0.1:8500"
+      address: [[ env "attr.unique.network.ip-address" ]]:8500
     connectAware: true
     serviceName: "traefik"
 

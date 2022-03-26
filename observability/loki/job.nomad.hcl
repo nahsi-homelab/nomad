@@ -166,13 +166,20 @@ job "loki" {
     }
 
     service {
-      name = "loki-distibutor"
+      name = "loki-distributor"
       port = "http"
 
       meta {
         alloc_id  = NOMAD_ALLOC_ID
         component = "distributor"
       }
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
+        "traefik.http.routers.loki-distributor.entrypoints=https",
+        "traefik.http.routers.loki-distributor.rule=Host(`loki-distributor.service.consul`)",
+      ]
 
       check {
         name     = "Loki distibutor"
