@@ -1,0 +1,98 @@
+auth_enabled: false
+
+common:
+  replication_factor: 3
+  ring:
+    instance_addr: {{ env "NOMAD_IP_grpc" }}
+    zone_awareness_enabled: true
+    instance_availability_zone: {{ env "node.datacenter" }}
+    kvstore:
+      store: "consul"
+      consul:
+        host: {{ env "NOMAD_IP_grpc" }}:8500
+
+server:
+  log_level: "info"
+  http_listen_address: "127.0.0.1"
+  grpc_listen_port: {{ env "NOMAD_PORT_grpc" }}
+  grpc_tls_config:
+    client_auth_type: "RequireAndVerifyClientCert"
+    client_ca_file: "/secrets/certs/CA.pem"
+    cert_file: "/secrets/certs/cert.pem"
+    key_file: "/secrets/certs/key.pem"
+
+ingester_client:
+  grpc_client_config:
+    grpc_compression: "snappy"
+    tls_enabled: true
+    tls_ca_path: "/secrets/certs/CA.pem"
+    tls_cert_path: "/secrets/certs/cert.pem"
+    tls_key_path: "/secrets/certs/key.pem"
+
+ingester:
+  wal:
+    dir: {{ env "NOMAD_ALLOC_DIR" }}/data/wal
+    flush_on_shutdown: true
+    replay_memory_ceiling: "4G"
+
+query_scheduler:
+  grpc_client_config:
+    grpc_compression: "snappy"
+    tls_enabled: true
+    tls_ca_path: "/secrets/certs/CA.pem"
+    tls_cert_path: "/secrets/certs/cert.pem"
+    tls_key_path: "/secrets/certs/key.pem"
+
+frontend:
+  compress_responses: true
+  downstream_url: http://{{ env "NOMAD_UPSTREAM_ADDR_loki_querier" }}
+
+frontend_worker:
+  grpc_client_config:
+    grpc_compression: "snappy"
+    tls_enabled: true
+    tls_ca_path: "/secrets/certs/CA.pem"
+    tls_cert_path: "/secrets/certs/cert.pem"
+    tls_key_path: "/secrets/certs/key.pem"
+
+schema_config:
+  configs:
+    - from: 2022-03-25
+      store: boltdb-shipper
+      object_store: s3
+      schema: v11
+      index:
+        prefix: index_
+        period: 24h
+
+storage_config:
+  boltdb_shipper:
+    active_index_directory: {{ env "NOMAD_ALLOC_DIR" }}/data/index
+    cache_location: {{ env "NOMAD_ALLOC_DIR" }}/data/cache
+    shared_store: s3
+    index_gateway_client:
+      server_address: "loki-index-gateway.service.consul:3101"
+      grpc_client_config:
+        grpc_compression: "snappy"
+        tls_enabled: true
+        tls_ca_path: "/secrets/certs/CA.pem"
+        tls_cert_path: "/secrets/certs/cert.pem"
+        tls_key_path: "/secrets/certs/key.pem"
+
+  aws:
+    endpoint: "https://s3.nahsi.dev"
+    bucketnames: "loki"
+    access_key_id: "${S3_ACCESS_KEY_ID}"
+    secret_access_key: "${S3_SECRET_ACCESS_KEY}"
+    region: homelab
+    s3forcepathstyle: true
+
+compactor:
+  working_directory: {{ env "NOMAD_ALLOC_DIR" }}/data/compactor
+  shared_store: s3
+  compaction_interval: "5m"
+
+limits_config:
+  retention_period: "1461h" # 2 months
+  reject_old_samples: true
+  reject_old_samples_max_age: 168h

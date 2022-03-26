@@ -27,8 +27,8 @@ job "victoria-metrics" {
 
       meta {
         dashboard = "wnf0q_kZk"
-        alloc_id = NOMAD_ALLOC_ID
-        envoy = NOMAD_HOST_PORT_envoy
+        alloc_id  = NOMAD_ALLOC_ID
+        envoy     = NOMAD_HOST_PORT_envoy
       }
 
       tags = [
@@ -134,7 +134,7 @@ job "victoria-metrics" {
 
       meta {
         dashboard = "G7Z29GzMGz"
-        alloc_id = NOMAD_ALLOC_ID
+        alloc_id  = NOMAD_ALLOC_ID
       }
 
       tags = [

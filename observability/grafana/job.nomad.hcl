@@ -13,6 +13,7 @@ job "grafana" {
 
   group "grafana" {
     count = 2
+
     constraint {
       distinct_property = node.datacenter
     }
@@ -61,9 +62,15 @@ job "grafana" {
         sidecar_service {
           proxy {
             local_service_port = 3000
+
             upstreams {
               destination_name = "victoria-metrics"
               local_bind_port  = 8428
+            }
+
+            upstreams {
+              destination_name = "loki-query-frontend"
+              local_bind_port  = 3100
             }
           }
         }

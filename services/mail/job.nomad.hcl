@@ -9,7 +9,8 @@ variables {
     caddy             = "2.4.6"
 
     redis = "6.2"
-  resec = "latest" }
+    resec = "latest"
+  }
 }
 
 job "mail" {
