@@ -26,6 +26,10 @@ job "loki" {
     attribute = node.datacenter
   }
 
+  spread {
+    attribute = node.unique.name
+  }
+
   vault {
     policies = ["loki"]
   }
