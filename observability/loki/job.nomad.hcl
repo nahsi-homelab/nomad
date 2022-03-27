@@ -18,7 +18,6 @@ job "loki" {
   datacenters = [
     "syria",
     "asia",
-    "pontus",
   ]
   namespace = "observability"
 
@@ -697,8 +696,9 @@ job "loki" {
       }
 
       resources {
-        cpu    = 500
-        memory = 256
+        cpu        = 500
+        memory     = 256
+        memory_max = 1024
       }
     }
   }
@@ -820,8 +820,9 @@ job "loki" {
       }
 
       resources {
-        cpu    = 500
-        memory = 256
+        cpu        = 500
+        memory     = 256
+        memory_max = 512
       }
     }
   }
