@@ -1,6 +1,7 @@
 variables {
   versions = {
-    traefik = "2.6.1"
+    traefik  = "2.6.1"
+    promtail = "2.4.2"
   }
 }
 
@@ -60,11 +61,16 @@ job "ingress" {
         to           = 2022
         host_network = "public"
       }
+
+      port "promtail" {
+        to = 3000
+      }
     }
 
     service {
       name = "ingress"
       port = "traefik"
+      task = "traefik"
 
       meta {
         dashboard = "qPdAviJmz"
@@ -82,6 +88,22 @@ job "ingress" {
         port     = "traefik"
         interval = "10s"
         timeout  = "2s"
+      }
+    }
+
+    service {
+      name = "promtail"
+      port = "promtail"
+
+      meta {
+        sidecar_to = "ingress"
+      }
+
+      check {
+        type     = "http"
+        path     = "/ready"
+        interval = "10s"
+        timeout  = "1s"
       }
     }
 
@@ -160,6 +182,61 @@ job "ingress" {
         destination = "secrets/certs/nahsi.dev/key.pem"
         change_mode = "restart"
         splay       = "5m"
+      }
+    }
+
+    task "promtail" {
+      driver = "docker"
+      user   = "nobody"
+
+      lifecycle {
+        hook    = "poststart"
+        sidecar = true
+      }
+
+      vault {
+        policies = ["promtail"]
+      }
+
+      resources {
+        cpu    = 50
+        memory = 32
+      }
+
+      config {
+        image = "grafana/promtail:${var.versions.promtail}"
+
+        args = [
+          "-config.file=local/promtail.yml"
+        ]
+
+        ports = [
+          "promtail",
+        ]
+      }
+
+      template {
+        data        = file("promtail.yml")
+        destination = "local/promtail.yml"
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "pki/issue/internal" "common_name=promtail.service.consul" -}}
+        {{ .Data.issuing_ca }}{{ end }}
+        EOH
+
+        destination = "secrets/certs/CA.pem"
+        change_mode = "restart"
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "secret/promtail/loki" -}}
+        {{ .Data.data.username }}:{{ .Data.data.password }}{{ end }}
+        EOH
+
+        destination = "secrets/auth"
       }
     }
   }

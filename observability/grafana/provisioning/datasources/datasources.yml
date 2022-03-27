@@ -9,3 +9,10 @@ datasources:
     jsonData:
       timeInterval: "10s"
       manageAlerts: false
+
+  - name: "Loki"
+    type: "loki"
+    url: "http://127.0.0.1:3100"
+    basicAuth: false
+    jsonData:
+      maxLines: 1000

@@ -1,6 +1,7 @@
 variables {
   versions = {
-    traefik = "2.6.1"
+    traefik  = "2.6.1"
+    promtail = "2.4.2"
   }
 }
 
@@ -10,6 +11,7 @@ job "traefik" {
     "asia",
     "pontus",
   ]
+
   namespace = "infra"
   type      = "system"
 
@@ -34,11 +36,16 @@ job "traefik" {
         static = 443
         to     = 443
       }
+
+      port "promtail" {
+        to = 3000
+      }
     }
 
     service {
       name = "traefik"
       port = "traefik"
+      task = "traefik"
 
       meta {
         dashboard = "qPdAviJmz"
@@ -63,6 +70,22 @@ job "traefik" {
         port     = "traefik"
         interval = "10s"
         timeout  = "2s"
+      }
+    }
+
+    service {
+      name = "promtail"
+      port = "promtail"
+
+      meta {
+        sidecar_to = "traefik"
+      }
+
+      check {
+        type     = "http"
+        path     = "/ready"
+        interval = "10s"
+        timeout  = "1s"
       }
     }
 
@@ -138,6 +161,61 @@ job "traefik" {
         change_mode = "restart"
         destination = "secrets/certs/internal/key.pem"
         splay       = "5m"
+      }
+    }
+
+    task "promtail" {
+      driver = "docker"
+      user   = "nobody"
+
+      lifecycle {
+        hook    = "poststart"
+        sidecar = true
+      }
+
+      vault {
+        policies = ["promtail"]
+      }
+
+      resources {
+        cpu    = 50
+        memory = 32
+      }
+
+      config {
+        image = "grafana/promtail:${var.versions.promtail}"
+
+        args = [
+          "-config.file=local/promtail.yml"
+        ]
+
+        ports = [
+          "promtail",
+        ]
+      }
+
+      template {
+        data        = file("promtail.yml")
+        destination = "local/promtail.yml"
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "pki/issue/internal" "common_name=promtail.service.consul" -}}
+        {{ .Data.issuing_ca }}{{ end }}
+        EOH
+
+        destination = "secrets/certs/CA.pem"
+        change_mode = "restart"
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "secret/promtail/loki" -}}
+        {{ .Data.data.username }}:{{ .Data.data.password }}{{ end }}
+        EOH
+
+        destination = "secrets/auth"
       }
     }
   }

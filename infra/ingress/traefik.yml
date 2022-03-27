@@ -93,7 +93,7 @@ providers:
     prefix: "ingress"
     exposedByDefault: false
     endpoint:
-      address: "172.17.0.1:8500"
+      address: [[ env "attr.unique.network.ip-address" ]]:8500
     connectAware: true
     serviceName: "ingress"
 
