@@ -461,6 +461,19 @@ job "loki" {
         destination = "local/loki.yml"
       }
 
+      template {
+        data = <<-EOH
+        {{ with secret "secret/minio/loki" }}
+        S3_ACCESS_KEY_ID={{ .Data.data.access_key }}
+        S3_SECRET_ACCESS_KEY={{ .Data.data.secret_key }}
+        {{- end }}
+        EOH
+
+        destination = "secrets/s3.env"
+        splay       = "1m"
+        env         = true
+      }
+
       dynamic "template" {
         for_each = local.certs
         content {
@@ -590,13 +603,6 @@ job "loki" {
     network {
       mode = "bridge"
 
-      dns {
-        servers = [
-          "192.168.130.1",
-          "192.168.230.1",
-        ]
-      }
-
       port "http" {}
       port "health" {}
       port "grpc" {}
@@ -627,7 +633,7 @@ job "loki" {
 
             upstreams {
               destination_name = "loki-querier"
-              local_bind_port  = 3100
+              local_bind_port  = 9095
             }
 
             expose {
@@ -698,7 +704,7 @@ job "loki" {
   }
 
   group "index-gateway" {
-    count = 2
+    count = 1
 
     ephemeral_disk {
       size    = 1000
@@ -712,8 +718,8 @@ job "loki" {
       port "http" {}
       port "health" {}
       port "grpc" {
-        to     = 3101
-        static = 3101
+        to     = 9095
+        static = 9095
       }
     }
 
@@ -777,7 +783,6 @@ job "loki" {
           "-config.file=/local/loki.yml",
           "-config.expand-env=true",
           "-target=index-gateway",
-          "-server.grpc-listen-port=${NOMAD_PORT_grpc}",
         ]
       }
 
@@ -803,7 +808,7 @@ job "loki" {
         for_each = local.certs
         content {
           data = <<-EOH
-          {{- with secret "pki/issue/internal" "ttl=10d" "common_name=loki-index-gateway.service.consul" (env "attr.unique.network.ip-address" | printf  "ip_sans=%s") -}}
+          {{- with secret "pki/issue/internal" "ttl=10d" "common_name=loki-index-gateway.service.consul" (env "attr.unique.network.ip-address" | printf "ip_sans=%s") -}}
           {{ .Data.${template.value} }}
           {{- end -}}
           EOH

@@ -46,6 +46,12 @@ query_scheduler:
 frontend:
   compress_responses: true
   downstream_url: http://{{ env "NOMAD_UPSTREAM_ADDR_loki_querier" }}
+  grpc_client_config:
+    grpc_compression: "snappy"
+    tls_enabled: true
+    tls_ca_path: "/secrets/certs/CA.pem"
+    tls_cert_path: "/secrets/certs/cert.pem"
+    tls_key_path: "/secrets/certs/key.pem"
 
 frontend_worker:
   grpc_client_config:
@@ -71,7 +77,7 @@ storage_config:
     cache_location: {{ env "NOMAD_ALLOC_DIR" }}/data/cache
     shared_store: s3
     index_gateway_client:
-      server_address: "loki-index-gateway.service.consul:3101"
+      server_address: "loki-index-gateway.service.consul:9095"
       grpc_client_config:
         grpc_compression: "snappy"
         tls_enabled: true
