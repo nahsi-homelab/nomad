@@ -178,6 +178,8 @@ job "loki" {
         "traefik.consulcatalog.connect=true",
         "traefik.http.routers.loki-distributor.entrypoints=https",
         "traefik.http.routers.loki-distributor.rule=Host(`loki-distributor.service.consul`)",
+        "traefik.http.middlewares.loki-distributor.basicauth.users=promtail:$$apr1$$wnir40yf$$vcxJYiqcEQLknQAZcpy/I1",
+        "traefik.http.routers.loki-distirbutor.middlewares=loki-distributor@consulcatalog",
       ]
 
       check {

@@ -6,16 +6,20 @@ positions:
   filename: {{ env "NOMAD_ALLOC_DIR" }}/data/positions.yml
 
 client:
-  url: https://loki-distributor.service.consul/loki/api/v1/push
+  url: "https://loki-distributor.service.consul/loki/api/v1/push"
+
+  basic_auth:
+    password_file: "/secrets/auth"
 
   tls_config:
-    insecure_skip_verify: true
+    ca_file: "/secrets/certs/CA.pem"
 
 scrape_configs:
   - job_name: "traefik"
     static_configs:
     - labels:
         source: "ingress"
+        host: {{ env "node.unique.name" }}
         __path__: {{ env "NOMAD_ALLOC_DIR" }}/data/access.log
     pipeline_stages:
       - json:

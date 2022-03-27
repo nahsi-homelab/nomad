@@ -173,6 +173,10 @@ job "traefik" {
         sidecar = true
       }
 
+      vault {
+        policies = ["promtail"]
+      }
+
       resources {
         cpu    = 50
         memory = 32
@@ -193,6 +197,25 @@ job "traefik" {
       template {
         data        = file("promtail.yml")
         destination = "local/promtail.yml"
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "pki/issue/internal" "common_name=promtail.service.consul" -}}
+        {{ .Data.issuing_ca }}{{ end }}
+        EOH
+
+        destination = "secrets/certs/CA.pem"
+        change_mode = "restart"
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "secret/promtail/loki" -}}
+        {{ .Data.data.username }}:{{ .Data.data.password }}{{ end }}
+        EOH
+
+        destination = "secrets/auth"
       }
     }
   }
