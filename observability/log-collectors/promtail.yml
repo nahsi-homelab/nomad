@@ -57,6 +57,23 @@ scrape_configs:
       - static_labels:
           filtered: "true"
 
+  - match: # loki
+      selector: '{job="loki",task!~"connect-.*"}'
+      pipeline_name: "loki"
+      stages:
+      - json:
+          expressions:
+            message:
+      - output:
+          source: message
+      - regex:
+          expression: '^.* ts=(?P<time>\S+).*$'
+      - timestamp:
+          source: time
+          format: "RFC3339Nano"
+      - static_labels:
+          filtered: "true"
+
   - match: # promtail
       selector: '{task="promtail"}'
       pipeline_name: "promtail"
