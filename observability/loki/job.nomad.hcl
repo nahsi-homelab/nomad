@@ -18,6 +18,7 @@ job "loki" {
   datacenters = [
     "syria",
     "asia",
+    "pontus",
   ]
   namespace = "observability"
 
@@ -266,6 +267,10 @@ job "loki" {
   group "ingester" {
     count = 3
 
+    constraint {
+      distinct_property = node.datacenter
+    }
+
     ephemeral_disk {
       size    = 4100
       migrate = true
@@ -286,7 +291,7 @@ job "loki" {
 
       meta {
         alloc_id  = NOMAD_ALLOC_ID
-        component = "ingestor"
+        component = "ingester"
       }
 
       check {

@@ -30,6 +30,7 @@ ingester_client:
     tls_key_path: "/secrets/certs/key.pem"
 
 ingester:
+  autoforget_unhealthy: true
   wal:
     dir: {{ env "NOMAD_ALLOC_DIR" }}/data/wal
     flush_on_shutdown: true
