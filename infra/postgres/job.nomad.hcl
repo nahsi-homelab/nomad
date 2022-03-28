@@ -1,7 +1,7 @@
 variables {
   versions = {
     patroni  = "14-2.1.2"
-    exporter = "0.10.0"
+    exporter = "0.10.1"
   }
 }
 
@@ -321,8 +321,12 @@ job "postgres" {
       config {
         image = "quay.io/prometheuscommunity/postgres-exporter:v${var.versions.exporter}"
 
+        args = [
+          "--log.level=info",
+        ]
+
         ports = [
-          "exporter"
+          "exporter",
         ]
       }
 
