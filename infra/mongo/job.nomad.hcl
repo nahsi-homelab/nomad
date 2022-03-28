@@ -253,7 +253,7 @@ job "mongo" {
 
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "common_name=mongo-exporter.service.consul" -}}
+        {{- with secret "pki/issue/internal" "ttl=90d" "common_name=mongo-exporter.service.consul" -}}
         {{ .Data.private_key }}
         {{ .Data.certificate }}{{ end }}
         EOH
