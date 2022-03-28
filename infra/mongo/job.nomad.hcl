@@ -71,6 +71,7 @@ job "mongo" {
 
         args = [
           "--bind_ip=0.0.0.0",
+          "--quiet",
           "--replSet=main",
           "--clusterAuthMode=x509",
           "--tlsMode=preferTLS",
@@ -154,6 +155,7 @@ job "mongo" {
 
         args = [
           "--bind_ip=0.0.0.0",
+          "--quiet",
           "--replSet=main",
           "--clusterAuthMode=x509",
           "--tlsMode=preferTLS",
