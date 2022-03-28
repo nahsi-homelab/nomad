@@ -150,7 +150,7 @@ job "mail" {
       # CA
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=30d" "common_name=*.service.consul" -}}
+        {{- with secret "pki/issue/internal" "ttl=90d" "common_name=*.service.consul" -}}
         {{ .Data.issuing_ca }}{{ end }}
         EOH
 
@@ -162,7 +162,7 @@ job "mail" {
       # bundle
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=30d" "common_name=wildduck.service.consul" -}}
+        {{- with secret "pki/issue/internal" "ttl=90d" "common_name=wildduck.service.consul" -}}
         {{ .Data.private_key }}
         {{ .Data.certificate }}{{ end }}
         EOH
@@ -253,7 +253,7 @@ job "mail" {
       # CA
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=30d" "common_name=*.service.consul" -}}
+        {{- with secret "pki/issue/internal" "ttl=90d" "common_name=*.service.consul" -}}
         {{ .Data.issuing_ca }}{{ end }}
         EOH
 
@@ -265,7 +265,7 @@ job "mail" {
       # bundle
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=30d" "common_name=ducky.service.consul" -}}
+        {{- with secret "pki/issue/internal" "ttl=90d" "common_name=ducky.service.consul" -}}
         {{ .Data.private_key }}
         {{ .Data.certificate }}{{ end }}
         EOH
@@ -476,7 +476,7 @@ job "mail" {
       # CA
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=30d" "common_name=*.service.consul" -}}
+        {{- with secret "pki/issue/internal" "ttl=90d" "common_name=*.service.consul" -}}
         {{ .Data.issuing_ca }}{{ end }}
         EOH
 
@@ -488,7 +488,7 @@ job "mail" {
       # bundle
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=30d" "common_name=haraka.service.consul" -}}
+        {{- with secret "pki/issue/internal" "ttl=90d" "common_name=haraka.service.consul" -}}
         {{ .Data.private_key }}
         {{ .Data.certificate }}{{ end }}
         EOH
@@ -635,7 +635,7 @@ job "mail" {
       # CA
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=30d" "common_name=*.service.consul" -}}
+        {{- with secret "pki/issue/internal" "ttl=90d" "common_name=*.service.consul" -}}
         {{ .Data.issuing_ca }}{{ end }}
         EOH
 
@@ -647,7 +647,7 @@ job "mail" {
       # bundle
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=30d" "common_name=zone-mta.service.consul" -}}
+        {{- with secret "pki/issue/internal" "ttl=90d" "common_name=zone-mta.service.consul" -}}
         {{ .Data.private_key }}
         {{ .Data.certificate }}{{ end }}
         EOH
@@ -723,7 +723,7 @@ job "mail" {
       # CA
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=30d" "common_name=*.service.consul" -}}
+        {{- with secret "pki/issue/internal" "ttl=90d" "common_name=*.service.consul" -}}
         {{ .Data.issuing_ca }}{{ end }}
         EOH
 
@@ -735,7 +735,7 @@ job "mail" {
       # bundle
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=30d" "common_name=zone-mta-webadmin.service.consul" -}}
+        {{- with secret "pki/issue/internal" "ttl=90d" "common_name=zone-mta-webadmin.service.consul" -}}
         {{ .Data.private_key }}
         {{ .Data.certificate }}{{ end }}
         EOH
