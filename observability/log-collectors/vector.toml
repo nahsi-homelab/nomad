@@ -1,0 +1,22 @@
+data_dir = '[[ env "NOMAD_ALLOC_DIR" ]]/vector'
+
+[api]
+  enabled = true
+  address = '0.0.0.0:[[ env "NOMAD_PORT_vector" ]]'
+  playground = true
+
+[sources.logs]
+  type = "docker_logs"
+
+[sinks.loki]
+  type = "loki"
+  inputs = ["logs"]
+  endpoint = 'http://127.0.0.1:[[ env "NOMAD_PORT_loki" ]]/'
+  encoding.codec = "json"
+  healthcheck.enabled = false
+  labels.namespace = "{{ label.com\\.hashicorp\\.nomad\\.namespace }}"
+  labels.job = "{{ label.com\\.hashicorp\\.nomad\\.job_name }}"
+  labels.group = "{{ label.com\\.hashicorp\\.nomad\\.task_group_name }}"
+  labels.task = "{{ label.com\\.hashicorp\\.nomad\\.task_name }}"
+  labels.alloc_id = "{{ label.com\\.hashicorp\\.nomad\\.alloc_id }}"
+  remove_label_fields = true

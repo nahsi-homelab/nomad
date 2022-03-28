@@ -1,0 +1,122 @@
+server:
+  http_listen_port: [[ env "NOMAD_PORT_promtail" ]]
+  grpc_listen_port: 0
+
+positions:
+  filename: '[[ env "NOMAD_ALLOC_DIR" ]]/positions.yml'
+
+clients:
+  - url: "https://loki-distributor.service.consul/loki/api/v1/push"
+    basic_auth:
+      password_file: "/secrets/auth"
+    tls_config:
+      ca_file: "/secrets/certs/CA.pem"
+
+scrape_configs:
+- job_name: "nomad"
+  loki_push_api:
+    server:
+      http_listen_address: "0.0.0.0"
+      http_listen_port: [[ env "NOMAD_PORT_loki" ]]
+      log_format: "json"
+    labels:
+      source: "nomad"
+
+  pipeline_stages:
+  - match: # traefik
+      selector: '{job=~"traefik|ingress",group="traefik",task="traefik"}'
+      pipeline_name: "traefik"
+      stages:
+      - json:
+          expressions:
+            message:
+      - output:
+          source: message
+      - regex:
+          expression: '^time="(?P<time>.*)" level=(?P<level>.*) .*'
+      - timestamp:
+          source: time
+          format: "RFC3339"
+      - static_labels:
+          filtered: "true"
+
+  - match: # grafana
+      selector: '{job="grafana",group="grafana",task="grafana"}'
+      pipeline_name: "grafana"
+      stages:
+      - json:
+          expressions:
+            message:
+      - output:
+          source: message
+      - regex:
+          expression: '^t=(?P<time>\S+) lvl=(?P<level>\S+).*$'
+      - timestamp:
+          source: time
+          format: "2006-01-02T15:04:05-0700"
+      - static_labels:
+          filtered: "true"
+
+  - match: # promtail
+      selector: '{task="promtail"}'
+      pipeline_name: "promtail"
+      stages:
+      - json:
+          expressions:
+            message:
+      - output:
+          source: message
+      - regex:
+          expression: '^level=(?P<level>\S+) ts=(?P<time>\S+).*$'
+      - timestamp:
+          source: time
+          format: "RFC3339Nano"
+      - static_labels:
+          filtered: "true"
+
+  - match: # victoria-metrics
+      selector: '{job="victoria-metrics"}'
+      pipeline_name: "victoria-metrics"
+      stages:
+      - json:
+          expressions:
+            message:
+      - output:
+          source: message
+      - regex:
+          expression: '^(?P<time>\S+)\s+(?P<level>\S+)\s+(?P<function>\S+)\s+(?P<msg>.*)$'
+      - timestamp:
+          source: time
+          format: "RFC3339Nano"
+      - static_labels:
+          filtered: "true"
+
+  - match: # patroni
+      selector: '{job="postgres",task="patroni"}'
+      pipeline_name: "patroni"
+      stages:
+      - json:
+          expressions:
+            message:
+      - output:
+          source: message
+      - multiline:
+          firstline: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
+      - regex:
+          expression: '^(?P<time>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\,\d{3}).*'
+      - timestamp:
+          source: time
+          format: "2006-01-02 15:04:05,999"
+      - drop:
+          expression: ".*INFO: no action.*"
+          drop_counter_reason: "noise-filter"
+      - static_labels:
+          filtered: "true"
+
+  - match: # drop
+      selector: '{filtered!="true"}'
+      action: drop
+      drop_counter_reason: "nomad-filter"
+
+  - labeldrop:
+      - filtered
