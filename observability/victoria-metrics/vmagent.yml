@@ -177,7 +177,7 @@ scrape_configs:
         services:
           - "mongo-exporter"
     relabel_configs:
-      - source_labels: ["__meta_consul_service_metadata_alloc_id"]
+      - source_labels: ["__meta_consul_service"]
         target_label: "instance"
 
   - job_name: "minio-job"
