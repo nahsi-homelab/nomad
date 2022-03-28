@@ -148,8 +148,9 @@ job "loki" {
       }
 
       resources {
-        cpu    = 500
-        memory = 256
+        cpu        = 200
+        memory     = 256
+        memory_max = 1024
       }
     }
   }
@@ -258,8 +259,9 @@ job "loki" {
       }
 
       resources {
-        cpu    = 500
-        memory = 256
+        cpu        = 200
+        memory     = 128
+        memory_max = 1024
       }
     }
   }
@@ -382,8 +384,9 @@ job "loki" {
       }
 
       resources {
-        cpu    = 500
-        memory = 256
+        cpu        = 300
+        memory     = 128
+        memory_max = 1024
       }
     }
   }
@@ -496,8 +499,9 @@ job "loki" {
       }
 
       resources {
-        cpu    = 500
-        memory = 256
+        cpu        = 200
+        memory     = 128
+        memory_max = 1024
       }
     }
   }
@@ -597,8 +601,9 @@ job "loki" {
       }
 
       resources {
-        cpu    = 500
-        memory = 256
+        cpu        = 100
+        memory     = 64
+        memory_max = 128
       }
     }
   }
@@ -703,9 +708,9 @@ job "loki" {
       }
 
       resources {
-        cpu        = 500
-        memory     = 256
-        memory_max = 1024
+        cpu        = 100
+        memory     = 64
+        memory_max = 128
       }
     }
   }
@@ -827,9 +832,9 @@ job "loki" {
       }
 
       resources {
-        cpu        = 500
-        memory     = 256
-        memory_max = 512
+        cpu        = 200
+        memory     = 128
+        memory_max = 1024
       }
     }
   }

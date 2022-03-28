@@ -49,14 +49,6 @@ query_range:
   align_queries_with_step: true
   max_retries: 5
   split_queries_by_interval: "15m"
-  cache_results: true
-
-  results_cache:
-    cache:
-      enable_fifocache: true
-      fifocache:
-        size: 512
-        validity: "24h"
 
 frontend:
   compress_responses: true

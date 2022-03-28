@@ -82,7 +82,7 @@ job "log-collectors" {
 
       resources {
         cpu    = 100
-        memory = 32
+        memory = 64
       }
 
       config {
