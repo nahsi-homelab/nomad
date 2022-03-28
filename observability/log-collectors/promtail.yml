@@ -75,7 +75,7 @@ scrape_configs:
           filtered: "true"
 
   - match: # victoria-metrics
-      selector: '{job="victoria-metrics"}'
+      selector: '{job="victoria-metrics",task=~"victoria-metrics|vmagent"}'
       pipeline_name: "victoria-metrics"
       stages:
       - json:
@@ -91,9 +91,9 @@ scrape_configs:
       - static_labels:
           filtered: "true"
 
-  - match: # patroni
+  - match: # postgres
       selector: '{job="postgres",task="patroni"}'
-      pipeline_name: "patroni"
+      pipeline_name: "postgres"
       stages:
       - json:
           expressions:
@@ -110,6 +110,158 @@ scrape_configs:
       - drop:
           expression: ".*INFO: no action.*"
           drop_counter_reason: "noise-filter"
+      - static_labels:
+          filtered: "true"
+
+  - match: # postgres-exporter
+      selector: '{task="postgres-exporter"}'
+      pipeline_name: "postgres-exporter"
+      stages:
+      - json:
+          expressions:
+            message:
+      - output:
+          source: message
+      - regex:
+          expression: '^ts=(?P<time>\S+).*$'
+      - timestamp:
+          source: time
+          format: "RFC3339Nano"
+      - static_labels:
+          filtered: "true"
+
+  - match: # mariadb
+      selector: '{job="mariadb",task="mariadb"}'
+      pipeline_name: "mariadb"
+      stages:
+      - json:
+          expressions:
+            message:
+      - output:
+          source: message
+      - multiline:
+          firstline: '^\d{4}-\d{2}-\d{2}  \d{2}:\d{2}:\d{2}'
+      - regex:
+          expression: '^(?P<time>\d{4}-\d{2}-\d{2}  \d{2}:\d{2}:\d{2}).*'
+      - timestamp:
+          source: time
+          format: "2006-01-02  15:04:05"
+      - drop:
+          source: "stream"
+          value: "stdout"
+          drop_counter_reason: "noise-filter"
+      - static_labels:
+          filtered: "true"
+
+  - match: # minio
+      selector: '{job="minio",task="minio"}'
+      pipeline_name: "minio"
+      stages:
+      - json:
+          expressions:
+            message:
+      - output:
+          source: message
+      - multiline:
+          firstline: '^\S+'
+      - static_labels:
+          filtered: "true"
+
+  - match: # redis
+      selector: '{task="redis"}'
+      pipeline_name: "redis"
+      stages:
+      - json:
+          expressions:
+            message:
+      - output:
+          source: message
+      - regex:
+          expression: '^.* (?P<time>\d{2} \w{3} \d{4} \d{2}:\d{2}:\d{2}\.\d{3}).*'
+      - timestamp:
+          source: time
+          format: "02 Jan 2006 15:04:05.999"
+      - static_labels:
+          filtered: "true"
+
+  - match: # resec
+      selector: '{task="resec"}'
+      pipeline_name: "resec"
+      stages:
+      - json:
+          expressions:
+            message:
+      - output:
+          source: message
+      - regex:
+          expression: '^time="(?P<time>.*)" level=(?P<level>.*) .*'
+      - timestamp:
+          source: time
+          format: "RFC3339"
+      - static_labels:
+          filtered: "true"
+
+  - match: # wildduck
+      selector: '{job="mail",task="wildduck"}'
+      pipeline_name: "mail"
+      stages:
+      - json:
+          expressions:
+            message:
+      - output:
+          source: message
+      - static_labels:
+          filtered: "true"
+
+  - match: # zone-mta
+      selector: '{job="mail",task="zone-mta"}'
+      pipeline_name: "mail"
+      stages:
+      - json:
+          expressions:
+            message:
+      - output:
+          source: message
+      - static_labels:
+          filtered: "true"
+
+  - match: # haraka
+      selector: '{job="mail",task="haraka"}'
+      pipeline_name: "mail"
+      stages:
+      - json:
+          expressions:
+            message:
+      - drop:
+          source: "stream"
+          value: "stderr"
+          drop_counter_reason: "noise-filter"
+      - output:
+          source: message
+      - multiline:
+          firstline: '^\S+'
+      - regex:
+          expression: '^(?P<time>\S+) .*'
+      - timestamp:
+          source: time
+          format: "RFC3339Nano"
+      - static_labels:
+          filtered: "true"
+
+  - match: # vultr-csi
+      selector: '{job=~"vultr-csi-.*"}'
+      pipeline_name: "vultr-csi"
+      stages:
+      - json:
+          expressions:
+            message:
+      - output:
+          source: message
+      - regex:
+          expression: '^time="(?P<time>.*)" level=(?P<level>.*) .*'
+      - timestamp:
+          source: time
+          format: "RFC3339"
       - static_labels:
           filtered: "true"
 
