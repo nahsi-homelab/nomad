@@ -4,7 +4,7 @@ global:
 scrape_configs:
   - job_name: "envoy"
     consul_sd_configs:
-      - server: "http://172.26.64.1:8500"
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
     relabel_configs:
       - source_labels: ["job"]
         target_label: "instance"
@@ -38,7 +38,7 @@ scrape_configs:
   - job_name: "vmagent"
     metrics_path: "/metrics"
     consul_sd_configs:
-      - server: "http://172.26.64.1:8500"
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
         services:
           - "vmagent"
     relabel_configs:
@@ -51,7 +51,7 @@ scrape_configs:
 
   - job_name: "victoria-metrics"
     consul_sd_configs:
-      - server: "http://172.26.64.1:8500"
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
         services:
           - "victoria-metrics"
     relabel_configs:
@@ -60,7 +60,7 @@ scrape_configs:
 
   - job_name: "loki"
     consul_sd_configs:
-      - server: "http://172.26.64.1:8500"
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
         services:
           - "loki-compactor"
           - "loki-distributor"
@@ -80,7 +80,7 @@ scrape_configs:
     params:
       format: ["prometheus"]
     consul_sd_configs:
-      - server: "http://172.26.64.1:8500"
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
         services:
           - "consul-api"
     relabel_configs:
@@ -94,7 +94,7 @@ scrape_configs:
     params:
       format: ["prometheus"]
     consul_sd_configs:
-      - server: "http://172.26.64.1:8500"
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
         services:
           - "nomad-api"
     relabel_configs:
@@ -116,7 +116,7 @@ scrape_configs:
 
   - job_name: "telegraf-exporter"
     consul_sd_configs:
-      - server: "http://172.26.64.1:8500"
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
         services:
           - "telegraf-exporter"
     relabel_configs:
@@ -125,7 +125,7 @@ scrape_configs:
 
   - job_name: "traefik"
     consul_sd_configs:
-      - server: "http://172.26.64.1:8500"
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
         services:
           - "traefik"
     relabel_configs:
@@ -134,7 +134,7 @@ scrape_configs:
 
   - job_name: "ingress"
     consul_sd_configs:
-      - server: "http://172.26.64.1:8500"
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
         services:
           - "ingress"
     relabel_configs:
@@ -143,7 +143,7 @@ scrape_configs:
 
   - job_name: "grafana"
     consul_sd_configs:
-      - server: "http://172.26.64.1:8500"
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
         services:
           - "grafana"
     relabel_configs:
@@ -152,7 +152,7 @@ scrape_configs:
 
   - job_name: "postgres-exporter"
     consul_sd_configs:
-      - server: "http://172.26.64.1:8500"
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
         services:
           - "postgres-exporter"
     relabel_configs:
@@ -164,7 +164,7 @@ scrape_configs:
     tls_config:
       ca_file: "/secrets/certs/CA.pem"
     consul_sd_configs:
-      - server: "http://172.26.64.1:8500"
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
         services:
           - "patroni"
     relabel_configs:
@@ -173,7 +173,7 @@ scrape_configs:
 
   - job_name: "mongo-exporter"
     consul_sd_configs:
-      - server: "http://172.26.64.1:8500"
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
         services:
           - "mongo-exporter"
     relabel_configs:
@@ -193,7 +193,7 @@ scrape_configs:
 
   - job_name: "network-exporter"
     consul_sd_configs:
-      - server: "http://172.26.64.1:8500"
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
         services:
           - "network-exporter"
     relabel_configs:
@@ -202,7 +202,7 @@ scrape_configs:
 
   - job_name: "mariadb-exporter"
     consul_sd_configs:
-      - server: "http://172.26.64.1:8500"
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
         services:
           - "mariadb-exporter"
     relabel_configs:
@@ -211,7 +211,7 @@ scrape_configs:
 
   - job_name: "sftpgo"
     consul_sd_configs:
-      - server: "http://172.26.64.1:8500"
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
         services:
           - "sftpgo-metrics"
     relabel_configs:
