@@ -265,20 +265,26 @@ scrape_configs:
       - static_labels:
           filtered: "true"
 
-  - match: # vultr-csi
-      selector: '{job=~"vultr-csi-.*"}'
-      pipeline_name: "vultr-csi"
+  - match: # sftpgo
+      selector: '{job="sftpgo"}'
+      pipeline_name: "sftpgo"
       stages:
       - json:
           expressions:
             message:
       - output:
           source: message
-      - regex:
-          expression: '^time="(?P<time>.*)" level=(?P<level>.*) .*'
+      - json:
+          expressions:
+            time:
+            user_agent:
+      - drop:
+          source: "user_agent"
+          value: "Consul Health Check"
+          drop_counter_reason: "noise-filter"
       - timestamp:
           source: time
-          format: "RFC3339"
+          format: "RFC3339Nano"
       - static_labels:
           filtered: "true"
 
