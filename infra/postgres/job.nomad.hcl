@@ -65,8 +65,9 @@ job "postgres" {
       }
 
       resources {
-        cpu    = 300
-        memory = 512
+        cpu        = 100
+        memory     = 256
+        memory_max = 512
       }
 
       volume_mount {
