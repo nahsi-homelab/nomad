@@ -143,6 +143,8 @@ job "unifi" {
         UP_UNIFI_CONTROLLER_1_URL        = "https://unifi-asia.service.consul:8443"
         UP_UNIFI_CONTROLLER_1_SAVE_SITES = false
         UP_UNIFI_CONTROLLER_1_SITE_1     = "asia"
+
+        UP_INFLUXDB_DISABLE = true
       }
 
       config {
