@@ -1,6 +1,6 @@
 variables {
   versions = {
-    controller = "6.2.26"
+    controller = "7.0.25"
   }
 
   dc = [
