@@ -2,6 +2,10 @@ common:
   temp_path: {{ env "NOMAD_ALLOC_DIR" }}
   proxy_protocol: 1
 
+defender:
+  enabled: true
+  driver: "provider"
+
 data_provider:
   driver: "postgresql"
   name: "sftpgo"
