@@ -22,13 +22,13 @@ jobs:
       jobs: "${{ steps.jobs.outputs.matrix }}"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 2
 
       - name: "Get changed files"
         id: files
-        uses: tj-actions/changed-files@v13
+        uses: tj-actions/changed-files@v18
         with:
           files: |
             ${{ inputs.namespace }}
