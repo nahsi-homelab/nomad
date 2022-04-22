@@ -4,12 +4,10 @@ common:
   replication_factor: 3
   ring:
     instance_addr: {{ env "NOMAD_IP_grpc" }}
-    zone_awareness_enabled: true
-    instance_availability_zone: {{ env "node.datacenter" }}
     kvstore:
       store: "consul"
       consul:
-        host: {{ env "NOMAD_IP_grpc" }}:8500
+        host: {{ env "attr.unique.network.ip-address" }}:8500
 
 server:
   log_level: "info"
@@ -48,7 +46,6 @@ query_scheduler:
 query_range:
   align_queries_with_step: true
   max_retries: 5
-  split_queries_by_interval: "15m"
 
 frontend:
   compress_responses: true
@@ -104,7 +101,7 @@ storage_config:
 compactor:
   working_directory: {{ env "NOMAD_ALLOC_DIR" }}/data/compactor
   shared_store: s3
-  compaction_interval: "5m"
+  compaction_interval: "30m"
 
 limits_config:
   retention_period: "1461h" # 2 months

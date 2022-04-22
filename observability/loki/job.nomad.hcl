@@ -1,8 +1,6 @@
 variables {
   versions = {
-    loki  = "2.4.2"
-    redis = "6.2"
-    resec = "latest"
+    loki = "2.5.0"
   }
 }
 
@@ -17,14 +15,8 @@ locals {
 job "loki" {
   datacenters = [
     "syria",
-    "asia",
-    "pontus",
   ]
   namespace = "observability"
-
-  spread {
-    attribute = node.datacenter
-  }
 
   spread {
     attribute = node.unique.name
@@ -148,7 +140,7 @@ job "loki" {
       }
 
       resources {
-        cpu        = 3700
+        cpu        = 5000
         memory     = 256
         memory_max = 1024
       }
@@ -267,10 +259,10 @@ job "loki" {
   }
 
   group "ingester" {
-    count = 3
+    count = 2
 
     constraint {
-      distinct_property = node.datacenter
+      distinct_property = node.unique.name
     }
 
     ephemeral_disk {
