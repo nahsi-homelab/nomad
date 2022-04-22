@@ -30,7 +30,9 @@ jobs:
         id: files
         uses: tj-actions/changed-files@v13
         with:
-          files: "${{ inputs.namespace }}"
+          files: |
+            ${{ inputs.namespace }}
+            ! ./archive/**
 
       - name: "Create matrix"
         if: steps.files.outputs.any_changed == 'true'
