@@ -32,7 +32,7 @@ jobs:
         with:
           files: |
             ${{ inputs.namespace }}
-          files-ignore:
+          files_ignore:
             archive/**
 
       - name: "Create matrix"

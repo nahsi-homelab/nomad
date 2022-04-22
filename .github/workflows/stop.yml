@@ -26,7 +26,7 @@ jobs:
         with:
           files: |
             **/job.nomad.hcl
-          files-ignore:
+          files_ignore:
             archive/**
 
       - name: "Create matrix"
