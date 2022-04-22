@@ -26,7 +26,7 @@ jobs:
         with:
           files: |
             **/job.nomad.hcl
-            ! ./archive/**
+            !archive
 
       - name: "Create matrix"
         if: steps.files.outputs.any_deleted == 'true'
