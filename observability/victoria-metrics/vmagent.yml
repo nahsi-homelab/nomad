@@ -167,15 +167,6 @@ scrape_configs:
       - source_labels: ["__meta_consul_service_metadata_dc"]
         target_label: "instance"
 
-  - job_name: "mariadb-exporter"
-    consul_sd_configs:
-      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
-        services:
-          - "mariadb-exporter"
-    relabel_configs:
-      - source_labels: ["__meta_consul_service"]
-        target_label: "instance"
-
   - job_name: "sftpgo"
     consul_sd_configs:
       - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
