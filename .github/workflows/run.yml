@@ -32,7 +32,8 @@ jobs:
         with:
           files: |
             ${{ inputs.namespace }}
-            !archive
+          files-ignore:
+            archive/**
 
       - name: "Create matrix"
         if: steps.files.outputs.any_changed == 'true'
