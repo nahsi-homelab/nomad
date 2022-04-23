@@ -16,14 +16,8 @@ variables {
 job "mail" {
   datacenters = [
     "syria",
-    "asia"
   ]
   namespace = "services"
-
-  spread {
-    attribute = "${node.datacenter}"
-    weight    = 100
-  }
 
   group "wildduck" {
     ephemeral_disk {
@@ -31,7 +25,7 @@ job "mail" {
       migrate = true
     }
 
-    count = 2
+    count = 1
     update {
       max_parallel = 1
       stagger      = "1m"
@@ -223,7 +217,7 @@ job "mail" {
       }
 
       lifecycle {
-        hook = "poststart"
+        hook    = "poststart"
         sidecar = true
       }
 
@@ -278,7 +272,7 @@ job "mail" {
   }
 
   group "webmail" {
-    count = 2
+    count = 1
     update {
       max_parallel = 1
       stagger      = "1m"
@@ -409,7 +403,7 @@ job "mail" {
   }
 
   group "haraka" {
-    count = 2
+    count = 1
     update {
       max_parallel = 1
       stagger      = "1m"
@@ -527,11 +521,6 @@ job "mail" {
     update {
       max_parallel = 1
       stagger      = "1m"
-    }
-
-    constraint {
-      attribute = "${node.datacenter}"
-      value     = "syria"
     }
 
     network {
@@ -843,7 +832,7 @@ job "mail" {
         }
 
         check_restart {
-          limit = 2
+          limit = 3
           grace = "5s"
         }
       }
