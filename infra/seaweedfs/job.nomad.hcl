@@ -71,7 +71,6 @@ job "seaweedfs" {
           "-mdir=/data",
           "-defaultReplication=010",
           "-peers=10.1.10.10:9333,10.1.10.20:9333,10.1.10.1:9333",
-          /* "-peers=master-1.seaweedfs.service.consul:9333,master-2.seaweedfs.service.consul:9333,master-3.seaweedfs.service.consul:9333", */
 
           "-ip=${NOMAD_IP_http}",
           "-ip.bind=0.0.0.0",
