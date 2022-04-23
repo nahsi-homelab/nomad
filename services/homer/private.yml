@@ -4,6 +4,10 @@ columns: "auto"
 connectivityCheck: true
 footer: ""
 
+defaults:
+  layout: list
+  colorTheme: auto
+
 colors:
   dark:
     highlight-primary: "#373B41"
@@ -31,14 +35,14 @@ links:
     url: "https://home-assistant.service.consul"
     target: "_blank"
 
-  - name: "UniFI"
+  - name: "UniFI-syria"
     icon: "fa fa-network-wired"
-    url: "https://unifi.service.consul"
+    url: "https://unifi-syria.service.consul"
     target: "_blank"
 
-  - name: "CloudFlare"
-    icon: "fab fa-cloudflare"
-    url: "https://dash.cloudflare.com"
+  - name: "UniFI-asia"
+    icon: "fa fa-network-wired"
+    url: "https://unifi-asia.service.consul"
     target: "_blank"
 
 services:
@@ -67,17 +71,6 @@ services:
       - name: "vmagent"
         logo: "https://assets.nahsi.dev/file/nahsi-assets/vm.png"
         url: "https://vmagent.service.consul"
-
-  - name: "Infra"
-    icon: "fa fa-server"
-    items:
-      - name: "Traefik"
-        logo: "https://assets.nahsi.dev/file/nahsi-assets/traefik.png"
-        url: "https://traefik.service.consul"
-
-      - name: "MinIO"
-        logo: "https://assets.nahsi.dev/file/nahsi-assets/minio.png"
-        url: "https://minio.nahsi.dev"
 
   - name: "Applications"
     icon: "fa fa-code-branch"
@@ -127,3 +120,24 @@ services:
 
       - name: "ZoneMTA"
         url: "https://zone-mta.service.consul"
+
+  - name: "Infra"
+    icon: "fa fa-server"
+    items:
+      - name: "Traefik"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/traefik.png"
+        url: "https://traefik.service.consul"
+
+      - name: "MinIO"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/minio.png"
+        url: "https://minio.nahsi.dev"
+
+      - name: "SeaweedFS"
+        subtitle: "master"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/seaweedfs.png"
+        url: "https://seaweedfs-master.service.consul"
+
+      - name: "SeaweedFS"
+        subtitle: "filer"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/seaweedfs.png"
+        url: "https://seaweedfs-filer.service.consul"
