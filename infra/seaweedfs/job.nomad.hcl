@@ -101,8 +101,9 @@ job "seaweedfs" {
         ]
 
         meta {
-          alloc_id = NOMAD_ALLOC_ID
-          metrics  = NOMAD_PORT_metrics
+          alloc_id  = NOMAD_ALLOC_ID
+          component = "master"
+          metrics   = NOMAD_ADDR_metrics
         }
 
         check {
@@ -211,8 +212,9 @@ job "seaweedfs" {
         port = "http"
 
         meta {
-          alloc_id = NOMAD_ALLOC_ID
-          metrics  = NOMAD_PORT_metrics
+          alloc_id  = NOMAD_ALLOC_ID
+          component = "volume"
+          metrics   = NOMAD_ADDR_metrics
         }
 
         check {
@@ -328,8 +330,9 @@ job "seaweedfs" {
         ]
 
         meta {
-          alloc_id = NOMAD_ALLOC_ID
-          metrics  = NOMAD_PORT_metrics
+          alloc_id  = NOMAD_ALLOC_ID
+          component = "filer"
+          metrics   = NOMAD_ADDR_metrics
         }
 
         check {

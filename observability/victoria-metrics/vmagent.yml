@@ -193,3 +193,18 @@ scrape_configs:
     relabel_configs:
       - source_labels: ["__meta_consul_service"]
         target_label: "instance"
+
+  - job_name: "seaweedfs"
+    consul_sd_configs:
+      - server: 'http://{{ env "attr.unique.network.ip-address" }}:8500'
+        services:
+          - "seaweedfs-master"
+          - "seaweedfs-volume"
+          - "seaweedfs-filer"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
+      - source_labels: ["__meta_consul_service_metadata_component"]
+        target_label: "component"
+      - source_labels: ["__meta_consul_service_metadata_metrics"]
+        target_label: "__address__"
