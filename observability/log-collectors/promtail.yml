@@ -288,6 +288,18 @@ scrape_configs:
       - static_labels:
           filtered: "true"
 
+  - match: # seaweedfs
+      selector: '{job="seaweedfs"}'
+      pipeline_name: "seaweedfs"
+      stages:
+      - json:
+          expressions:
+            message:
+      - output:
+          source: message
+      - static_labels:
+          filtered: "true"
+
   - match: # drop
       selector: '{filtered!="true"}'
       action: drop

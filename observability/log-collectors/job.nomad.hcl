@@ -1,7 +1,7 @@
 variables {
   versions = {
     vector   = "0.20.0"
-    promtail = "2.4.2"
+    promtail = "2.5.0"
   }
 }
 
