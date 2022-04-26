@@ -29,6 +29,12 @@ job "loki" {
   group "compactor" {
     count = 1
 
+    affinity {
+      attribute = attr.cpu.totalcompute
+      operator  = ">="
+      value     = 20000
+    }
+
     ephemeral_disk {
       size    = 1000
       migrate = true
