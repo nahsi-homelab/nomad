@@ -47,6 +47,10 @@ services:
         logo: "https://assets.nahsi.dev/file/nahsi-assets/roundcube.svg"
         url: "https://mail.nahsi.dev"
 
+      - name: "FileRun"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/filerun.png"
+        url: "https://filerun.nahsi.dev"
+
       - name: "SFTPGo"
         icon: "fas fa-cloud-download-alt"
         url: "https://files.nahsi.dev/sftpgo"
