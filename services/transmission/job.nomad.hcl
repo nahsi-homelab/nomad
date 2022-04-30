@@ -26,7 +26,7 @@ job "transmission" {
     }
 
     service {
-      name = "transmission-nahsi"
+      name = "transmission"
       port = "web-ui"
 
       tags = [
