@@ -40,6 +40,13 @@ job "filerun" {
       access_mode     = "single-node-writer"
     }
 
+    volume "taisto" {
+      type            = "csi"
+      source          = "filerun-taisto"
+      attachment_mode = "file-system"
+      access_mode     = "single-node-writer"
+    }
+
     task "filerun" {
       driver = "docker"
 
@@ -62,6 +69,11 @@ job "filerun" {
       volume_mount {
         volume      = "nahsi"
         destination = "/users/nahsi"
+      }
+
+      volume_mount {
+        volume      = "taisto"
+        destination = "/users/taisto"
       }
 
       config {
