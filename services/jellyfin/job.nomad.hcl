@@ -28,6 +28,7 @@ job "jellyfin" {
       ]
 
       check {
+        name     = "Jellyfin HTTP"
         type     = "http"
         protocol = "http"
         path     = "/health"
@@ -47,6 +48,18 @@ job "jellyfin" {
       source = "jellyfin-cache"
     }
 
+    volume "video-nahsi" {
+      type      = "host"
+      source    = "video-nahsi"
+      read_only = true
+    }
+
+    volume "video-taisto" {
+      type      = "host"
+      source    = "video-taisto"
+      read_only = true
+    }
+
     task "jellyfin" {
       driver = "docker"
       user   = "nobody"
@@ -61,23 +74,30 @@ job "jellyfin" {
         destination = "/cache"
       }
 
+      volume_mount {
+        volume      = "video-nahsi"
+        destination = "/video"
+        read_only   = true
+      }
+
+      volume_mount {
+        volume      = "video-taisto"
+        destination = "/taisto/video"
+        read_only   = true
+      }
+
       config {
-        image = "jellyfin/jellyfin:${var.version}-${attr.cpu.arch}"
+        image = "jellyfin/jellyfin:${var.version}"
 
         ports = [
-          "http"
-        ]
-
-        volumes = [
-          "/home/nahsi/media/video:/video:ro",
-          "/home/nahsi/media/audio/audiobooks:/audiobooks:ro",
-          "/home/nahsi/media/podcasts:/podcasts:ro"
+          "http",
         ]
       }
 
       resources {
-        cpu    = 10000
-        memory = 2048
+        cpu        = 10000
+        memory     = 2048
+        memory_max = 4096
       }
     }
   }
