@@ -29,7 +29,7 @@ job "loki" {
   group "compactor" {
     count = 1
 
-    affinity {
+    constraint {
       attribute = attr.cpu.totalcompute
       operator  = ">="
       value     = 20000
