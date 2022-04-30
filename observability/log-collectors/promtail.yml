@@ -300,6 +300,22 @@ scrape_configs:
       - static_labels:
           filtered: "true"
 
+  - match: # transmission
+      selector: '{job="transmission",task="transmission"}'
+      pipeline_name: "transmission"
+      stages:
+      - json:
+          expressions:
+            message:
+      - output:
+          source: message
+      - drop:
+          source: "stream"
+          value: "stdout"
+          drop_counter_reason: "noise-filter"
+      - static_labels:
+          filtered: "true"
+
   - match: # drop
       selector: '{filtered!="true"}'
       action: drop
