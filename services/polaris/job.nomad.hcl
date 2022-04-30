@@ -17,14 +17,18 @@ job "polaris" {
     }
 
     volume "polaris" {
-      type   = "host"
-      source = "polaris"
+      type            = "csi"
+      source          = "polaris"
+      attachment_mode = "file-system"
+      access_mode     = "single-node-writer"
     }
 
     volume "music" {
-      type      = "host"
-      source    = "music-nahsi"
-      read_only = true
+      type            = "csi"
+      source          = "music"
+      attachment_mode = "file-system"
+      access_mode     = "multi-node-multi-writer"
+      read_only       = true
     }
 
     service {
