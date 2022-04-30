@@ -32,7 +32,7 @@ job "transmission" {
       tags = [
         "traefik.enable=true",
         "traefik.http.routers.transmission-nahsi.entrypoints=https",
-        "traefik.http.routers.transmission-nahsi.rule=Host(`transmission-nahsi.service.consul`)",
+        "traefik.http.routers.transmission-nahsi.rule=Host(`transmission.service.consul`)",
       ]
     }
 
