@@ -6,14 +6,25 @@ job "polaris" {
   datacenters = ["syria"]
   namespace   = "services"
 
-  constraint {
-    attribute = attr.unique.hostname
-    value     = "antiochia"
-  }
-
   group "polaris" {
+    ephemeral_disk {
+      sticky  = true
+      migrate = true
+    }
+
     network {
       port "http" {}
+    }
+
+    volume "polaris" {
+      type   = "host"
+      source = "polaris"
+    }
+
+    volume "music" {
+      type      = "host"
+      source    = "music-nahsi"
+      read_only = true
     }
 
     service {
@@ -30,27 +41,34 @@ job "polaris" {
     task "polaris" {
       driver = "docker"
 
+      volume_mount {
+        volume      = "polaris"
+        destination = "/var/lib/polaris"
+      }
+
+      volume_mount {
+        volume      = "music"
+        destination = "/music"
+        read_only   = true
+      }
+
       env {
-        POLARIS_PORT = "${NOMAD_PORT_http}"
+        POLARIS_PORT      = NOMAD_PORT_http
+        POLARIS_CACHE_DIR = "${NOMAD_ALLOC_DIR}/data"
       }
 
       config {
         image = "ogarcia/polaris:${var.version}"
 
         ports = [
-          "http"
-        ]
-
-        volumes = [
-          "/home/nahsi/media/music/:/music:ro",
-          "/mnt/apps/polaris/cache:/var/cache/polaris",
-          "/mnt/apps/polaris/data:/var/lib/polaris",
+          "http",
         ]
       }
 
       resources {
-        cpu    = 100
-        memory = 300
+        cpu        = 100
+        memory     = 32
+        memory_max = 64
       }
     }
   }
