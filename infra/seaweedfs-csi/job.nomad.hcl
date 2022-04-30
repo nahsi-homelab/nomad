@@ -51,7 +51,7 @@ job "seaweedfs-csi" {
       resources {
         cpu        = 100
         memory     = 64
-        memory_max = 128
+        memory_max = 512
       }
     }
   }
