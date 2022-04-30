@@ -27,8 +27,10 @@ job "mariadb" {
     }
 
     volume "mariadb" {
-      type   = "host"
-      source = "mariadb"
+      type            = "csi"
+      source          = "mariadb"
+      attachment_mode = "file-system"
+      access_mode     = "single-node-writer"
     }
 
     task "mariadb" {
