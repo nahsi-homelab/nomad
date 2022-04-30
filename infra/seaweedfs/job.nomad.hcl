@@ -1,7 +1,7 @@
 variables {
   log_level = "1" # log level [0|1|2|3|4]
   versions = {
-    seaweedfs = "2.99"
+    seaweedfs = "3.00"
   }
 }
 
@@ -70,6 +70,7 @@ job "seaweedfs" {
           "master",
           "-mdir=/data",
           "-defaultReplication=010",
+          "-volumeSizeLimitMB=5120",
           "-peers=10.1.10.10:9333,10.1.10.20:9333,10.1.10.1:9333",
 
           "-ip=${NOMAD_IP_http}",
@@ -143,6 +144,11 @@ job "seaweedfs" {
       port "metrics" {}
     }
 
+    volume "index" {
+      type   = "host"
+      source = "seaweedfs-index"
+    }
+
     volume "ssd" {
       type   = "host"
       source = "seaweedfs-ssd"
@@ -161,13 +167,18 @@ job "seaweedfs" {
       kill_timeout = "90s"
 
       volume_mount {
+        volume      = "index"
+        destination = "/data/index"
+      }
+
+      volume_mount {
         volume      = "ssd"
-        destination = "/ssd"
+        destination = "/data/ssd"
       }
 
       volume_mount {
         volume      = "hdd"
-        destination = "/hdd"
+        destination = "/data/hdd"
       }
 
       config {
@@ -182,10 +193,10 @@ job "seaweedfs" {
         args = [
           "-v=${var.log_level}",
           "volume",
-          "-dir=/ssd,/hdd",
+          "-dir=/data/ssd,/data/hdd",
           "-disk=ssd,hdd",
-          "-max=5,20",
-          "-dir.idx=/ssd",
+          "-max=25,100",
+          "-dir.idx=/data/index",
 
           "-dataCenter=${node.datacenter}",
           "-rack=${node.unique.name}",
