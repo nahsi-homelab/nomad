@@ -25,7 +25,8 @@ job "seaweedfs-csi" {
       driver = "docker"
 
       config {
-        image = "chrislusf/seaweedfs-csi-driver:${var.versions.seaweedfs}"
+        image      = "chrislusf/seaweedfs-csi-driver:${var.versions.seaweedfs}"
+        force_pull = true
 
         args = [
           "--endpoint=unix://csi/csi.sock",
@@ -36,6 +37,9 @@ job "seaweedfs-csi" {
         ]
 
         privileged = true
+        cap_add = [
+          "SYS_ADMIN",
+        ]
       }
 
       csi_plugin {
@@ -45,9 +49,9 @@ job "seaweedfs-csi" {
       }
 
       resources {
-        cpu        = 512
-        memory     = 1024
-        memory_max = 3072
+        cpu        = 100
+        memory     = 64
+        memory_max = 128
       }
     }
   }

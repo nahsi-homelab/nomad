@@ -300,6 +300,18 @@ scrape_configs:
       - static_labels:
           filtered: "true"
 
+  - match: # seaweedfs-csi
+      selector: '{job="seaweedfs-csi"}'
+      pipeline_name: "seaweedfs-csi"
+      stages:
+      - json:
+          expressions:
+            message:
+      - output:
+          source: message
+      - static_labels:
+          filtered: "true"
+
   - match: # transmission
       selector: '{job="transmission",task="transmission"}'
       pipeline_name: "transmission"
