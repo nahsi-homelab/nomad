@@ -79,6 +79,10 @@ services:
         logo: "https://assets.nahsi.dev/file/nahsi-assets/jellyfin.svg"
         url: "https://jellyfin.nahsi.dev"
 
+      - name: "Calibre"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/calibre.png"
+        url: "https://calibre.nahsi.dev"
+
       - name: "Hyperion"
         logo: "https://assets.nahsi.dev/file/nahsi-assets/hyperion.png"
         url: "https://hyperion.service.consul"
