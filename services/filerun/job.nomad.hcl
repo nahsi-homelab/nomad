@@ -9,6 +9,11 @@ job "filerun" {
   namespace   = "services"
 
   group "filerun" {
+    ephemeral_disk {
+      sticky  = true
+      migrate = true
+    }
+
     network {
       port "http" {
         to = 80
@@ -79,6 +84,10 @@ job "filerun" {
       config {
         image = "filerun/filerun:${var.versions.filerun}"
         ports = ["http"]
+
+        volumes = [
+          "local/settings.ini:/usr/local/etc/php/conf.d/filerun-optimization.ini:ro",
+        ]
       }
 
       template {
@@ -87,13 +96,18 @@ job "filerun" {
         FR_DB_USER='{{ .Data.username }}'
         FR_DB_PASS='{{ .Data.password }}'
         {{- end }}
-        FR_DB_HOST=mariadb.service.consul
+        FR_DB_HOST='mariadb.service.consul'
         FR_DB_PORT=3306
-        FR_DB_NAME=filerun
+        FR_DB_NAME='filerun'
         EOH
 
         destination = "secrets/db.env"
         env         = true
+      }
+
+      template {
+        data        = file("settings.ini")
+        destination = "local/settings.ini"
       }
 
       resources {
