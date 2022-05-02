@@ -93,8 +93,8 @@ job "mail" {
 
       resources {
         cpu        = 300
-        memory     = 64
-        memory_max = 128
+        memory     = 150
+        memory_max = 300
       }
 
       env {
@@ -737,7 +737,7 @@ job "mail" {
   }
 
   group "redis" {
-    count = 2
+    count = 1
     update {
       max_parallel = 1
       stagger      = "1m"
@@ -843,8 +843,9 @@ job "mail" {
         CONSUL_LOCK_KEY     = "resec/mail/.lock"
         MASTER_TAGS         = "master"
         SLAVE_TAGS          = "replica"
-        REDIS_ADDR          = "127.0.0.1:6379"
-        ANNOUNCE_ADDR       = "${NOMAD_ADDR_redis}"
+        /* REDIS_ADDR          = NOMAD_ADDR_redis */
+        REDIS_ADDR          = "127.0.0.1:${NOMAD_PORT_redis}"
+        ANNOUNCE_ADDR       = NOMAD_ADDR_redis
         STATE_SERVER        = "true"
       }
 

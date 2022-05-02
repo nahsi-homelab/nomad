@@ -85,8 +85,9 @@ job "seaweedfs" {
       }
 
       resources {
-        cpu    = 300
-        memory = 128
+        cpu        = 300
+        memory     = 128
+        memory_max = 256
       }
 
       service {
@@ -326,8 +327,9 @@ job "seaweedfs" {
       }
 
       resources {
-        cpu    = 512
-        memory = 256
+        cpu        = 500
+        memory     = 256
+        memory_max = 512
       }
 
       service {

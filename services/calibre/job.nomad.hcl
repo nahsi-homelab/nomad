@@ -1,7 +1,7 @@
 variables {
   versions = {
     calibre     = "version-v5.41.0"
-    calibre_web = "0.6.18"
+    calibre_web = "version-0.6.18"
   }
 }
 
@@ -140,7 +140,7 @@ job "calibre" {
       }
 
       config {
-        image      = "nahsihub/calibre-web-dark:${var.versions.calibre_web}"
+        image      = "lscr.io/linuxserver/calibre-web:${var.versions.calibre_web}"
         force_pull = true
 
         ports = [
@@ -151,7 +151,7 @@ job "calibre" {
       resources {
         cpu        = 100
         memory     = 256
-        memory_max = 512
+        memory_max = 1024
       }
     }
   }
