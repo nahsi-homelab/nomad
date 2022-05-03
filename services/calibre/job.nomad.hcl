@@ -1,79 +1,12 @@
 variables {
   versions = {
-    calibre     = "version-v5.41.0"
     calibre_web = "version-0.6.18"
   }
 }
 
 job "calibre" {
-  datacenters = ["syria"]
+  datacenters = ["asia"]
   namespace   = "services"
-
-  group "calibre" {
-    network {
-      port "guacamole" {
-        to = 8080
-      }
-      port "http" {
-        to = 8081
-      }
-    }
-
-    volume "calibre" {
-      type            = "csi"
-      source          = "calibre"
-      attachment_mode = "file-system"
-      access_mode     = "multi-node-multi-writer"
-    }
-
-    task "calibre" {
-      driver = "docker"
-
-      vault {
-        policies = [
-          "calibre",
-        ]
-      }
-
-      env {
-        PUID = "1050"
-        PGID = "1050"
-        TZ   = "Europe/Moscow"
-      }
-
-      volume_mount {
-        volume      = "calibre"
-        destination = "/config"
-      }
-
-      config {
-        image      = "lscr.io/linuxserver/calibre:${var.versions.calibre}"
-        force_pull = true
-
-        ports = [
-          "guacamole",
-          "http",
-        ]
-      }
-
-      template {
-        data = <<-EOH
-        {{ with secret "secret/calibre/guacamole" }}
-        PASSWORD='{{ .Data.data.password }}'
-        {{- end }}
-        EOH
-
-        destination = "secrets/secret.env"
-        env         = true
-      }
-
-      resources {
-        cpu        = 500
-        memory     = 256
-        memory_max = 1024
-      }
-    }
-  }
 
   group "calibre-web" {
     network {
@@ -97,7 +30,7 @@ job "calibre" {
       ]
 
       check {
-        name     = "SeaweedFS master"
+        name     = "calibre-web"
         type     = "tcp"
         port     = "http"
         interval = "20s"
@@ -106,25 +39,21 @@ job "calibre" {
     }
 
     volume "calibre-web" {
-      type            = "csi"
-      source          = "calibre-web"
-      attachment_mode = "file-system"
-      access_mode     = "single-node-writer"
+      type   = "host"
+      source = "calibre-web"
     }
 
     volume "calibre" {
-      type            = "csi"
-      source          = "calibre"
-      attachment_mode = "file-system"
-      access_mode     = "multi-node-multi-writer"
+      type   = "host"
+      source = "calibre"
     }
 
     task "calibre-web" {
       driver = "docker"
 
       env {
-        PUID        = "1050"
-        PGID        = "1050"
+        PUID        = "1000"
+        PGID        = "1000"
         TZ          = "Europe/Moscow"
         DOCKER_MODS = "linuxserver/calibre-web:calibre"
       }
