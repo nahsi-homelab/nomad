@@ -92,9 +92,9 @@ job "mariadb" {
       }
 
       env {
-        MARIADB_GALERA_CLUSTER_NAME      = "galera"
-        MARIADB_GALERA_NODE_ADDRESS      = NOMAD_ADDR_replication
-        MARIADB_GALERA_CLUSTER_ADDRESS   = "gcomm://mariadb-0.service.consul:4567,mariadb-1.service.consul:4567"
+        MARIADB_GALERA_CLUSTER_NAME    = "galera"
+        MARIADB_GALERA_NODE_ADDRESS    = NOMAD_ADDR_replication
+        MARIADB_GALERA_CLUSTER_ADDRESS = "gcomm://mariadb-0.service.consul:4567,mariadb-1.service.consul:4567"
 
         MARIADB_ENABLE_SSL    = "yes"
         MARIADB_TLS_CERT_FILE = "/secrets/certs/cert.pem"
@@ -105,7 +105,8 @@ job "mariadb" {
       }
 
       config {
-        image = "bitnami/mariadb-galera:${var.versions.galera}"
+        image        = "bitnami/mariadb-galera:${var.versions.galera}"
+        network_mode = "host"
 
         ports = [
           "db",
