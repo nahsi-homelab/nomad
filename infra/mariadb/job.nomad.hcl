@@ -1,6 +1,7 @@
 variables {
   versions = {
-    galera   = "10.7"
+    mariadb  = "10.7"
+    maxscale = "6.3"
     exporter = "0.13.0"
   }
 }
@@ -11,22 +12,13 @@ locals {
     "cert" = "certificate",
     "key"  = "private_key",
   }
-
-  options = [
-    "--innodb_log_write_ahead_size=16384",
-    "--innodb_doublewrite=0",
-    "--innodb_use_native_aio=0",
-    "--innodb_use_atomic_writes=0",
-    "--innodb_flush_method=O_DIRECT",
-    "--innodb_flush_neighbors=0",
-  ]
 }
 
 job "mariadb" {
   datacenters = ["syria"]
   namespace   = "infra"
 
-  group "galera" {
+  group "mariadb" {
     count = 2
 
     network {
@@ -34,36 +26,10 @@ job "mariadb" {
         to     = 3306
         static = 3306
       }
-
-      port "replication" {
-        to     = 4567
-        static = 4567
-      }
-
-      port "ist" {
-        # Incremental State Transfer
-        to     = 4568
-        static = 4568
-      }
-
-      port "sst" {
-        # State Snapshot Transfer
-        to     = 4444
-        static = 4444
-      }
     }
 
     service {
-      name = "mariadb"
-      port = "db"
-
-      meta {
-        alloc_id = NOMAD_ALLOC_ID
-      }
-    }
-
-    service {
-      name = "mariadb-${NOMAD_ALLOC_INDEX}"
+      name = "mariadb-${meta.mariadb_index}"
       port = "db"
 
       meta {
@@ -76,8 +42,9 @@ job "mariadb" {
       source = "mariadb"
     }
 
-    task "galera" {
+    task "mariadb" {
       driver = "docker"
+      user   = "999"
 
       kill_signal  = "SIGTERM"
       kill_timeout = "90s"
@@ -88,61 +55,74 @@ job "mariadb" {
 
       volume_mount {
         volume      = "mariadb"
-        destination = "/bitnami/mariadb"
+        destination = "/var/lib/mysql"
       }
 
       env {
-        MARIADB_GALERA_CLUSTER_NAME    = "galera"
-        MARIADB_GALERA_NODE_ADDRESS    = NOMAD_ADDR_replication
-        MARIADB_GALERA_CLUSTER_ADDRESS = "gcomm://mariadb-0.service.consul:4567,mariadb-1.service.consul:4567"
-
-        MARIADB_ENABLE_SSL    = "yes"
-        MARIADB_TLS_CERT_FILE = "/secrets/certs/cert.pem"
-        MARIADB_TLS_KEY_FILE  = "/secrets/certs/key.pem"
-        MARIADB_TLS_CA_FILE   = "/secrets/certs/CA.pem"
-
-        MARIADB_EXTRA_FLAGS = join(" ", local.options)
+        MARIADB_MYSQL_LOCALHOST_USER = true
       }
 
       config {
-        image        = "bitnami/mariadb-galera:${var.versions.galera}"
-        network_mode = "host"
+        image = "mariadb:${var.versions.mariadb}"
+        init  = true
+
+        args = [
+          "--innodb_log_write_ahead_size=16384",
+          "--innodb_doublewrite=0",
+          "--innodb_use_native_aio=0",
+          "--innodb_use_atomic_writes=0",
+          "--innodb_flush_method=O_DIRECT",
+          "--innodb_flush_neighbors=0",
+
+          "--log-bin",
+          "--log-basename=${node.unique.name}",
+          "--server-id=${meta.mariadb_index}",
+          "--binlog-format=mixed",
+          "--log-slave-updates",
+
+          "--ssl-cert=/secrets/certs/cert.pem",
+          "--ssl-key=/secrets/certs/key.pem",
+          "--ssl-ca=/secrets/certs/CA.pem",
+        ]
 
         ports = [
           "db",
-          "replication",
-          "ist",
-          "sst",
         ]
+
+        mount {
+          type     = "bind"
+          target   = "/docker-entrypoint-initdb.d"
+          source   = "secrets/init"
+          readonly = true
+        }
       }
 
       template {
         data = <<-EOF
         {{- with secret "secret/mariadb/users/superuser" -}}
-        MARIADB_ROOT_USER='{{ .Data.data.username }}'
         MARIADB_ROOT_PASSWORD='{{ .Data.data.password }}'
-        {{- end }}
-
-        {{ with secret "secret/mariadb/users/replication" -}}
-        MARIADB_REPLICATION_USER='{{ .Data.data.username }}'
-        MARIADB_REPLICATION_PASSWORD='{{ .Data.data.password }}'
-        {{- end }}
-
-        {{ with secret "secret/mariadb/users/backup" -}}
-        MARIADB_GALERA_MARIABACKUP_USER='{{ .Data.data.username }}'
-        MARIADB_GALERA_MARIABACKUP_PASSWORD='{{ .Data.data.password }}'
         {{- end }}
         EOF
 
-        destination = "local/secrets.env"
+        destination = "secrets/secrets.env"
         env         = true
+        splay       = "5m"
+      }
+
+      dynamic "template" {
+        for_each = fileset(".", "init/**")
+
+        content {
+          data        = file(template.value)
+          destination = "secrets/${template.value}"
+        }
       }
 
       dynamic "template" {
         for_each = local.certs
         content {
           data = <<-EOH
-          {{- with secret "pki/issue/internal" "ttl=10d" "common_name=mariadb.service.consul" (env "NOMAD_ALLOC_INDEX" | printf "alt_names=mariadb-%s.service.consul") (env "attr.unique.network.ip-address" | printf "ip_sans=%s") -}}
+          {{- with secret "pki/issue/internal" "ttl=10d" "common_name=mariadb.service.consul" (env "NOMAD_ALLOC_ID" | printf "alt_names=mariadb-%s.service.consul") (env "attr.unique.network.ip-address" | printf "ip_sans=%s") -}}
           {{ .Data.${template.value} }}
           {{- end -}}
           EOH
@@ -157,6 +137,138 @@ job "mariadb" {
         cpu        = 300
         memory     = 256
         memory_max = 512
+      }
+    }
+  }
+
+  group "maxscale" {
+    count = 1
+
+    network {
+      mode = "bridge"
+
+      port "rw" {
+        to     = 3006
+        static = 3006
+      }
+
+      port "ro" {
+        to     = 3007
+        static = 3007
+      }
+
+      port "api" {}
+    }
+
+    service {
+      name = "mariadb"
+      port = "rw"
+
+      meta {
+        alloc_id = NOMAD_ALLOC_ID
+      }
+    }
+
+    service {
+      name = "maxscale"
+      port = "api"
+
+      meta {
+        alloc_id = NOMAD_ALLOC_ID
+      }
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
+        "traefik.http.routers.maxscale.entrypoints=https",
+        "traefik.http.routers.maxscale.rule=Host(`maxscale.service.consul`)",
+      ]
+
+      check {
+        name     = "MaxScale HTTP"
+        port     = "api"
+        type     = "http"
+        path     = "/"
+        interval = "20s"
+        timeout  = "1s"
+      }
+
+      connect {
+        sidecar_service {
+          proxy {
+            local_service_port = 8989
+
+            expose {
+              path {
+                path            = "/"
+                protocol        = "http"
+                local_path_port = 8989
+                listener_port   = "api"
+              }
+            }
+          }
+        }
+      }
+    }
+
+    task "maxscale" {
+      driver = "docker"
+
+      kill_signal  = "SIGTERM"
+      kill_timeout = "10s"
+
+      vault {
+        policies = ["maxscale"]
+      }
+
+      config {
+        image = "mariadb/maxscale:${var.versions.maxscale}"
+
+        command = "maxscale"
+        args = [
+          "-d",
+          "-U",
+          "maxscale",
+          "-l", "stdout"
+        ]
+
+        ports = [
+          "rw",
+          "ro",
+        ]
+
+        mount {
+          type     = "bind"
+          target   = "/etc/maxscale.cnf"
+          source   = "secrets/maxscale.ini"
+          readonly = true
+        }
+      }
+
+      template {
+        data        = file("maxscale.ini")
+        destination = "secrets/maxscale.ini"
+      }
+
+      dynamic "template" {
+        for_each = local.certs
+        content {
+          data = <<-EOH
+          {{- with secret "pki/issue/internal" "ttl=10d" "common_name=mariadb.service.consul" (env "attr.unique.network.ip-address" | printf "ip_sans=%s") -}}
+          {{ .Data.${template.value} }}
+          {{- end -}}
+          EOH
+
+          destination = "secrets/certs/${template.key}.pem"
+          change_mode = "restart"
+          splay       = "10m"
+        }
+      }
+
+      resources {
+        cpu        = 200
+        memory     = 128
+        memory_max = 256
       }
     }
   }
