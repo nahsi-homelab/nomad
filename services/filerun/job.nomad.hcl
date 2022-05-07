@@ -9,11 +9,6 @@ job "filerun" {
   namespace   = "services"
 
   group "filerun" {
-    ephemeral_disk {
-      sticky  = true
-      migrate = true
-    }
-
     network {
       port "http" {
         to = 80
@@ -32,24 +27,18 @@ job "filerun" {
     }
 
     volume "filerun" {
-      type            = "csi"
-      source          = "filerun"
-      attachment_mode = "file-system"
-      access_mode     = "single-node-writer"
+      type   = "host"
+      source = "filerun"
     }
 
     volume "nahsi" {
-      type            = "csi"
-      source          = "filerun-nahsi"
-      attachment_mode = "file-system"
-      access_mode     = "single-node-writer"
+      type   = "host"
+      source = "storage-nahsi"
     }
 
     volume "taisto" {
-      type            = "csi"
-      source          = "filerun-taisto"
-      attachment_mode = "file-system"
-      access_mode     = "single-node-writer"
+      type   = "host"
+      source = "storage-taisto"
     }
 
     task "filerun" {
@@ -97,7 +86,7 @@ job "filerun" {
         FR_DB_PASS='{{ .Data.password }}'
         {{- end }}
         FR_DB_HOST='mariadb.service.consul'
-        FR_DB_PORT=3306
+        FR_DB_PORT=3106
         FR_DB_NAME='filerun'
         EOH
 
