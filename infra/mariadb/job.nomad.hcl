@@ -26,11 +26,24 @@ job "mariadb" {
         to     = 3306
         static = 3306
       }
+
+      port "exporter" {
+        to = 9104
+      }
     }
 
     service {
       name = "mariadb-${meta.mariadb_index}"
       port = "db"
+
+      meta {
+        alloc_id = NOMAD_ALLOC_ID
+      }
+    }
+
+    service {
+      name = "mariadb-exporter"
+      port = "exporter"
 
       meta {
         alloc_id = NOMAD_ALLOC_ID
@@ -137,6 +150,36 @@ job "mariadb" {
         cpu        = 300
         memory     = 256
         memory_max = 512
+      }
+    }
+
+    task "mysqld-exporter" {
+      driver = "docker"
+      user   = "nobody"
+
+      vault {
+        policies = ["mysqld-exporter"]
+      }
+
+      resources {
+        cpu    = 50
+        memory = 64
+      }
+
+      config {
+        image = "prom/mysqld-exporter:v${var.versions.exporter}"
+        ports = ["exporter"]
+      }
+
+      template {
+        data = <<-EOF
+        {{- with secret "mariadb/static-creds/exporter" }}
+        DATA_SOURCE_NAME='exporter:{{ .Data.password }}@({{ env "NOMAD_ADDR_db" }})/'
+        {{- end }}
+        EOF
+
+        destination = "secrets/secrets.env"
+        env         = true
       }
     }
   }
