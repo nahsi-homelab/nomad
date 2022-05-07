@@ -144,6 +144,11 @@ job "mariadb" {
   group "maxscale" {
     count = 1
 
+    ephemeral_disk {
+      sticky  = true
+      migrate = true
+    }
+
     network {
       mode = "bridge"
 
