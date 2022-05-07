@@ -195,9 +195,14 @@ job "mariadb" {
     network {
       mode = "bridge"
 
-      port "rw" {
+      port "rw-tls" {
         to     = 3006
         static = 3006
+      }
+
+      port "rw" {
+        to     = 3106
+        static = 3106
       }
 
       port "ro" {
@@ -205,12 +210,17 @@ job "mariadb" {
         static = 3007
       }
 
+      port "ro-tls" {
+        to     = 3107
+        static = 3107
+      }
+
       port "api" {}
     }
 
     service {
       name = "mariadb"
-      port = "rw"
+      port = "rw-tls"
 
       meta {
         alloc_id = NOMAD_ALLOC_ID
@@ -282,7 +292,9 @@ job "mariadb" {
 
         ports = [
           "rw",
+          "rw-tls",
           "ro",
+          "ro-tls",
         ]
 
         mount {
