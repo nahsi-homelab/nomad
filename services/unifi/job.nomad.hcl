@@ -107,8 +107,9 @@ job "unifi" {
         }
 
         resources {
-          cpu    = 100
-          memory = 1024
+          cpu        = 100
+          memory     = 1024
+          memory_max = 2048
         }
       }
     }
