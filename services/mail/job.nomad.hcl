@@ -66,10 +66,10 @@ job "mail" {
       port = "imap"
 
       tags = [
-        "ingress.enable=true",
-        "ingress.tcp.routers.wildduck-imap.entrypoints=imap",
-        "ingress.tcp.routers.wildduck-imap.rule=HostSNI(`mail.nahsi.dev`)",
-        "ingress.tcp.routers.wildduck-imap.tls.passthrough=true"
+        "traefik.enable=true",
+        "traefik.tcp.routers.wildduck-imap.entrypoints=imap",
+        "traefik.tcp.routers.wildduck-imap.rule=HostSNI(`mail.nahsi.dev`)",
+        "traefik.tcp.routers.wildduck-imap.tls.passthrough=true"
       ]
     }
 
@@ -294,10 +294,10 @@ job "mail" {
       port = "http"
 
       tags = [
-        "ingress.enable=true",
-        "ingress.http.routers.roundcube.entrypoints=https",
-        "ingress.http.routers.roundcube.rule=Host(`mail.nahsi.dev`)",
-        "ingress.http.services.roundcube.loadBalancer.sticky.cookie=true",
+        "traefik.enable=true",
+        "traefik.http.routers.roundcube.entrypoints=public",
+        "traefik.http.routers.roundcube.rule=Host(`mail.nahsi.dev`)",
+        "traefik.http.services.roundcube.loadBalancer.sticky.cookie=true",
       ]
 
       check {
@@ -422,9 +422,9 @@ job "mail" {
       port = "smtp"
 
       tags = [
-        "ingress.enable=true",
-        "ingress.tcp.routers.haraka.entrypoints=smtp-relay",
-        "ingress.tcp.routers.haraka.rule=HostSNI(`*`)",
+        "traefik.enable=true",
+        "traefik.tcp.routers.haraka.entrypoints=smtp-relay",
+        "traefik.tcp.routers.haraka.rule=HostSNI(`*`)",
       ]
 
       check {
@@ -570,10 +570,10 @@ job "mail" {
       port = "smtp"
 
       tags = [
-        "ingress.enable=true",
-        "ingress.tcp.routers.zone-mta-smtp.entrypoints=smtp",
-        "ingress.tcp.routers.zone-mta-smtp.rule=HostSNI(`mail.nahsi.dev`)",
-        "ingress.tcp.routers.zone-mta-smtp.tls.passthrough=true"
+        "traefik.enable=true",
+        "traefik.tcp.routers.zone-mta-smtp.entrypoints=smtp",
+        "traefik.tcp.routers.zone-mta-smtp.rule=HostSNI(`mail.nahsi.dev`)",
+        "traefik.tcp.routers.zone-mta-smtp.tls.passthrough=true"
       ]
     }
 
