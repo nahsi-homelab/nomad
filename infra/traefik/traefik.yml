@@ -39,6 +39,9 @@ entryPoints:
           - main: "nahsi.dev"
             sans:
               - "*.nahsi.dev"
+    proxyProtocol:
+      trustedIPs:
+        - "10.1.10.1"
 
   smtp:
     address: :[[ env "NOMAD_PORT_smtp" ]]
@@ -52,6 +55,9 @@ entryPoints:
           - main: "nahsi.dev"
             sans:
               - "*.nahsi.dev"
+    proxyProtocol:
+      trustedIPs:
+        - "10.1.10.1"
 
   smtp-relay:
     address: :[[ env "NOMAD_PORT_smtp_relay" ]]
@@ -59,6 +65,10 @@ entryPoints:
       lifeCycle:
         requestAcceptGraceTimeout: 15
         graceTimeOut: 10
+    proxyProtocol:
+      trustedIPs:
+        - "10.1.10.1"
+
 
   imap:
     address: :[[ env "NOMAD_PORT_imap" ]]
@@ -72,6 +82,9 @@ entryPoints:
           - main: "nahsi.dev"
             sans:
               - "*.nahsi.dev"
+    proxyProtocol:
+      trustedIPs:
+        - "10.1.10.1"
 
   sftp:
     address: :[[ env "NOMAD_PORT_sftp" ]]
@@ -79,6 +92,9 @@ entryPoints:
       lifeCycle:
         requestAcceptGraceTimeout: 15
         graceTimeOut: 10
+    proxyProtocol:
+      trustedIPs:
+        - "10.1.10.1"
 
 api:
   insecure: true
