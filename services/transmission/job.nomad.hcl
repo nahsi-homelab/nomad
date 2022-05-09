@@ -8,13 +8,14 @@ job "transmission" {
   namespace   = "services"
 
   vault {
-    policies = [ "transmission" ]
+    policies = ["transmission"]
   }
 
   group "transmission-nahsi" {
     network {
       port "web-ui" {
-        to = 9091
+        to     = 9091
+        static = 9091
       }
 
       port "peer" {
@@ -93,6 +94,8 @@ job "transmission" {
           "web-ui",
           "peer",
         ]
+
+        network_mode = "host"
       }
 
       resources {
@@ -106,7 +109,8 @@ job "transmission" {
   group "transmission-taisto" {
     network {
       port "web-ui" {
-        to = 9091
+        to     = 9092
+        static = 9092
       }
 
       port "peer" {
@@ -175,6 +179,8 @@ job "transmission" {
           "web-ui",
           "peer",
         ]
+
+        network_mode = "host"
       }
 
       template {
