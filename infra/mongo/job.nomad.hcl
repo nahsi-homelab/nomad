@@ -5,13 +5,6 @@ variables {
   }
 }
 
-locals {
-  voters = [
-    "primary",
-    "secondary",
-  ]
-}
-
 job "mongo" {
   datacenters = [
     "syria",
@@ -20,8 +13,8 @@ job "mongo" {
   ]
   namespace = "infra"
 
-  group "mongo-voters" {
-    count = 2
+  group "mongo" {
+    count = 3
 
     network {
       port "db" {
@@ -50,8 +43,9 @@ job "mongo" {
       user   = "999"
 
       resources {
-        cpu    = 500
-        memory = 512
+        cpu        = 500
+        memory     = 256
+        memory_max = 512
       }
 
       vault {
@@ -64,8 +58,9 @@ job "mongo" {
       }
 
       config {
-        image    = "mongo:${var.versions.mongo}"
-        hostname = "mongo-${meta.mongo_node_id}.service.consul"
+        image      = "mongo:${var.versions.mongo}"
+        force_pull = true
+        hostname   = "mongo-${meta.mongo_node_id}.service.consul"
 
         ports = ["db"]
 
@@ -76,8 +71,8 @@ job "mongo" {
           "--clusterAuthMode=x509",
           "--tlsMode=preferTLS",
           "--tlsCAFile=/secrets/certs/CA.pem",
-          "--tlsClusterFile=/secrets/certs/${meta.mongo_node_id}.pem",
-          "--tlsCertificateKeyFile=/secrets/certs/${meta.mongo_node_id}.pem",
+          "--tlsClusterFile=/secrets/certs/cert.pem",
+          "--tlsCertificateKeyFile=/secrets/certs/cert.pem",
         ]
       }
 
@@ -89,103 +84,19 @@ job "mongo" {
 
         destination = "secrets/certs/CA.pem"
         change_mode = "restart"
-        splay       = "1m"
-      }
-
-      dynamic "template" {
-        for_each = local.voters
-        content {
-          data = <<-EOH
-          {{- with secret "pki/issue/internal" "ttl=90d" "common_name=mongo.service.consul" "alt_names=mongo-${template.value}.service.consul" -}}
-          {{ .Data.private_key }}
-          {{ .Data.certificate }}{{ end }}
-          EOH
-
-          destination = "secrets/certs/${template.value}.pem"
-          change_mode = "restart"
-          splay       = "1m"
-        }
-      }
-    }
-  }
-
-  group "mongo-arbiter" {
-    count = 1
-
-    constraint {
-      attribute = node.datacenter
-      value     = "pontus"
-    }
-
-    network {
-      port "db" {
-        to     = 27017
-        static = 27017
-      }
-    }
-
-    service {
-      name = "mongo-arbiter"
-      port = "db"
-    }
-
-    service {
-      name = "mongo"
-      port = "db"
-    }
-
-    task "mongod" {
-      driver = "docker"
-      user   = "999"
-
-      resources {
-        cpu    = 300
-        memory = 256
-      }
-
-      vault {
-        policies = ["mongo"]
-      }
-
-      config {
-        image    = "mongo:${var.versions.mongo}"
-        hostname = "mongo-arbiter.service.consul"
-
-        ports = ["db"]
-
-        args = [
-          "--bind_ip=0.0.0.0",
-          "--quiet",
-          "--replSet=main",
-          "--clusterAuthMode=x509",
-          "--tlsMode=preferTLS",
-          "--tlsCAFile=/secrets/certs/CA.pem",
-          "--tlsClusterFile=/secrets/certs/arbiter.pem",
-          "--tlsCertificateKeyFile=/secrets/certs/arbiter.pem",
-        ]
+        splay       = "5m"
       }
 
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=90d" "common_name=*.service.consul" -}}
-        {{ .Data.issuing_ca }}{{ end }}
-        EOH
-
-        destination = "secrets/certs/CA.pem"
-        change_mode = "restart"
-        splay       = "1m"
-      }
-
-      template {
-        data = <<-EOH
-        {{- with secret "pki/issue/internal" "ttl=90d" "common_name=mongo.service.consul" "alt_names=mongo-arbiter.service.consul" -}}
+        {{- with secret "pki/issue/internal" "ttl=90d" "common_name=mongo.service.consul" (env "meta.mongo_node_id" | printf "alt_names=mongo-%s.service.consul") (env "attr.unique.network.ip-address" | printf "ip_sans=%s") -}}
         {{ .Data.private_key }}
         {{ .Data.certificate }}{{ end }}
         EOH
 
-        destination = "secrets/certs/arbiter.pem"
+        destination = "secrets/certs/cert.pem"
         change_mode = "restart"
-        splay       = "1m"
+        splay       = "5m"
       }
     }
   }
@@ -250,7 +161,6 @@ job "mongo" {
 
         destination = "secrets/certs/CA.pem"
         change_mode = "restart"
-        splay       = "1m"
       }
 
       template {
@@ -262,7 +172,6 @@ job "mongo" {
 
         destination = "secrets/certs/key.pem"
         change_mode = "restart"
-        splay       = "1m"
       }
     }
   }
