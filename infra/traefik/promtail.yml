@@ -18,7 +18,7 @@ scrape_configs:
     static_configs:
     - labels:
         source: "traefik"
-        host: {{ env "node.unique.name" }}
+        instance: {{ env "node.unique.name" }}
         __path__: {{ env "NOMAD_ALLOC_DIR" }}/data/access.log
     pipeline_stages:
       - json:
