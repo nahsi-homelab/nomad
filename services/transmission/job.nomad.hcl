@@ -8,9 +8,7 @@ job "transmission" {
   namespace   = "services"
 
   vault {
-    policies = [
-      "transmission",
-    ]
+    policies = [ "transmission" ]
   }
 
   group "transmission-nahsi" {
@@ -122,9 +120,9 @@ job "transmission" {
       port = "web-ui"
 
       tags = [
-        "ingress.enable=true",
-        "ingress.http.routers.transmission-taisto.entrypoints=https",
-        "ingress.http.routers.transmission-taisto.rule=Host(`transmission-taisto.nahsi.dev`)",
+        "traefik.enable=true",
+        "traefik.http.routers.transmission-taisto.entrypoints=public",
+        "traefik.http.routers.transmission-taisto.rule=Host(`transmission-taisto.nahsi.dev`)",
       ]
     }
 

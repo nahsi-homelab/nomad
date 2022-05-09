@@ -20,9 +20,9 @@ job "filerun" {
       port = "http"
 
       tags = [
-        "ingress.enable=true",
-        "ingress.http.routers.filerun.entrypoints=https",
-        "ingress.http.routers.filerun.rule=Host(`filerun.nahsi.dev`)",
+        "traefik.enable=true",
+        "traefik.http.routers.filerun.entrypoints=public",
+        "traefik.http.routers.filerun.rule=Host(`filerun.nahsi.dev`)",
       ]
     }
 

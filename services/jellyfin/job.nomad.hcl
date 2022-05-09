@@ -22,9 +22,9 @@ job "jellyfin" {
         "traefik.enable=true",
         "traefik.http.routers.jellyfin.entrypoints=https",
         "traefik.http.routers.jellyfin.rule=Host(`jellyfin.service.consul`)",
-        "ingress.enable=true",
-        "ingress.http.routers.jellyfin.entrypoints=https",
-        "ingress.http.routers.jellyfin.rule=Host(`jellyfin.nahsi.dev`)",
+
+        "traefik.http.routers.jellyfin-pub.entrypoints=public",
+        "traefik.http.routers.jellyfin-pub.rule=Host(`jellyfin.nahsi.dev`)",
       ]
 
       check {
@@ -34,7 +34,7 @@ job "jellyfin" {
         path     = "/health"
         port     = "http"
         interval = "20s"
-        timeout  = "2s"
+        timeout  = "1s"
       }
     }
 
