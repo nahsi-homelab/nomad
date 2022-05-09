@@ -71,7 +71,7 @@ job "seaweedfs" {
           "-mdir=/data",
           "-defaultReplication=010",
           "-volumeSizeLimitMB=5120",
-          "-peers=10.1.10.10:9333,10.1.10.20:9333,10.1.10.1:9333",
+          "-peers=10.1.10.10:9333,10.1.10.20:9333,10.1.10.40:9333",
 
           "-ip=${NOMAD_IP_http}",
           "-ip.bind=0.0.0.0",
@@ -155,11 +155,6 @@ job "seaweedfs" {
       source = "seaweedfs-ssd"
     }
 
-    volume "hdd" {
-      type   = "host"
-      source = "seaweedfs-hdd"
-    }
-
     task "volume" {
       driver = "docker"
       user   = "nobody"
@@ -177,11 +172,6 @@ job "seaweedfs" {
         destination = "/data/ssd"
       }
 
-      volume_mount {
-        volume      = "hdd"
-        destination = "/data/hdd"
-      }
-
       config {
         image = "chrislusf/seaweedfs:${var.versions.seaweedfs}"
 
@@ -194,9 +184,9 @@ job "seaweedfs" {
         args = [
           "-v=${var.log_level}",
           "volume",
-          "-dir=/data/ssd,/data/hdd",
-          "-disk=ssd,hdd",
-          "-max=25,100",
+          "-dir=/data/ssd",
+          "-disk=ssd",
+          "-max=25",
           "-dir.idx=/data/index",
 
           "-dataCenter=${node.datacenter}",
