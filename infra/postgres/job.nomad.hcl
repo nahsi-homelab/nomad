@@ -1,6 +1,6 @@
 variables {
   versions = {
-    patroni  = "14-2.1.2"
+    patroni  = "14-2.1.3"
     exporter = "0.10.1"
   }
 }
@@ -8,7 +8,6 @@ variables {
 job "postgres" {
   datacenters = [
     "syria",
-    "asia",
   ]
   namespace = "infra"
 
@@ -16,33 +15,20 @@ job "postgres" {
     count = 2
 
     network {
+      mode = "bridge"
+
       port "postgres" {
         to     = 5432
         static = 5432
       }
 
       port "patroni" {
-        to = 8008
-      }
-    }
-
-    service {
-      name = "patroni"
-      port = "patroni"
-
-      meta {
-        alloc_id = NOMAD_ALLOC_ID
+        to     = 8008
+        static = 8008
       }
 
-      check {
-        name     = "Patroni HTTP"
-        type     = "http"
-        protocol = "https"
-        path     = "/health"
-        interval = "10s"
-        timeout  = "2s"
-
-        tls_skip_verify = true
+      port "exporter" {
+        to = 9187
       }
     }
 
@@ -83,13 +69,9 @@ job "postgres" {
         init    = true
         command = "/local/patroni.yml"
 
-        extra_hosts = [
-          "host.docker.internal:host-gateway"
-        ]
-
         ports = [
           "postgres",
-          "patroni"
+          "patroni",
         ]
       }
 
@@ -107,66 +89,24 @@ job "postgres" {
         EOF
 
         destination = "secrets/vars.env"
-        change_mode = "noop"
         env         = true
       }
 
-      template {
-        data = <<-EOH
-        {{- with secret "pki/issue/internal" "common_name=patroni.service.consul" -}}
-        {{ .Data.issuing_ca }}{{ end }}
-        EOH
+      service {
+        name = "patroni"
+        port = "patroni"
 
-        destination = "secrets/certs/CA.pem"
-        change_mode = "restart"
-        splay       = "5m"
-      }
+        meta {
+          alloc_id = NOMAD_ALLOC_ID
+        }
 
-      template {
-        data = <<-EOH
-        {{- with secret "pki/issue/internal" "common_name=patroni.service.consul" "alt_names=localhost" (env "attr.unique.network.ip-address" | printf "ip_sans=127.0.0.1,%s") -}}
-        {{ .Data.certificate }}{{ end }}
-        EOH
-
-        destination = "secrets/certs/cert.pem"
-        change_mode = "restart"
-        splay       = "5m"
-      }
-
-      template {
-        data = <<-EOH
-        {{- with secret "pki/issue/internal" "common_name=patroni.service.consul" "alt_names=localhost" (env "attr.unique.network.ip-address" | printf "ip_sans=127.0.0.1,%s") -}}
-        {{ .Data.private_key }}{{ end }}
-        EOH
-
-        change_mode = "restart"
-        destination = "secrets/certs/key.pem"
-        splay       = "5m"
-      }
-    }
-  }
-
-  group "postgres-exporter" {
-    network {
-      port "exporter" {
-        to = 9187
-      }
-    }
-
-    service {
-      name = "postgres-exporter"
-      port = "exporter"
-
-      meta {
-        alloc_id = NOMAD_ALLOC_ID
-      }
-
-      check {
-        name     = "postgres-exporter"
-        path     = "/"
-        type     = "http"
-        interval = "10s"
-        timeout  = "2s"
+        check {
+          name     = "Patroni HTTP"
+          type     = "http"
+          path     = "/health"
+          interval = "20s"
+          timeout  = "1s"
+        }
       }
     }
 
@@ -198,7 +138,7 @@ job "postgres" {
       template {
         data = <<-EOF
         PG_EXPORTER_AUTO_DISCOVER_DATABASES=true
-        DATA_SOURCE_URI=master.postgres.service.consul:5432/postgres?sslmode=disable
+        DATA_SOURCE_URI=localhost:5432/postgres?sslmode=disable
         {{ with secret "postgres/creds/postgres-exporter" }}
         DATA_SOURCE_USER='{{ .Data.username }}'
         DATA_SOURCE_PASS='{{ .Data.password }}'
@@ -208,6 +148,23 @@ job "postgres" {
         destination = "secrets/vars.env"
         change_mode = "restart"
         env         = true
+      }
+
+      service {
+        name = "postgres-exporter"
+        port = "exporter"
+
+        meta {
+          alloc_id = NOMAD_ALLOC_ID
+        }
+
+        check {
+          name     = "postgres-exporter"
+          path     = "/"
+          type     = "http"
+          interval = "20s"
+          timeout  = "1s"
+        }
       }
     }
   }
