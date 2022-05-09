@@ -1,10 +1,11 @@
+# https://github.com/drakkan/sftpgo/blob/main/docs/full-configuration.md
 common:
   temp_path: {{ env "NOMAD_ALLOC_DIR" }}
   proxy_protocol: 1
 
-defender:
-  enabled: true
-  driver: "provider"
+  defender:
+    enabled: true
+    driver: "provider"
 
 data_provider:
   driver: "postgresql"
@@ -19,7 +20,8 @@ httpd:
     port: {{ env "NOMAD_PORT_http" }}
     address: ""
     proxy_allowed:
-      - "192.168.0.0/16"
+      - "10.1.10.0/24"
+      - "10.2.10.0/24"
   web_root: "/sftpgo"
 
 webdavd:
@@ -27,7 +29,8 @@ webdavd:
     address: ""
     port: {{ env "NOMAD_PORT_webdav" }}
     proxy_allowed:
-      - "192.168.0.0/16"
+      - "10.1.10.0/24"
+      - "10.2.10.0/24"
   cache:
     expiration_time: "60" # in minutes
 

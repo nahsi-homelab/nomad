@@ -1,13 +1,12 @@
 variables {
   versions = {
-    sftpgo = "2.2.2-alpine"
+    sftpgo = "2.2.3-alpine"
   }
 }
 
 job "sftpgo" {
   datacenters = [
     "syria",
-    "asia"
   ]
   namespace = "services"
 
@@ -34,13 +33,17 @@ job "sftpgo" {
       name = "sftpgo-metrics"
       port = "metrics"
 
+      meta {
+        alloc_id  = NOMAD_ALLOC_ID
+      }
+
       check {
-        name     = "sftpgo HTTP"
+        name     = "SFTPGo HTTP"
         port     = "http"
         type     = "http"
         path     = "/healthz"
-        interval = "10s"
-        timeout  = "2s"
+        interval = "20s"
+        timeout  = "1s"
       }
     }
 
@@ -49,17 +52,17 @@ job "sftpgo" {
       port = "http"
 
       tags = [
-        "ingress.enable=true",
-        "ingress.http.routers.sftpgo-http.entrypoints=https",
-        "ingress.http.routers.sftpgo-http.rule=Host(`files.nahsi.dev`) && PathPrefix(`/sftpgo`)",
+        "traefik.enable=true",
+        "traefik.http.routers.sftpgo-http.entrypoints=public",
+        "traefik.http.routers.sftpgo-http.rule=Host(`files.nahsi.dev`) && PathPrefix(`/sftpgo`)",
       ]
 
       check {
-        name     = "sftpgo HTTP"
+        name     = "SFTPGo HTTP"
         type     = "http"
         path     = "/healthz"
-        interval = "10s"
-        timeout  = "2s"
+        interval = "20s"
+        timeout  = "1s"
       }
     }
 
@@ -68,11 +71,11 @@ job "sftpgo" {
       port = "webdav"
 
       tags = [
-        "ingress.enable=true",
-        "ingress.http.routers.sftpgo-webdav.entrypoints=https",
-        "ingress.http.routers.sftpgo-webdav.rule=Host(`files.nahsi.dev`) && PathPrefix(`/dav`)",
-        "ingress.http.middlewares.sftpgo-webdav-stripprefix.stripprefix.prefixes=/dav",
-        "ingress.http.routers.sftpgo-webdav.middlewares=sftpgo-webdav-stripprefix@consulcatalog",
+        "traefik.enable=true",
+        "traefik.http.routers.sftpgo-webdav.entrypoints=public",
+        "traefik.http.routers.sftpgo-webdav.rule=Host(`files.nahsi.dev`) && PathPrefix(`/dav`)",
+        "traefik.http.middlewares.sftpgo-webdav-stripprefix.stripprefix.prefixes=/dav",
+        "traefik.http.routers.sftpgo-webdav.middlewares=sftpgo-webdav-stripprefix@consulcatalog",
       ]
 
       check {
@@ -80,8 +83,8 @@ job "sftpgo" {
         type     = "http"
         port     = "http"
         path     = "/healthz"
-        interval = "10s"
-        timeout  = "2s"
+        interval = "20s"
+        timeout  = "1s"
       }
     }
 
@@ -90,19 +93,19 @@ job "sftpgo" {
       port = "sftp"
 
       tags = [
-        "ingress.enable=true",
-        "ingress.tcp.services.sftpgo-sftp.loadBalancer.proxyProtocol.version=2",
-        "ingress.tcp.routers.sftpgo-sftp.entrypoints=sftp",
-        "ingress.tcp.routers.sftpgo-sftp.rule=HostSNI(`*`)",
+        "traefik.enable=true",
+        "traefik.tcp.services.sftpgo-sftp.loadBalancer.proxyProtocol.version=2",
+        "traefik.tcp.routers.sftpgo-sftp.entrypoints=sftp",
+        "traefik.tcp.routers.sftpgo-sftp.rule=HostSNI(`*`)",
       ]
 
       check {
-        name     = "sftpgo HTTP"
+        name     = "SFTPGo HTTP"
         port     = "http"
         type     = "http"
         path     = "/healthz"
-        interval = "10s"
-        timeout  = "2s"
+        interval = "20s"
+        timeout  = "1s"
       }
     }
 
@@ -153,7 +156,7 @@ job "sftpgo" {
         EOH
 
         destination = "secrets/db.env"
-        splay       = "1m"
+        splay       = "3m"
         env         = true
       }
 
