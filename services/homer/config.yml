@@ -21,6 +21,11 @@ colors:
     link-hover: "#5A647E"
 
 links:
+  - name: "GitHub"
+    icon: "fab fa-github"
+    url: "https://github.com/nahsi"
+    target: "_blank"
+
   - name: "Telegram"
     icon: "fab fa-telegram"
     url: "https://t.me/nahsi_at_tg"
@@ -35,6 +40,10 @@ links:
     icon: "fa fa-briefcase"
     url: "https://resume.nahsi.dev"
     target: "_blank"
+
+  - name: "Homelab"
+    icon: "fa fa-flask"
+    url: "#homelab"
 
 services:
   - icon: "fas fa-globe"
@@ -68,5 +77,6 @@ services:
         url: "https://minio.nahsi.dev"
 
       - name: "LLPSI"
+        icon: "fa fa-graduation-cap"
         subtitle: "Lingua Latina Per Se Illustrata exercises"
         url: "https://llpsi.nahsi.dev"

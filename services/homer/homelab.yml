@@ -4,10 +4,6 @@ columns: "auto"
 connectivityCheck: true
 footer: ""
 
-defaults:
-  layout: list
-  colorTheme: auto
-
 colors:
   dark:
     highlight-primary: "#373B41"
@@ -35,15 +31,9 @@ links:
     url: "https://home-assistant.service.consul"
     target: "_blank"
 
-  - name: "UniFI-syria"
-    icon: "fa fa-network-wired"
-    url: "https://unifi-syria.service.consul"
-    target: "_blank"
-
-  - name: "UniFI-asia"
-    icon: "fa fa-network-wired"
-    url: "https://unifi-asia.service.consul"
-    target: "_blank"
+  - name: "nahsi.dev"
+    icon: "fa fa-globe"
+    url: "#config"
 
 services:
   - name: "HashiStack"
@@ -149,3 +139,16 @@ services:
         subtitle: "filer"
         logo: "https://assets.nahsi.dev/file/nahsi-assets/seaweedfs.png"
         url: "https://seaweedfs-filer.service.consul"
+
+  - name: "Network"
+    icon: "fa fa-network-wired"
+    items:
+      - name: "UniFI"
+        subtitle: "syria"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/unifi.png"
+        url: "https://unifi-syria.service.consul"
+
+      - name: "UniFI"
+        subtitle: "asia"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/unifi.png"
+        url: "https://unifi-asia.service.consul"
