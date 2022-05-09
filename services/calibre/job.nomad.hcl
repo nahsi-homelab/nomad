@@ -20,13 +20,9 @@ job "calibre" {
       port = "http"
 
       tags = [
-        "ingress.enable=true",
-        "ingress.http.routers.calibre-web.entrypoints=https",
-        "ingress.http.routers.calibre-web.rule=Host(`calibre.nahsi.dev`)",
-
         "traefik.enable=true",
-        "traefik.http.routers.calibre-web.entrypoints=https",
-        "traefik.http.routers.calibre-web.rule=Host(`calibre-web.service.consul`)",
+        "traefik.http.routers.calibre-web.entrypoints=public",
+        "traefik.http.routers.calibre-web.rule=Host(`calibre.nahsi.dev`)",
       ]
 
       check {

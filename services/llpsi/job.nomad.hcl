@@ -1,16 +1,12 @@
 job "llpsi" {
   datacenters = [
     "syria",
-    "asia"
   ]
   namespace = "services"
 
-  constraint {
-    distinct_property = "${node.datacenter}"
-  }
-
   group "llpsi" {
-    count = 2
+    count = 1
+
     network {
       port "http" {
         to = 80
@@ -23,11 +19,8 @@ job "llpsi" {
 
       tags = [
         "traefik.enable=true",
-        "traefik.http.routers.llpsi.entrypoints=https",
-        "traefik.http.routers.llpsi.rule=Host(`llpsi.service.consul`)",
-        "ingress.enable=true",
-        "ingress.http.routers.llpsi.entrypoints=https",
-        "ingress.http.routers.llpsi.rule=Host(`llpsi.nahsi.dev`)",
+        "traefik.http.routers.llpsi.entrypoints=public",
+        "traefik.http.routers.llpsi.rule=Host(`llpsi.nahsi.dev`)",
       ]
 
       check {
@@ -36,7 +29,7 @@ job "llpsi" {
         port     = "http"
         path     = "/"
         interval = "20s"
-        timeout  = "2s"
+        timeout  = "1s"
       }
     }
 
@@ -53,7 +46,7 @@ job "llpsi" {
         image = "nahsihub/llpsi:latest"
 
         ports = [
-          "http"
+          "http",
         ]
       }
     }
