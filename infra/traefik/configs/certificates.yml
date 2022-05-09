@@ -1,6 +1,6 @@
 tls:
-  stores:
-    default:
-      defaultCertificate:
-        certFile: "/secrets/certs/internal/cert.pem"
-        keyFile: "/secrets/certs/internal/key.pem"
+  certificates:
+    - certFile: '[[ env "NOMAD_SECRETS_DIR" ]]/certs/nahsi.dev/cert.pem'
+      keyFile: '[[ env "NOMAD_SECRETS_DIR" ]]/certs/nahsi.dev/key.pem'
+    - certFile: '[[ env "NOMAD_SECRETS_DIR" ]]/certs/internal/cert.pem'
+      keyFile: '[[ env "NOMAD_SECRETS_DIR" ]]/certs/internal/key.pem'

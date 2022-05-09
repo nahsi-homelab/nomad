@@ -1,6 +1,5 @@
 server:
   http_listen_port: {{ env "NOMAD_PORT_promtail" }}
-  grpc_listen_port: 0
 
 positions:
   filename: {{ env "NOMAD_ALLOC_DIR" }}/data/positions.yml
@@ -28,10 +27,10 @@ scrape_configs:
             level: level
             method: RequestMethod
             status: DownstreamStatus
+            service: ServiceName
             path: RequestPath
       - labels:
-          method:
-          status:
+          service:
       - timestamp:
           source: time
           format: "RFC3339"

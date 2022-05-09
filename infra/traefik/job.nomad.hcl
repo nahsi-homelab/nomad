@@ -1,7 +1,7 @@
 variables {
   versions = {
-    traefik  = "2.6.1"
-    promtail = "2.4.2"
+    traefik  = "2.6.6"
+    promtail = "2.5.0"
   }
 }
 
@@ -9,37 +9,58 @@ job "traefik" {
   datacenters = [
     "syria",
     "asia",
-    "pontus",
   ]
-
   namespace = "infra"
   type      = "system"
 
   update {
     max_parallel = 1
     stagger      = "2m"
-    auto_revert  = true
   }
 
   group "traefik" {
     network {
       port "traefik" {
-        to = 8080
+        to     = 59427
+        static = 59427
       }
 
       port "http" {
-        static = 80
         to     = 80
+        static = 80
       }
 
       port "https" {
-        static = 443
         to     = 443
+        static = 443
       }
 
-      port "promtail" {
-        to = 3000
+      port "public" {
+        to     = 444
+        static = 444
       }
+
+      port "smtp" {
+        to     = 465
+        static = 465
+      }
+
+      port "smtp-relay" {
+        to     = 25
+        static = 25
+      }
+
+      port "imap" {
+        to     = 993
+        static = 993
+      }
+
+      port "sftp" {
+        to     = 2022
+        static = 2022
+      }
+
+      port "promtail" {}
     }
 
     service {
@@ -68,8 +89,8 @@ job "traefik" {
         type     = "http"
         path     = "/ping"
         port     = "traefik"
-        interval = "10s"
-        timeout  = "2s"
+        interval = "20s"
+        timeout  = "1s"
       }
     }
 
@@ -79,12 +100,15 @@ job "traefik" {
 
       meta {
         sidecar_to = "traefik"
+        alloc_id   = NOMAD_ALLOC_ID
       }
 
       check {
+        name     = "Promtail HTTP"
         type     = "http"
         path     = "/ready"
-        interval = "10s"
+        port     = "promtail"
+        interval = "20s"
         timeout  = "1s"
       }
     }
@@ -111,6 +135,11 @@ job "traefik" {
           "traefik",
           "http",
           "https",
+          "public",
+          "smtp",
+          "smtp-relay",
+          "imap",
+          "sftp",
         ]
 
         args = [
@@ -121,7 +150,7 @@ job "traefik" {
       template {
         data        = file("traefik.yml")
         destination = "local/traefik.yml"
-        splay       = "5m"
+        change_mode = "noop"
 
         left_delimiter  = "[["
         right_delimiter = "]]"
@@ -148,8 +177,7 @@ job "traefik" {
         EOH
 
         destination = "secrets/certs/internal/cert.pem"
-        change_mode = "restart"
-        splay       = "5m"
+        change_mode = "noop"
       }
 
       template {
@@ -158,9 +186,28 @@ job "traefik" {
         {{ .Data.private_key }}{{ end }}
         EOH
 
-        change_mode = "restart"
         destination = "secrets/certs/internal/key.pem"
-        splay       = "5m"
+        change_mode = "noop"
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "secret/certificate" -}}
+        {{ .Data.data.ca_bundle }}{{ end }}
+        EOH
+
+        destination = "secrets/certs/nahsi.dev/cert.pem"
+        change_mode = "noop"
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "secret/certificate" -}}
+        {{ .Data.data.key }}{{ end }}
+        EOH
+
+        destination = "secrets/certs/nahsi.dev/key.pem"
+        change_mode = "noop"
       }
     }
 
@@ -186,7 +233,7 @@ job "traefik" {
         image = "grafana/promtail:${var.versions.promtail}"
 
         args = [
-          "-config.file=local/promtail.yml"
+          "-config.file=local/promtail.yml",
         ]
 
         ports = [

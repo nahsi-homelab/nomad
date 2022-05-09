@@ -1,9 +1,9 @@
 entryPoints:
   traefik:
-    address: ":8080"
+    address: :[[ env "NOMAD_PORT_traefik" ]]
 
   http:
-    address: ":80"
+    address: :[[ env "NOMAD_PORT_http" ]]
     transport:
       lifeCycle:
         requestAcceptGraceTimeout: 15
@@ -15,7 +15,7 @@ entryPoints:
           scheme: "https"
 
   https:
-    address: ":443"
+    address: :[[ env "NOMAD_PORT_https" ]]
     transport:
       lifeCycle:
         requestAcceptGraceTimeout: 15
@@ -26,6 +26,59 @@ entryPoints:
           - main: "service.consul"
             sans:
               - "*.service.consul"
+
+  public:
+    address: :[[ env "NOMAD_PORT_public" ]]
+    transport:
+      lifeCycle:
+        requestAcceptGraceTimeout: 15
+        graceTimeOut: 10
+    http:
+      tls:
+        domains:
+          - main: "nahsi.dev"
+            sans:
+              - "*.nahsi.dev"
+
+  smtp:
+    address: :[[ env "NOMAD_PORT_smtp" ]]
+    transport:
+      lifeCycle:
+        requestAcceptGraceTimeout: 15
+        graceTimeOut: 10
+    http:
+      tls:
+        domains:
+          - main: "nahsi.dev"
+            sans:
+              - "*.nahsi.dev"
+
+  smtp-relay:
+    address: :[[ env "NOMAD_PORT_smtp_relay" ]]
+    transport:
+      lifeCycle:
+        requestAcceptGraceTimeout: 15
+        graceTimeOut: 10
+
+  imap:
+    address: :[[ env "NOMAD_PORT_imap" ]]
+    transport:
+      lifeCycle:
+        requestAcceptGraceTimeout: 15
+        graceTimeOut: 10
+    http:
+      tls:
+        domains:
+          - main: "nahsi.dev"
+            sans:
+              - "*.nahsi.dev"
+
+  sftp:
+    address: :[[ env "NOMAD_PORT_sftp" ]]
+    transport:
+      lifeCycle:
+        requestAcceptGraceTimeout: 15
+        graceTimeOut: 10
 
 api:
   insecure: true
@@ -58,5 +111,5 @@ providers:
     serviceName: "traefik"
 
   file:
-    directory: "/local/configs"
+    directory: [[ env "NOMAD_TASK_DIR" ]]/configs
     watch: true
