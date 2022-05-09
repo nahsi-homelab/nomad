@@ -49,7 +49,7 @@ services:
 
       - name: "Vault"
         logo: "https://assets.nahsi.dev/file/nahsi-assets/vault.png"
-        url: "https://vault.nahsi.dev"
+        url: "https://vault.service.consul"
 
   - name: "Observability"
     icon: "fa fa-heartbeat"
