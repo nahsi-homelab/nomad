@@ -18,22 +18,12 @@ job "loki" {
   ]
   namespace = "observability"
 
-  spread {
-    attribute = node.unique.name
-  }
-
   vault {
     policies = ["loki"]
   }
 
   group "compactor" {
     count = 1
-
-    constraint {
-      attribute = attr.cpu.totalcompute
-      operator  = ">="
-      value     = 20000
-    }
 
     ephemeral_disk {
       size    = 1000
@@ -58,12 +48,19 @@ job "loki" {
         component = "compactor"
       }
 
+      tags = [
+        "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
+        "traefik.http.routers.loki-compactor-ring.entrypoints=https",
+        "traefik.http.routers.loki-compactor-ring.rule=Host(`loki-compactor.service.consul`) && Path(`/compactor/ring`)",
+      ]
+
       check {
         name     = "Loki compactor"
         port     = "health"
         type     = "http"
         path     = "/ready"
-        interval = "10s"
+        interval = "20s"
         timeout  = "1s"
       }
 
@@ -146,7 +143,7 @@ job "loki" {
       }
 
       resources {
-        cpu        = 3500
+        cpu        = 3000
         memory     = 256
         memory_max = 1024
       }
@@ -176,10 +173,14 @@ job "loki" {
       tags = [
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
+
         "traefik.http.routers.loki-distributor.entrypoints=https",
         "traefik.http.routers.loki-distributor.rule=Host(`loki-distributor.service.consul`)",
         "traefik.http.middlewares.loki-distributor.basicauth.users=promtail:$$apr1$$wnir40yf$$vcxJYiqcEQLknQAZcpy/I1",
         "traefik.http.routers.loki-distirbutor.middlewares=loki-distributor@consulcatalog",
+
+        "traefik.http.routers.loki-distributor-ring.entrypoints=https",
+        "traefik.http.routers.loki-distributor-ring.rule=Host(`loki-distributor.cinarra.com`) && Path(`/distributor/ring`)",
       ]
 
       check {
@@ -187,7 +188,7 @@ job "loki" {
         port     = "health"
         type     = "http"
         path     = "/ready"
-        interval = "10s"
+        interval = "20s"
         timeout  = "1s"
       }
 
@@ -252,7 +253,7 @@ job "loki" {
 
           destination = "secrets/certs/${template.key}.pem"
           change_mode = "restart"
-          splay       = "1m"
+          splay       = "5m"
         }
       }
 
@@ -272,7 +273,7 @@ job "loki" {
     }
 
     ephemeral_disk {
-      size    = 4100
+      size    = 4000
       migrate = true
       sticky  = true
     }
@@ -294,12 +295,19 @@ job "loki" {
         component = "ingester"
       }
 
+      tags = [
+        "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
+        "traefik.http.routers.loki-ingester-ring.entrypoints=https",
+        "traefik.http.routers.loki-ingester-ring.rule=Host(`loki-ingester.service.consul`) && Path(`/ring`)",
+      ]
+
       check {
         name     = "Loki ingester"
         port     = "health"
         type     = "http"
         path     = "/ready"
-        interval = "10s"
+        interval = "20s"
         timeout  = "1s"
       }
 
@@ -362,7 +370,7 @@ job "loki" {
         EOH
 
         destination = "secrets/s3.env"
-        splay       = "1m"
+        splay       = "5m"
         env         = true
       }
 
@@ -414,7 +422,7 @@ job "loki" {
         port     = "health"
         type     = "http"
         path     = "/ready"
-        interval = "10s"
+        interval = "50s"
         timeout  = "1s"
       }
 
@@ -477,7 +485,7 @@ job "loki" {
         EOH
 
         destination = "secrets/s3.env"
-        splay       = "1m"
+        splay       = "5m"
         env         = true
       }
 
@@ -485,7 +493,7 @@ job "loki" {
         for_each = local.certs
         content {
           data = <<-EOH
-          {{- with secret "pki/issue/internal" "ttl=10d" "common_name=loki-querier.service.consul" (env "attr.unique.network.ip-address" | printf  "ip_sans=%s,127.0.0.1") -}}
+          {{- with secret "pki/issue/internal" "ttl=10d" "common_name=loki-querier.service.consul" (env "attr.unique.network.ip-address" | printf  "ip_sans=%s") -}}
           {{ .Data.${template.value} }}
           {{- end -}}
           EOH
@@ -512,7 +520,10 @@ job "loki" {
 
       port "http" {}
       port "health" {}
-      port "grpc" {}
+      port "grpc" {
+        to     = 9096
+        static = 9096
+      }
     }
 
     service {
@@ -529,7 +540,7 @@ job "loki" {
         port     = "health"
         type     = "http"
         path     = "/ready"
-        interval = "10s"
+        interval = "20s"
         timeout  = "1s"
       }
 
@@ -626,12 +637,22 @@ job "loki" {
         component = "query-frontend"
       }
 
+      tags = [
+        "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
+
+        "traefik.http.routers.loki-query-frontend.entrypoints=https",
+        "traefik.http.routers.loki-query-frontend.rule=Host(`loki-query-frontend.service.consul`)",
+        "traefik.http.middlewares.loki-query-frontend.basicauth.users=grafana:$apr1$5yBhGAwc$SrXPFIfimv5cCNH8UrDpE/",
+        "traefik.http.routers.loki-query-frontend.middlewares=loki-query-frontend@consulcatalog",
+      ]
+
       check {
         name     = "Loki query-frontend"
         port     = "health"
         type     = "http"
         path     = "/ready"
-        interval = "10s"
+        interval = "20s"
         timeout  = "1s"
       }
 
@@ -639,11 +660,6 @@ job "loki" {
         sidecar_service {
           proxy {
             local_service_port = 80
-
-            upstreams {
-              destination_name = "loki-querier"
-              local_bind_port  = 9095
-            }
 
             expose {
               path {
@@ -728,8 +744,8 @@ job "loki" {
       port "http" {}
       port "health" {}
       port "grpc" {
-        to     = 9095
-        static = 9095
+        to     = 9097
+        static = 9097
       }
     }
 
