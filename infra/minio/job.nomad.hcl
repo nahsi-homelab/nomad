@@ -1,6 +1,13 @@
 variables {
   versions = {
-    minio = "RELEASE.2022-03-17T06-34-49Z"
+    minio = "RELEASE.2022-05-08T23-50-31Z"
+  }
+}
+
+locals {
+  certs = {
+    "public.crt"  = "certificate",
+    "private.key" = "private_key",
   }
 }
 
@@ -11,17 +18,9 @@ job "minio" {
   ]
   namespace = "infra"
 
-  constraint {
-    distinct_property = meta.minio_node_id
-  }
-
-  update {
-    max_parallel = 1
-    stagger      = "1m"
-  }
-
   group "minio" {
     count = 4
+
     network {
       port "api" {
         to     = 9000
@@ -35,15 +34,15 @@ job "minio" {
     }
 
     service {
-      name = "minio-console"
+      name = "minio"
       port = "console"
 
       tags = [
-        "ingress.enable=true",
-        "ingress.http.routers.minio-ui.entrypoints=https",
-        "ingress.http.routers.minio-ui.rule=Host(`minio.nahsi.dev`)",
-        "ingress.http.services.minio-ui.loadbalancer.server.scheme=https",
-        "ingress.http.services.minio-ui.loadbalancer.serverstransport=skipverify@file",
+        "traefik.enable=true",
+        "traefik.http.routers.minio-ui.entrypoints=public",
+        "traefik.http.routers.minio-ui.rule=Host(`minio.nahsi.dev`)",
+        "traefik.http.services.minio-ui.loadbalancer.server.scheme=https",
+        "traefik.http.services.minio-ui.loadbalancer.serverstransport=skipverify@file",
       ]
 
       check {
@@ -52,23 +51,29 @@ job "minio" {
         protocol = "https"
         port     = "api"
         path     = "/minio/health/live"
-        interval = "10s"
-        timeout  = "2s"
+        interval = "20s"
+        timeout  = "1s"
 
         tls_skip_verify = true
       }
     }
 
     service {
-      name = "minio"
+      name = "s3"
       port = "api"
 
       tags = [
-        "ingress.enable=true",
-        "ingress.http.routers.minio-api.rule=Host(`s3.nahsi.dev`)",
-        "ingress.http.routers.minio-api.entrypoints=https",
-        "ingress.http.services.minio-api.loadbalancer.server.scheme=https",
-        "ingress.http.services.minio-api.loadbalancer.serverstransport=skipverify@file",
+        "traefik.enable=true",
+
+        "traefik.http.routers.minio-api-pub.rule=Host(`s3.nahsi.dev`)",
+        "traefik.http.routers.minio-api-pub.entrypoints=public",
+        "traefik.http.services.minio-api-pub.loadbalancer.server.scheme=https",
+        "traefik.http.services.minio-api-pub.loadbalancer.serverstransport=skipverify@file",
+
+        "traefik.http.routers.minio-api.rule=Host(`s3.service.consul`)",
+        "traefik.http.routers.minio-api.entrypoints=https",
+        "traefik.http.services.minio-api.loadbalancer.server.scheme=https",
+        "traefik.http.services.minio-api.loadbalancer.serverstransport=skipverify@file",
       ]
 
       check {
@@ -76,8 +81,8 @@ job "minio" {
         type     = "http"
         protocol = "https"
         path     = "/minio/health/live"
-        interval = "10s"
-        timeout  = "2s"
+        interval = "20s"
+        timeout  = "1s"
 
         tls_skip_verify = true
       }
@@ -116,9 +121,9 @@ job "minio" {
         MINIO_USERNAME = "nobody"
 
         MINIO_SITE_NAME   = "homelab"
-        MINIO_SITE_REGION = "homelab"
+        MINIO_SITE_REGION = "syria"
 
-        MINIO_SERVER_URL           = "https://minio.service.consul:9000"
+        MINIO_SERVER_URL           = "https://s3.service.consul:9000"
         MINIO_BROWSER_REDIRECT_URL = "https://minio.nahsi.dev"
         MINIO_PROMETHEUS_URL       = "https://victoria-metrics.service.consul"
       }
@@ -129,7 +134,7 @@ job "minio" {
 
         ports = [
           "api",
-          "console"
+          "console",
         ]
 
         command = "minio"
@@ -147,42 +152,34 @@ job "minio" {
         MINIO_ROOT_PASSWORD={{ with secret "secret/minio/root" }}{{ .Data.data.password }}{{ end }}
         EOF
 
-        destination = "secrets/vars.env"
-        change_mode = "noop"
+        destination = "secrets/secrets.env"
         env         = true
       }
 
       template {
         data = <<-EOH
-        {{- with secret "pki/issue/internal" "common_name=minio.service.consul" "alt_names=*.service.consul" -}}
+        {{- with secret "pki/issue/internal" "common_name=*.service.consul" -}}
         {{ .Data.issuing_ca }}{{ end }}
         EOH
 
         destination = "secrets/certs/CAs/public.crt"
         change_mode = "restart"
-        splay       = "1m"
+        splay       = "5m"
       }
 
-      template {
-        data = <<-EOH
-        {{- with secret "pki/issue/internal" "common_name=minio.service.consul" "alt_names=minio.service.consul,*.service.consul,localhost" "ip_sans=127.0.0.1" -}}
-        {{ .Data.certificate }}{{ end }}
-        EOH
+      dynamic "template" {
+        for_each = local.certs
+        content {
+          data = <<-EOH
+          {{- with secret "pki/issue/internal" "ttl=31d" "common_name=s3.service.consul" (env "attr.unique.network.ip-address" | printf "ip_sans=%s,127.0.0.1") (env "meta.minio_node_id" | printf "alt_names=minio-%s.service.consul,minio.service.consul,localhost") -}}
+          {{ .Data.${template.value} }}
+          {{- end -}}
+          EOH
 
-        destination = "secrets/certs/public.crt"
-        change_mode = "restart"
-        splay       = "1m"
-      }
-
-      template {
-        data = <<-EOH
-        {{- with secret "pki/issue/internal" "common_name=minio.service.consul" "alt_names=minio.service.consul,*.service.consul,localhost" "ip_sans=127.0.0.1" -}}
-        {{ .Data.private_key }}{{ end }}
-        EOH
-
-        change_mode = "restart"
-        destination = "secrets/certs/private.key"
-        splay       = "1m"
+          destination = "secrets/certs/${template.key}"
+          change_mode = "restart"
+          splay       = "5m"
+        }
       }
     }
   }
