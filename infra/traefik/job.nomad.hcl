@@ -258,7 +258,7 @@ job "traefik" {
 
       template {
         data = <<-EOH
-        {{- with secret "secret/promtail/loki" -}}
+        {{- with secret "secret/loki/basicauth/promtail" -}}
         {{ .Data.data.username }}:{{ .Data.data.password }}{{ end }}
         EOH
 
