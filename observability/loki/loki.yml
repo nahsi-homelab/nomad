@@ -2,6 +2,7 @@ auth_enabled: false
 
 common:
   replication_factor: 2
+  instance_addr: {{ env "NOMAD_IP_grpc" }}
   ring:
     instance_addr: {{ env "NOMAD_IP_grpc" }}
     instance_availability_zone: {{ env "node.unique.name" }}
