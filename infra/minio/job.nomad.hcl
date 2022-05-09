@@ -69,11 +69,13 @@ job "minio" {
         "traefik.http.routers.minio-api-pub.entrypoints=public",
         "traefik.http.services.minio-api-pub.loadbalancer.server.scheme=https",
         "traefik.http.services.minio-api-pub.loadbalancer.serverstransport=skipverify@file",
+        "traefik.http.routers.minio-api-pub.service=minio-api-pub",
 
         "traefik.http.routers.minio-api.rule=Host(`s3.service.consul`)",
         "traefik.http.routers.minio-api.entrypoints=https",
         "traefik.http.services.minio-api.loadbalancer.server.scheme=https",
         "traefik.http.services.minio-api.loadbalancer.serverstransport=skipverify@file",
+        "traefik.http.routers.minio-api.service=minio-api",
       ]
 
       check {
@@ -123,7 +125,7 @@ job "minio" {
         MINIO_SITE_NAME   = "homelab"
         MINIO_SITE_REGION = "syria"
 
-        MINIO_SERVER_URL           = "https://s3.service.consul:9000"
+        MINIO_SERVER_URL           = "https://s3.service.consul"
         MINIO_BROWSER_REDIRECT_URL = "https://minio.nahsi.dev"
         MINIO_PROMETHEUS_URL       = "https://victoria-metrics.service.consul"
       }
