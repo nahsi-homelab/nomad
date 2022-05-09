@@ -1,7 +1,6 @@
 job "filestash" {
   datacenters = [
     "syria",
-    "asia"
   ]
   namespace = "services"
 
@@ -17,9 +16,9 @@ job "filestash" {
       port = "http"
 
       tags = [
-        "ingress.enable=true",
-        "ingress.http.routers.filestash.entrypoints=https",
-        "ingress.http.routers.filestash.rule=Host(`files.nahsi.dev`)",
+        "traefik.enable=true",
+        "traefik.http.routers.filestash.entrypoints=public",
+        "traefik.http.routers.filestash.rule=Host(`files.nahsi.dev`)",
       ]
     }
 
