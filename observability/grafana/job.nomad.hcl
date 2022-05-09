@@ -1,22 +1,17 @@
 variables {
   versions = {
-    grafana = "8.5.0"
+    grafana = "8.5.1"
   }
 }
 
 job "grafana" {
   datacenters = [
     "syria",
-    "asia"
   ]
   namespace = "observability"
 
   group "grafana" {
     count = 2
-
-    constraint {
-      distinct_property = node.datacenter
-    }
 
     network {
       mode = "bridge"
@@ -44,45 +39,8 @@ job "grafana" {
         name     = "Grafana HTTP"
         type     = "http"
         path     = "/api/health"
-        interval = "10s"
-        timeout  = "2s"
-      }
-    }
-
-    service {
-      name = "grafana-connect"
-      port = 3000
-
-      meta {
-        dashboard = "isFoa0z7k"
-        alloc_id  = NOMAD_ALLOC_ID
-      }
-
-      connect {
-        sidecar_service {
-          proxy {
-            local_service_port = 3000
-
-            upstreams {
-              destination_name = "victoria-metrics"
-              local_bind_port  = 8428
-            }
-
-            upstreams {
-              destination_name = "loki-query-frontend"
-              local_bind_port  = 3100
-            }
-          }
-        }
-      }
-
-      check {
-        expose   = true
-        name     = "Grafana HTTP"
-        type     = "http"
-        path     = "/api/health"
-        interval = "10s"
-        timeout  = "2s"
+        interval = "20s"
+        timeout  = "1s"
       }
     }
 
@@ -108,7 +66,7 @@ job "grafana" {
         image = "grafana/grafana:${var.versions.grafana}"
 
         ports = [
-          "http"
+          "http",
         ]
       }
 
@@ -128,23 +86,21 @@ job "grafana" {
 
       template {
         data        = <<-EOH
-        {{ with secret "secret/grafana/github" }}{{ .Data.data.client_id }}{{ end }}
+        {{- with secret "secret/grafana/users/admin" -}}
+        GF_SECURITY_ADMIN_USER='{{ .Data.data.username }}'
+        GF_SECURITY_ADMIN_PASSWORD='{{ .Data.data.password }}'
+        {{- end }}
+        {{ with secret "secret/grafana/github" -}}
+        GF_AUTH_GITHUB_CLIENT_ID='{{ .Data.data.client_id }}'
+        GF_AUTH_GITHUB_CLIENT_SECRET='{{ .Data.data.client_secret }}'
+        {{- end }}
+        {{ with secret "secret/loki/basicauth/grafana" -}}
+        LOKI_USERNAME='{{ .Data.data.username }}'
+        LOKI_PASSWORD='{{ .Data.data.password }}'
+        {{- end }}
         EOH
-        destination = "secrets/github/client_id"
-      }
-
-      template {
-        data        = <<-EOH
-        {{ with secret "secret/grafana/github" }}{{ .Data.data.secret_id }}{{ end }}
-        EOH
-        destination = "secrets/github/secret_id"
-      }
-
-      template {
-        data        = <<-EOH
-        {{ with secret "secret/grafana/users/admin" }}{{ .Data.data.password }}{{ end }}
-        EOH
-        destination = "secrets/admin_password"
+        destination = "secrets/secrets.env"
+        env         = true
       }
 
       template {

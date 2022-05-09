@@ -3,7 +3,7 @@ deleteDatasources: []
 datasources:
   - name: "VictoriaMetrics"
     type: "prometheus"
-    url: "http://127.0.0.1:8428"
+    url: "https://victoria-metrics.service.consul"
     isDefault: true
     basicAuth: false
     jsonData:
@@ -12,7 +12,15 @@ datasources:
 
   - name: "Loki"
     type: "loki"
-    url: "http://127.0.0.1:3100"
-    basicAuth: false
+    url: "https://loki-query-frontend.service.consul"
+    basicAuth: true
+    basicAuthUser: "${LOKI_USERNAME}"
     jsonData:
       maxLines: 1000
+      manageAlerts: false
+      tlsAuthWithCACert: true
+    secureJsonData:
+      basicAuthPassword: "${LOKI_PASSWORD}"
+      tlsCACert: |
+{{ with secret "pki/issue/internal" "common_name=*.service.consul" -}}
+{{ .Data.issuing_ca | indent 8 }}{{ end }}
