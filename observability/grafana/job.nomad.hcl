@@ -90,13 +90,20 @@ job "grafana" {
         GF_SECURITY_ADMIN_USER='{{ .Data.data.username }}'
         GF_SECURITY_ADMIN_PASSWORD='{{ .Data.data.password }}'
         {{- end }}
+
         {{ with secret "secret/grafana/github" -}}
         GF_AUTH_GITHUB_CLIENT_ID='{{ .Data.data.client_id }}'
         GF_AUTH_GITHUB_CLIENT_SECRET='{{ .Data.data.client_secret }}'
         {{- end }}
+
         {{ with secret "secret/loki/basicauth/grafana" -}}
         LOKI_USERNAME='{{ .Data.data.username }}'
         LOKI_PASSWORD='{{ .Data.data.password }}'
+        {{- end }}
+
+        {{ with secret "secret/victoria-metrics/basicauth/grafana" -}}
+        VM_USERNAME='{{ .Data.data.username }}'
+        VM_PASSWORD='{{ .Data.data.password }}'
         {{- end }}
         EOH
         destination = "secrets/secrets.env"
