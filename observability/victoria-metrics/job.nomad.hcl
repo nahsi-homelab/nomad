@@ -1,19 +1,19 @@
 variables {
   versions = {
-    vm = "1.75.0"
+    vm = "1.77.1"
   }
 }
 
 job "victoria-metrics" {
   datacenters = [
     "syria",
-    "asia"
   ]
   namespace = "observability"
 
   group "victoria-metrics" {
     network {
       mode = "bridge"
+
       port "http" {}
       port "health" {}
     }
@@ -32,6 +32,8 @@ job "victoria-metrics" {
         "traefik.consulcatalog.connect=true",
         "traefik.http.routers.vm.entrypoints=https",
         "traefik.http.routers.vm.rule=Host(`victoria-metrics.service.consul`)",
+        "traefik.http.middlewares.vm.basicauth.users=grafana:$apr1$t5jdWcQc$XW374MmpYV7bAwstzVOo3.,vmagent:$apr1$jX8.Ggk4$Y6VSTzJAt/fgtpNLoCrnT1",
+        "traefik.http.routers.vm.middlewares=vm@consulcatalog",
       ]
 
       connect {
@@ -62,7 +64,7 @@ job "victoria-metrics" {
         port     = "health"
         path     = "/-/ready"
         interval = "10s"
-        timeout  = "2s"
+        timeout  = "1s"
       }
     }
 
@@ -74,7 +76,7 @@ job "victoria-metrics" {
     task "victoria-metrics" {
       driver       = "docker"
       user         = "nobody"
-      kill_timeout = "10s"
+      kill_timeout = "15s"
 
       vault {
         policies = ["victoria-metrics"]
@@ -109,13 +111,10 @@ job "victoria-metrics" {
       min_healthy_time = "30s"
     }
 
-    constraint {
-      distinct_property = node.datacenter
-    }
-
     ephemeral_disk {
-      size   = 1100
+      size = 600
       sticky = true
+      migrate = true
     }
 
     network {
@@ -135,36 +134,9 @@ job "victoria-metrics" {
 
       tags = [
         "traefik.enable=true",
-        "traefik.consulcatalog.connect=true",
         "traefik.http.routers.vmagent.entrypoints=https",
         "traefik.http.routers.vmagent.rule=Host(`vmagent.service.consul`)",
       ]
-
-      connect {
-        sidecar_service {
-          proxy {
-            local_service_port = 8429
-            upstreams {
-              destination_name = "victoria-metrics"
-              local_bind_port  = 8428
-            }
-            expose {
-              path {
-                path            = "/metrics"
-                protocol        = "http"
-                local_path_port = 8429
-                listener_port   = "http"
-              }
-              path {
-                path            = "/-/ready"
-                protocol        = "http"
-                local_path_port = 8429
-                listener_port   = "health"
-              }
-            }
-          }
-        }
-      }
 
       check {
         name     = "vmagent HTTP"
@@ -172,7 +144,7 @@ job "victoria-metrics" {
         port     = "health"
         path     = "/-/ready"
         interval = "10s"
-        timeout  = "2s"
+        timeout  = "1s"
       }
     }
 
@@ -194,11 +166,17 @@ job "victoria-metrics" {
         image = "victoriametrics/vmagent:v${var.versions.vm}"
 
         args = [
-          "-httpListenAddr=127.0.0.1:8429",
+          "-httpListenAddr=0.0.0.0:${NOMAD_PORT_http}",
+          "-envflag.enable",
           "-promscrape.config=${NOMAD_TASK_DIR}/config.yml",
-          "-remoteWrite.url=http://localhost:8428/api/v1/write",
+
           "-remoteWrite.tmpDataPath=${NOMAD_ALLOC_DIR}/data/vmagent-queue",
           "-remoteWrite.maxDiskUsagePerURL=500MB",
+
+          "-remoteWrite.url=https://victoria-metrics.service.consul/api/v1/write",
+          "-remoteWrite.tlsCAFile=/secrets/certs/CA.pem",
+          "-remoteWrite.basicAuth.username=vmagent",
+          "-remoteWrite.basicAuth.password=${VM_PASSWORD}",
         ]
       }
 
@@ -218,6 +196,17 @@ job "victoria-metrics" {
         destination = "secrets/certs/CA.pem"
         change_mode = "restart"
         splay       = "5m"
+      }
+
+      template {
+        data = <<-EOH
+        {{- with secret "secret/victoria-metrics/basicauth/vmagent" }}
+        VM_PASSWORD={{ .Data.data.password }}
+        {{- end }}
+        EOH
+
+        destination = "secrets/vm.env"
+        env         = true
       }
 
       template {
