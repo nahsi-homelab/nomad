@@ -225,8 +225,9 @@ job "traefik" {
       }
 
       resources {
-        cpu    = 50
-        memory = 32
+        cpu        = 50
+        memory     = 64
+        memory_max = 128
       }
 
       config {
