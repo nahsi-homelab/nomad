@@ -46,20 +46,44 @@ links:
     url: "#homelab"
 
 services:
-  - icon: "fas fa-globe"
+  - name: "Media"
+    icon: "fa fa-photo-film"
     items:
       - name: "Jellyfin"
+        subtitle: "Movies"
         logo: "https://assets.nahsi.dev/file/nahsi-assets/jellyfin.svg"
         url: "https://jellyfin.nahsi.dev"
 
+      - name: "Polaris"
+        subtitle: "Music"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/polaris.png"
+        url: "https://polaris.nahsi.dev"
+
       - name: "Calibre"
+        subtitle: "Books"
         logo: "https://assets.nahsi.dev/file/nahsi-assets/calibre.png"
         url: "https://calibre.nahsi.dev"
 
+      - name: "Audiobookshelf"
+        subtitle: "Audiobooks & podcasts"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/audiobookshelf.png"
+        url: "https://calibre.nahsi.dev"
+
+  - name: "Services"
+    icon: "fa fa-globe"
+    items:
       - name: "Webmail"
         logo: "https://assets.nahsi.dev/file/nahsi-assets/roundcube.svg"
         url: "https://mail.nahsi.dev"
 
+      - name: "LLPSI"
+        icon: "fa fa-graduation-cap"
+        subtitle: "Lingua Latina Per Se Illustrata exercises"
+        url: "https://llpsi.nahsi.dev"
+
+  - name: "Filesharing"
+    icon: "fa fa-file"
+    items:
       - name: "FileRun"
         logo: "https://assets.nahsi.dev/file/nahsi-assets/filerun.png"
         url: "https://filerun.nahsi.dev"
@@ -75,8 +99,3 @@ services:
       - name: "MinIO"
         logo: "https://assets.nahsi.dev/file/nahsi-assets/minio.png"
         url: "https://minio.nahsi.dev"
-
-      - name: "LLPSI"
-        icon: "fa fa-graduation-cap"
-        subtitle: "Lingua Latina Per Se Illustrata exercises"
-        url: "https://llpsi.nahsi.dev"

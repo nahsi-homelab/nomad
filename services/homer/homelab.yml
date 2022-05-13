@@ -58,48 +58,43 @@ services:
         logo: "https://assets.nahsi.dev/file/nahsi-assets/grafana.png"
         url: "https://grafana.service.consul"
 
-      - name: "vmagent"
-        logo: "https://assets.nahsi.dev/file/nahsi-assets/vm.png"
-        url: "https://vmagent.service.consul"
+      - name: "Traefik"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/traefik.png"
+        url: "https://traefik.service.consul"
+
+  - name: "Media"
+    icon: "fa fa-photo-film"
+    items:
+      - name: "Jellyfin"
+        subtitle: "Movies"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/jellyfin.svg"
+        url: "https://jellyfin.nahsi.dev"
+
+      - name: "Polaris"
+        subtitle: "Music"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/polaris.png"
+        url: "https://polaris.nahsi.dev"
+
+      - name: "Calibre"
+        subtitle: "Books"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/calibre.png"
+        url: "https://calibre.nahsi.dev"
+
+      - name: "Audiobookshelf"
+        subtitle: "Audiobooks & podcasts"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/audiobookshelf.png"
+        url: "https://audiobookshelf.nahsi.dev"
 
   - name: "Applications"
     icon: "fa fa-code-branch"
     items:
-      - name: "Jellyfin"
-        logo: "https://assets.nahsi.dev/file/nahsi-assets/jellyfin.svg"
-        url: "https://jellyfin.nahsi.dev"
-
-      - name: "Calibre"
-        logo: "https://assets.nahsi.dev/file/nahsi-assets/calibre.png"
-        url: "https://calibre.nahsi.dev"
-
       - name: "Hyperion"
         logo: "https://assets.nahsi.dev/file/nahsi-assets/hyperion.png"
         url: "https://hyperion.service.consul"
 
-      - name: "Audioserve"
-        icon: "fas fa-file-audio"
-        url: "https://audioserve.nahsi.dev"
-
-      - name: "Polaris"
-        logo: "https://assets.nahsi.dev/file/nahsi-assets/polaris.png"
-        url: "https://polaris.service.consul"
-
       - name: "Transmission"
         logo: "https://assets.nahsi.dev/file/nahsi-assets/transmission.png"
         url: "https://transmission.service.consul"
-
-      - name: "FileRun"
-        logo: "https://assets.nahsi.dev/file/nahsi-assets/filerun.png"
-        url: "https://filerun.nahsi.dev"
-
-      - name: "SFTPGo"
-        icon: "fas fa-cloud-download-alt"
-        url: "https://files.nahsi.dev/sftpgo"
-
-      - name: "Filestash"
-        logo: "https://assets.nahsi.dev/file/nahsi-assets/filestash.png"
-        url: "https://files.nahsi.dev"
 
   - name: "Mail"
     icon: "fas fa-envelope"
@@ -119,17 +114,28 @@ services:
       - name: "ZoneMTA"
         url: "https://zone-mta.service.consul"
 
-  - name: "Infra"
-    icon: "fa fa-server"
+  - name: "Filesharing"
+    icon: "fa fa-file"
     items:
-      - name: "Traefik"
-        logo: "https://assets.nahsi.dev/file/nahsi-assets/traefik.png"
-        url: "https://traefik.service.consul"
+      - name: "FileRun"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/filerun.png"
+        url: "https://filerun.nahsi.dev"
+
+      - name: "SFTPGo"
+        icon: "fas fa-cloud-download-alt"
+        url: "https://files.nahsi.dev/sftpgo"
+
+      - name: "Filestash"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/filestash.png"
+        url: "https://files.nahsi.dev"
 
       - name: "MinIO"
         logo: "https://assets.nahsi.dev/file/nahsi-assets/minio.png"
         url: "https://minio.nahsi.dev"
 
+  - name: "Infra"
+    icon: "fa fa-server"
+    items:
       - name: "SeaweedFS"
         subtitle: "master"
         logo: "https://assets.nahsi.dev/file/nahsi-assets/seaweedfs.png"
@@ -139,6 +145,10 @@ services:
         subtitle: "filer"
         logo: "https://assets.nahsi.dev/file/nahsi-assets/seaweedfs.png"
         url: "https://seaweedfs-filer.service.consul"
+
+      - name: "vmagent"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/vm.png"
+        url: "https://vmagent.service.consul"
 
   - name: "Network"
     icon: "fa fa-network-wired"
