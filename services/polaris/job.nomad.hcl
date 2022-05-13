@@ -33,8 +33,8 @@ job "polaris" {
 
       tags = [
         "traefik.enable=true",
-        "traefik.http.routers.polaris.entrypoints=https",
-        "traefik.http.routers.polaris.rule=Host(`polaris.service.consul`)",
+        "traefik.http.routers.polaris.entrypoints=public",
+        "traefik.http.routers.polaris.rule=Host(`polaris.nahsi.dev`)",
       ]
     }
 
