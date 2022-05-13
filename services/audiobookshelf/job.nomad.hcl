@@ -15,6 +15,17 @@ job "audiobookshelf" {
       }
     }
 
+    service {
+      name = "audiobookshelf"
+      port = "http"
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.audiobookshelf.entrypoints=public",
+        "traefik.http.routers.audiobookshelf.rule=Host(`audio.nahsi.dev`)",
+      ]
+    }
+
     volume "config" {
       type   = "host"
       source = "audiobookshelf-config"
