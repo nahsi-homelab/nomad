@@ -45,11 +45,6 @@ job "transmission" {
       source = "video-nahsi"
     }
 
-    volume "audio" {
-      type   = "host"
-      source = "audio-nahsi"
-    }
-
     volume "downloads" {
       type   = "host"
       source = "downloads-nahsi"
@@ -74,11 +69,6 @@ job "transmission" {
       volume_mount {
         volume      = "video"
         destination = "/media/video"
-      }
-
-      volume_mount {
-        volume      = "audio"
-        destination = "/media/audio"
       }
 
       volume_mount {
