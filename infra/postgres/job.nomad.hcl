@@ -15,8 +15,6 @@ job "postgres" {
     count = 2
 
     network {
-      mode = "bridge"
-
       port "postgres" {
         to     = 5432
         static = 5432
@@ -138,7 +136,7 @@ job "postgres" {
       template {
         data = <<-EOF
         PG_EXPORTER_AUTO_DISCOVER_DATABASES=true
-        DATA_SOURCE_URI=localhost:5432/postgres?sslmode=disable
+        DATA_SOURCE_URI={{ env "attr.unique.network.ip-address" }}:5432/postgres?sslmode=disable
         {{ with secret "postgres/creds/postgres-exporter" }}
         DATA_SOURCE_USER='{{ .Data.username }}'
         DATA_SOURCE_PASS='{{ .Data.password }}'
