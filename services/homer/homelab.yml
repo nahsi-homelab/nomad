@@ -83,7 +83,7 @@ services:
       - name: "Audiobookshelf"
         subtitle: "Audiobooks & podcasts"
         logo: "https://assets.nahsi.dev/file/nahsi-assets/audiobookshelf.png"
-        url: "https://audiobookshelf.nahsi.dev"
+        url: "https://audio.nahsi.dev"
 
   - name: "Applications"
     icon: "fa fa-code-branch"
