@@ -119,7 +119,6 @@ job "victoria-metrics" {
 
     network {
       port "http" {}
-      port "health" {}
     }
 
     service {
@@ -140,7 +139,7 @@ job "victoria-metrics" {
       check {
         name     = "vmagent HTTP"
         type     = "http"
-        port     = "health"
+        port     = "http"
         path     = "/-/ready"
         interval = "10s"
         timeout  = "1s"
@@ -177,6 +176,8 @@ job "victoria-metrics" {
           "-remoteWrite.basicAuth.username=vmagent",
           "-remoteWrite.basicAuth.password=${VM_PASSWORD}",
         ]
+
+        ports = ["http"]
       }
 
       template {
