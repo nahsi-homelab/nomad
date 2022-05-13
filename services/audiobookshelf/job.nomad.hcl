@@ -75,7 +75,7 @@ job "audiobookshelf" {
       }
 
       resources {
-        cpu        = 200
+        cpu        = 5000
         memory     = 128
         memory_max = 256
       }
