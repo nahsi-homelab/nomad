@@ -118,7 +118,6 @@ job "victoria-metrics" {
     }
 
     network {
-      mode = "bridge"
       port "http" {}
       port "health" {}
     }
