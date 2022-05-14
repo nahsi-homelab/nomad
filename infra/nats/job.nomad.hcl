@@ -153,6 +153,7 @@ job "nats" {
 
         meta {
           alloc_id = NOMAD_ALLOC_ID
+          index    = meta.nats_index
         }
       }
     }
