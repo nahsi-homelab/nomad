@@ -94,7 +94,8 @@ job "nats" {
           "--cluster_advertise=nuts-${meta.nats_index}.service.consul:6222",
           "--routes=nats-route://nats-1.service.consul:6222,nats-route://nuts-2.service.consul:6222,nats-route://nats-3.service.consul:6222",
           "--client_advertise=nats-${meta.nats_index}.service.consul",
-          "--tls",
+          /* "--tls", */
+          "--tls=false",
           "--tlsverify",
           "--tlscert=/secrets/certs/cert.pem",
           "--tlskey=/secrets/certs/key.pem",

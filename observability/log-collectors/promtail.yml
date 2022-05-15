@@ -449,6 +449,28 @@ scrape_configs:
       - static_labels:
           filtered: "true"
 
+  - match: # dendrite
+      selector: '{job="dendrite"}'
+      pipeline_name: "dendrite"
+      stages:
+      - json:
+          expressions:
+            message:
+            stream:
+      - drop:
+          source: "stream"
+          value: "stderr"
+          drop_counter_reason: "noise-filter"
+      - output:
+          source: message
+      - regex:
+          expression: '^time="(?P<time>\S+)" .*'
+      - timestamp:
+          source: time
+          format: "RFC3339Nano"
+      - static_labels:
+          filtered: "true"
+
   - match: # drop
       selector: '{filtered!="true"}'
       action: drop
