@@ -13,7 +13,7 @@ global:
     conn_max_lifetime: -1
 
   # The server name to delegate server-server communications to, with optional port
-  well_known_server_name: "nahsi.dev:443"
+  well_known_server_name: "nahsi.dev"
 
   # Lists of domains that the server will trust as identity servers to verify third
   # party identifiers such as phone numbers and email addresses.
@@ -36,7 +36,7 @@ global:
   # name, number of active users and some information on your deployment config.
   # We use this information to understand how Dendrite is being used in the wild.
   report_stats:
-    enabled: false
+    enabled: true
     endpoint: https://matrix.org/report-usage-stats/push
 
   # Server notices allows server admins to send messages to all users on the server.
@@ -189,8 +189,8 @@ media_api:
 # Configuration for enabling experimental MSCs on this homeserver.
 mscs:
   mscs:
-  #  - msc2836  # (Threading, see https://github.com/matrix-org/matrix-doc/pull/2836)
-  #  - msc2946  # (Spaces Summary, see https://github.com/matrix-org/matrix-doc/pull/2946)
+   - msc2836  # (Threading, see https://github.com/matrix-org/matrix-doc/pull/2836)
+   - msc2946  # (Spaces Summary, see https://github.com/matrix-org/matrix-doc/pull/2946)
 
 # Configuration for the Sync API.
 sync_api:
