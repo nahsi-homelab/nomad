@@ -58,7 +58,9 @@ job "dendrite" {
       }
 
       config {
-        image = "matrixdotorg/dendrite-monolith:v${var.versions.dendrite}"
+        image        = "matrixdotorg/dendrite-monolith:v${var.versions.dendrite}"
+        network_mode = "host"
+
         ports = [
           "http",
         ]
