@@ -456,11 +456,6 @@ scrape_configs:
       - json:
           expressions:
             message:
-            stream:
-      - drop:
-          source: "stream"
-          value: "stderr"
-          drop_counter_reason: "noise-filter"
       - output:
           source: message
       - regex:
