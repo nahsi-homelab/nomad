@@ -138,7 +138,10 @@ job "nats" {
 
         args = [
           "-p=${NOMAD_PORT_exporter}",
+          "-prefix=nats",
           "-varz",
+          "-connz",
+          "-subz",
           "-jsz=all",
           "http://localhost:${NOMAD_PORT_monitoring}"
         ]
