@@ -89,7 +89,7 @@ job "log-collectors" {
         image = "grafana/promtail:${var.versions.promtail}"
 
         args = [
-          "-config.file=local/promtail.yml"
+          "-config.file=local/promtail.yml",
         ]
 
         ports = [
@@ -116,7 +116,7 @@ job "log-collectors" {
 
       template {
         data = <<-EOH
-        {{- with secret "secret/promtail/loki" -}}
+        {{- with secret "secret/loki/basicauth/promtail" -}}
         {{ .Data.data.username }}:{{ .Data.data.password }}{{ end }}
         EOH
 
@@ -152,7 +152,7 @@ job "log-collectors" {
         image = "timberio/vector:${var.versions.vector}-alpine"
 
         ports = [
-          "vector"
+          "vector",
         ]
       }
 

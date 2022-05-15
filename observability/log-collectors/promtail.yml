@@ -24,7 +24,7 @@ scrape_configs:
 
   pipeline_stages:
   - match: # traefik
-      selector: '{job=~"traefik|ingress",group="traefik",task="traefik"}'
+      selector: '{task="traefik"}'
       pipeline_name: "traefik"
       stages:
       - json:
@@ -101,7 +101,7 @@ scrape_configs:
       - output:
           source: message
       - regex:
-          expression: '^(?P<time>\S+)\s+(?P<level>\S+)\s+(?P<function>\S+)\s+(?P<msg>.*)$'
+          expression: '^(?P<time>\S+)\s+(?P<level>\S+)\s+(?P<function>\S+)\s+.*'
       - timestamp:
           source: time
           format: "RFC3339Nano"
@@ -140,7 +140,7 @@ scrape_configs:
       - output:
           source: message
       - regex:
-          expression: '^ts=(?P<time>\S+).*$'
+          expression: '^ts=(?P<time>\S+) .*'
       - timestamp:
           source: time
           format: "RFC3339Nano"
@@ -154,6 +154,11 @@ scrape_configs:
       - json:
           expressions:
             message:
+            stream:
+      - drop:
+          source: "stream"
+          value: "stdout"
+          drop_counter_reason: "noise-filter"
       - output:
           source: message
       - multiline:
@@ -163,10 +168,47 @@ scrape_configs:
       - timestamp:
           source: time
           format: "2006-01-02  15:04:05"
+      - static_labels:
+          filtered: "true"
+
+  - match: # maxscale
+      selector: '{job="mariadb",task="maxscale"}'
+      pipeline_name: "maxscale"
+      stages:
+      - json:
+          expressions:
+            message:
+            stream:
       - drop:
           source: "stream"
-          value: "stdout"
+          value: "stderr"
           drop_counter_reason: "noise-filter"
+      - output:
+          source: message
+      - multiline:
+          firstline: '^\d{4}-\d{2}-\d{2}  \d{2}:\d{2}:\d{2}'
+      - regex:
+          expression: '^(?P<time>\d{4}-\d{2}-\d{2}  \d{2}:\d{2}:\d{2}).*'
+      - timestamp:
+          source: time
+          format: "2006-01-02 15:04:05"
+      - static_labels:
+          filtered: "true"
+
+  - match: # nats
+      selector: '{job="nats",task="nats"}'
+      pipeline_name: "nats"
+      stages:
+      - json:
+          expressions:
+            message:
+      - output:
+          source: message
+      - regex:
+          expression: '.*(?P<time>\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}\.\d{6}) .*'
+      - timestamp:
+          source: time
+          format: "2006/01/02 15:04:05.999999"
       - static_labels:
           filtered: "true"
 
@@ -180,7 +222,31 @@ scrape_configs:
       - output:
           source: message
       - multiline:
-          firstline: '^\S+'
+          firstline: '^\\S+'
+      - static_labels:
+          filtered: "true"
+
+  - match: # seaweedfs
+      selector: '{job="seaweedfs"}'
+      pipeline_name: "seaweedfs"
+      stages:
+      - json:
+          expressions:
+            message:
+      - output:
+          source: message
+      - static_labels:
+          filtered: "true"
+
+  - match: # seaweedfs-csi
+      selector: '{job="seaweedfs-csi"}'
+      pipeline_name: "seaweedfs-csi"
+      stages:
+      - json:
+          expressions:
+            message:
+      - output:
+          source: message
       - static_labels:
           filtered: "true"
 
@@ -249,12 +315,12 @@ scrape_configs:
       - json:
           expressions:
             message:
+      - output:
+          source: message
       - drop:
           source: "stream"
           value: "stderr"
           drop_counter_reason: "noise-filter"
-      - output:
-          source: message
       - multiline:
           firstline: '^\S+'
       - regex:
@@ -288,27 +354,20 @@ scrape_configs:
       - static_labels:
           filtered: "true"
 
-  - match: # seaweedfs
-      selector: '{job="seaweedfs"}'
-      pipeline_name: "seaweedfs"
+  - match: # filestash
+      selector: '{job="filestash"}'
+      pipeline_name: "filestash"
       stages:
       - json:
           expressions:
             message:
       - output:
           source: message
-      - static_labels:
-          filtered: "true"
-
-  - match: # seaweedfs-csi
-      selector: '{job="seaweedfs-csi"}'
-      pipeline_name: "seaweedfs-csi"
-      stages:
-      - json:
-          expressions:
-            message:
-      - output:
-          source: message
+      - regex:
+          expression: '^(?P<time>\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}) .*'
+      - timestamp:
+          source: time
+          format: "2006/01/02 15:04:05"
       - static_labels:
           filtered: "true"
 
@@ -319,12 +378,74 @@ scrape_configs:
       - json:
           expressions:
             message:
-      - output:
-          source: message
+            stream:
       - drop:
           source: "stream"
           value: "stdout"
           drop_counter_reason: "noise-filter"
+      - output:
+          source: message
+      - static_labels:
+          filtered: "true"
+
+  - match: # home-assistant
+      selector: '{job="home-assistant"}'
+      pipeline_name: "home-assistant"
+      stages:
+      - json:
+          expressions:
+            message:
+            stream:
+      - drop:
+          source: "stream"
+          value: "stdout"
+          drop_counter_reason: "noise-filter"
+      - output:
+          source: message
+      - regex:
+          expression: '^(?P<time>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) .*'
+      - timestamp:
+          source: time
+          format: "2006-01-02 15:04:05"
+      - static_labels:
+          filtered: "true"
+
+  - match: # jellyfin
+      selector: '{job="jellyfin"}'
+      pipeline_name: "jellyfin"
+      stages:
+      - json:
+          expressions:
+            message:
+            stream:
+      - drop:
+          source: "stream"
+          value: "stderr"
+          drop_counter_reason: "noise-filter"
+      - output:
+          source: message
+      - regex:
+          expression: '^[(?P<time>\S+] .*'
+      - timestamp:
+          source: time
+          format: "15:04:05"
+      - static_labels:
+          filtered: "true"
+
+  - match: # audiobookshelf
+      selector: '{job="audiobookshelf"}'
+      pipeline_name: "audiobookshelf"
+      stages:
+      - json:
+          expressions:
+            message:
+      - output:
+          source: message
+      - regex:
+          expression: '^[(?P<time>\S+].*'
+      - timestamp:
+          source: time
+          format: "RFC3339Nano"
       - static_labels:
           filtered: "true"
 
@@ -334,4 +455,4 @@ scrape_configs:
       drop_counter_reason: "nomad-filter"
 
   - labeldrop:
-      - filtered
+      - "filtered"

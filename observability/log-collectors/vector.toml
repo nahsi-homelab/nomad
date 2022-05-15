@@ -11,7 +11,7 @@ data_dir = '[[ env "NOMAD_ALLOC_DIR" ]]/vector'
 [sinks.loki]
   type = "loki"
   inputs = ["logs"]
-  endpoint = 'http://127.0.0.1:[[ env "NOMAD_PORT_loki" ]]/'
+  endpoint = 'http://127.0.0.1:[[ env "NOMAD_PORT_loki" ]]'
   encoding.codec = "json"
   healthcheck.enabled = false
   labels.namespace = "{{ label.com\\.hashicorp\\.nomad\\.namespace }}"
