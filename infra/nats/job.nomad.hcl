@@ -139,6 +139,7 @@ job "nats" {
         args = [
           "-p=${NOMAD_PORT_exporter}",
           "-prefix=nats",
+          "-use_internal_server_id",
           "-varz",
           "-connz",
           "-subz",
