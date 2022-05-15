@@ -13,7 +13,7 @@ global:
     conn_max_lifetime: -1
 
   # The server name to delegate server-server communications to, with optional port
-  well_known_server_name: "matrix.nahsi.dev:443"
+  well_known_server_name: "nahsi.dev:443"
 
   # Lists of domains that the server will trust as identity servers to verify third
   # party identifiers such as phone numbers and email addresses.

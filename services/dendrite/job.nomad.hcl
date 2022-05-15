@@ -30,7 +30,7 @@ job "dendrite" {
       tags = [
         "traefik.enable=true",
         "traefik.http.routers.dendrite.entrypoints=public",
-        "traefik.http.routers.dendrite.rule=Host(`matrix.nahsi.dev`)",
+        "traefik.http.routers.dendrite.rule=Host(`nahsi.dev`) && PathPrefix(`/_matrix`)",
       ]
 
       check {
