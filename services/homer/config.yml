@@ -26,6 +26,11 @@ links:
     url: "https://github.com/nahsi"
     target: "_blank"
 
+  - name: "Matrix"
+    icon: "fas fa-message"
+    url: "https://matrix.to/#/@nahsi:nahsi.dev"
+    target: "_blank"
+
   - name: "Telegram"
     icon: "fab fa-telegram"
     url: "https://t.me/nahsi_at_tg"
