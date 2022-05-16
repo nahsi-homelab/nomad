@@ -81,6 +81,11 @@ services:
         logo: "https://assets.nahsi.dev/file/nahsi-assets/roundcube.svg"
         url: "https://mail.nahsi.dev"
 
+      - name: "Libreddit"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/libreddit.png"
+        subtitle: "Private front-end for Reddit"
+        url: "https://libreddit.nahsi.dev"
+
       - name: "LLPSI"
         icon: "fa fa-graduation-cap"
         subtitle: "Lingua Latina Per Se Illustrata exercises"

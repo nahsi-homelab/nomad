@@ -96,6 +96,11 @@ services:
         logo: "https://assets.nahsi.dev/file/nahsi-assets/transmission.png"
         url: "https://transmission.service.consul"
 
+      - name: "Libreddit"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/libreddit.png"
+        subtitle: "Private front-end for Reddit"
+        url: "https://libreddit.nahsi.dev"
+
   - name: "Mail"
     icon: "fas fa-envelope"
     items:
