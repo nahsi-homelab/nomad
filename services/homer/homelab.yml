@@ -146,6 +146,10 @@ services:
         logo: "https://assets.nahsi.dev/file/nahsi-assets/seaweedfs.png"
         url: "https://seaweedfs-filer.service.consul"
 
+      - name: "pgAdmin"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/pgadmin.png"
+        url: "https://pgadmin.service.consul"
+
       - name: "vmagent"
         logo: "https://assets.nahsi.dev/file/nahsi-assets/vm.png"
         url: "https://vmagent.service.consul"
