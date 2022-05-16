@@ -89,7 +89,7 @@ job "dendrite" {
       resources {
         cpu        = 3000
         memory     = 400
-        memory_max = 1024
+        memory_max = 2048
       }
     }
   }
