@@ -54,6 +54,8 @@ job "nats" {
         path     = "/healthz"
         interval = "10s"
         timeout  = "1s"
+
+        initial_status = "passing"
       }
     }
 
