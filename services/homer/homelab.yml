@@ -155,6 +155,11 @@ services:
         logo: "https://assets.nahsi.dev/file/nahsi-assets/pgadmin.png"
         url: "https://pgadmin.service.consul"
 
+      - name: "MariaDB"
+        subtitle: "MaxScale"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/mariadb.png"
+        url: "https://maxscale.service.consul"
+
       - name: "vmagent"
         logo: "https://assets.nahsi.dev/file/nahsi-assets/vm.png"
         url: "https://vmagent.service.consul"
