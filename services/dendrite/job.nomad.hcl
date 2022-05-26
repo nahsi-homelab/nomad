@@ -1,6 +1,6 @@
 variables {
   versions = {
-    dendrite = "0.8.5"
+    dendrite = "0.8.6"
   }
 }
 
