@@ -1,0 +1,11 @@
+driver: zfs-local-dataset
+
+zfs:
+  datasetParentName: main/nomad/dataset/v
+  detachedSnapshotsDatasetParentName: main/nomad/dataset/s
+
+  datasetProperties:
+    # key: value
+
+  datasetEnableQuotas: true
+  datasetEnableReservation: false
