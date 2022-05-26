@@ -102,27 +102,18 @@ job "filerun" {
 
         volumes = [
           "local/settings.ini:/usr/local/etc/php/conf.d/filerun-optimization.ini:ro",
+          "secrets/db.php:/var/lib/filerun/system/data/autoconfig.php:ro",
         ]
-      }
-
-      template {
-        data = <<-EOH
-        {{ with secret "mariadb/static-creds/filerun" }}
-        FR_DB_USER='{{ .Data.username }}'
-        FR_DB_PASS='{{ .Data.password }}'
-        {{- end }}
-        FR_DB_HOST='mariadb.service.consul'
-        FR_DB_PORT=3106
-        FR_DB_NAME='filerun'
-        EOH
-
-        destination = "secrets/db.env"
-        env         = true
       }
 
       template {
         data        = file("settings.ini")
         destination = "local/settings.ini"
+      }
+
+      template {
+        data        = file("db.php")
+        destination = "secrets/db.php"
       }
 
       resources {
