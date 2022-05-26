@@ -36,9 +36,24 @@ job "filerun" {
       source = "storage-nahsi"
     }
 
+    volume "video-nahsi" {
+      type   = "host"
+      source = "video-nahsi"
+    }
+
     volume "taisto" {
       type   = "host"
       source = "storage-taisto"
+    }
+
+    volume "taisto" {
+      type   = "host"
+      source = "storage-taisto"
+    }
+
+    volume "video-taisto" {
+      type   = "host"
+      source = "video-taisto"
     }
 
     task "filerun" {
@@ -66,8 +81,19 @@ job "filerun" {
       }
 
       volume_mount {
+        volume      = "video-nahsi"
+        destination = "/users/nahsi/video"
+        read_only   = true
+      }
+
+      volume_mount {
         volume      = "taisto"
         destination = "/users/taisto"
+      }
+
+      volume_mount {
+        volume      = "video-taisto"
+        destination = "/users/taisto/video"
       }
 
       config {
