@@ -1,6 +1,6 @@
 variables {
   versions = {
-    audiobookshelf = "2.0.15"
+    audiobookshelf = "2.0.17"
   }
 }
 
