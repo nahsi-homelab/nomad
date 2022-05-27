@@ -1,6 +1,6 @@
 variables {
   versions = {
-    grafana = "8.5.2"
+    grafana = "8.5.3"
   }
 }
 
