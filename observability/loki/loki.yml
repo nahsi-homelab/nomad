@@ -1,17 +1,5 @@
 auth_enabled: false
 
-common:
-  replication_factor: 2
-  instance_addr: {{ env "NOMAD_IP_grpc" }}
-  ring:
-    instance_addr: {{ env "NOMAD_IP_grpc" }}
-    instance_availability_zone: {{ env "node.unique.name" }}
-    kvstore:
-      store: "consul"
-      prefix: "loki/"
-      consul:
-        host: {{ env "attr.unique.network.ip-address" }}:8500
-
 server:
   log_level: "info"
   http_listen_address: "127.0.0.1"
@@ -21,6 +9,19 @@ server:
     client_ca_file: "/secrets/certs/CA.pem"
     cert_file: "/secrets/certs/cert.pem"
     key_file: "/secrets/certs/key.pem"
+
+common:
+  replication_factor: 2
+  instance_addr: {{ env "NOMAD_IP_grpc" }}
+  ring:
+    instance_addr: {{ env "NOMAD_IP_grpc" }}
+    instance_availability_zone: {{ env "node.unique.name" }}
+    zone_awareness_enabled: true
+    kvstore:
+      store: "consul"
+      prefix: "loki/"
+      consul:
+        host: {{ env "attr.unique.network.ip-address" }}:8500
 
 ingester_client:
   grpc_client_config:
@@ -38,17 +39,12 @@ ingester:
     replay_memory_ceiling: "4G"
 
 query_scheduler:
-  use_scheduler_ring: true
   grpc_client_config:
     grpc_compression: "snappy"
     tls_enabled: true
     tls_ca_path: "/secrets/certs/CA.pem"
     tls_cert_path: "/secrets/certs/cert.pem"
     tls_key_path: "/secrets/certs/key.pem"
-
-query_range:
-  align_queries_with_step: true
-  max_retries: 5
 
 frontend:
   scheduler_address: "loki-query-scheduler.service.consul:9096"
@@ -114,6 +110,23 @@ compactor:
   working_directory: {{ env "NOMAD_ALLOC_DIR" }}/data/compactor
   shared_store: s3
   compaction_interval: "24h"
+
+ruler:
+  alertmanager_url: https://alertmanager.service.consul
+  enable_alertmanager_v2: true
+  enable_api: true
+  external_url: https://loki.service.consul
+  rule_path: {{ env "NOMAD_ALLOC_DIR" }}/tmp/
+  storage:
+    type: local
+    local:
+      directory: {{ env "NOMAD_TASK_DIR" }}/rules
+  wal:
+    dir: {{ env "NOMAD_ALLOC_DIR" }}/data/ruler
+
+query_range:
+  align_queries_with_step: true
+  max_retries: 5
 
 limits_config:
   retention_period: "1461h" # 2 months

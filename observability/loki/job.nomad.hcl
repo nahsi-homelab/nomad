@@ -103,9 +103,9 @@ job "loki" {
         ]
 
         args = [
+          "-target=compactor",
           "-config.file=/local/loki.yml",
           "-config.expand-env=true",
-          "-target=compactor",
         ]
       }
 
@@ -146,6 +146,149 @@ job "loki" {
         cpu        = 3000
         memory     = 256
         memory_max = 1024
+      }
+    }
+  }
+
+  group "ruler" {
+    count = 1
+
+    ephemeral_disk {
+      size    = 1000
+      migrate = true
+      sticky  = true
+    }
+
+    network {
+      mode = "bridge"
+
+      port "http" {}
+      port "health" {}
+      port "grpc" {}
+    }
+
+    service {
+      name = "loki-ruler"
+      port = "http"
+
+      meta {
+        alloc_id  = NOMAD_ALLOC_ID
+        component = "ruler"
+      }
+
+      tags = [
+        "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
+
+        "traefik.http.routers.loki-ruler.entrypoints=https",
+        "traefik.http.routers.loki-ruler.rule=Host(`loki-query-frontend.service.consul`) && (PathPrefix(`/loki/api/v1/rules`) || PathPrefix(`/api/prom/rules`) || PathPrefix (`/prometheus/api/v1`))",
+
+        "traefik.http.routers.loki-ruler-ring.entrypoints=https",
+        "traefik.http.routers.loki-ruler-ring.rule=Host(`loki-ruler.service.consul`) && Path(`/ruler/ring`)",
+      ]
+
+      check {
+        name     = "Loki ruler"
+        port     = "health"
+        type     = "http"
+        path     = "/ready"
+        interval = "20s"
+        timeout  = "1s"
+      }
+
+      connect {
+        sidecar_service {
+          proxy {
+            local_service_port = 80
+
+            expose {
+              path {
+                path            = "/metrics"
+                protocol        = "http"
+                local_path_port = 80
+                listener_port   = "http"
+              }
+
+              path {
+                path            = "/ready"
+                protocol        = "http"
+                local_path_port = 80
+                listener_port   = "health"
+              }
+            }
+          }
+        }
+      }
+    }
+
+    task "ruler" {
+      driver       = "docker"
+      user         = "nobody"
+      kill_timeout = "90s"
+
+      config {
+        image = "grafana/loki:${var.versions.loki}"
+        ports = [
+          "http",
+          "health",
+          "grpc",
+        ]
+
+        args = [
+          "-target=ruler",
+          "-config.file=/local/loki.yml",
+          "-config.expand-env=true",
+        ]
+      }
+
+      template {
+        data        = file("loki.yml")
+        destination = "local/loki.yml"
+      }
+
+      dynamic "template" {
+        for_each = fileset(".", "rules/**")
+
+        content {
+          data            = file(template.value)
+          destination     = "local/${template.value}"
+          left_delimiter  = "[["
+          right_delimiter = "]]"
+        }
+      }
+
+      template {
+        data = <<-EOH
+        {{ with secret "secret/minio/loki" }}
+        S3_ACCESS_KEY_ID={{ .Data.data.access_key }}
+        S3_SECRET_ACCESS_KEY={{ .Data.data.secret_key }}
+        {{- end }}
+        EOH
+
+        destination = "secrets/s3.env"
+        splay       = "1m"
+        env         = true
+      }
+
+      dynamic "template" {
+        for_each = local.certs
+        content {
+          data = <<-EOH
+          {{- with secret "pki/issue/internal" "ttl=10d" "common_name=loki-ruler.service.consul" (env "attr.unique.network.ip-address" | printf "ip_sans=%s") -}}
+          {{ .Data.${template.value} }}
+          {{- end -}}
+          EOH
+
+          destination = "secrets/certs/${template.key}.pem"
+          change_mode = "restart"
+          splay       = "1m"
+        }
+      }
+
+      resources {
+        cpu        = 1000
+        memory     = 256
+        memory_max = 512
       }
     }
   }
@@ -231,9 +374,9 @@ job "loki" {
         ]
 
         args = [
+          "-target=distributor",
           "-config.file=/local/loki.yml",
           "-config.expand-env=true",
-          "-target=distributor",
         ]
       }
 
@@ -350,9 +493,9 @@ job "loki" {
         ]
 
         args = [
+          "-target=ingester",
           "-config.file=/local/loki.yml",
           "-config.expand-env=true",
-          "-target=ingester",
         ]
       }
 
@@ -465,9 +608,9 @@ job "loki" {
         ]
 
         args = [
+          "-target=querier",
           "-config.file=/local/loki.yml",
           "-config.expand-env=true",
-          "-target=querier",
         ]
       }
 
@@ -583,9 +726,9 @@ job "loki" {
         ]
 
         args = [
+          "-target=query-scheduler",
           "-config.file=/local/loki.yml",
           "-config.expand-env=true",
-          "-target=query-scheduler",
         ]
       }
 
@@ -695,9 +838,9 @@ job "loki" {
         ]
 
         args = [
+          "-target=query-frontend",
           "-config.file=/local/loki.yml",
           "-config.expand-env=true",
-          "-target=query-frontend",
         ]
       }
 
@@ -806,9 +949,9 @@ job "loki" {
         ]
 
         args = [
+          "-target=index-gateway",
           "-config.file=/local/loki.yml",
           "-config.expand-env=true",
-          "-target=index-gateway",
         ]
       }
 
