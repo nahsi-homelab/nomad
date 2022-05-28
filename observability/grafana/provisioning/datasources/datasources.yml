@@ -24,7 +24,6 @@ datasources:
     basicAuthUser: "${LOKI_USERNAME}"
     jsonData:
       maxLines: 1000
-      manageAlerts: false
       tlsAuthWithCACert: true
     secureJsonData:
       basicAuthPassword: "${LOKI_PASSWORD}"
