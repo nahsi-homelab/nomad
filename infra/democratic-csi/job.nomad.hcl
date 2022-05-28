@@ -1,21 +1,27 @@
 variables {
   versions = {
-    controller = "1.6.3"
+    csi = "1.6.3"
   }
 }
 
-job "democratic-controller" {
+job "democratic-csi" {
   datacenters = ["syria"]
   namespace   = "infra"
+  type        = "system"
 
-  group "controller" {
-    task "controller" {
+  group "monolith" {
+    task "monolith" {
       driver = "docker"
 
+      env {
+        CSI_NODE_ID = node.unique.name
+      }
+
       config {
-        image = "democraticcsi/democratic-csi:v${var.versions.controller}"
+        image = "democraticcsi/democratic-csi:v${var.versions.csi}"
 
         privileged = true
+        ipc_mode   = "host"
 
         args = [
           "--log-level=info",
@@ -23,13 +29,21 @@ job "democratic-controller" {
           "--csi-name=org.democratic-csi.zfs-local-dataset",
           "--csi-version=1.5.0",
           "--csi-mode=controller",
+          "--csi-mode=node",
           "--server-socket=/csi/csi.sock",
         ]
+
+        mount {
+          type     = "bind"
+          target   = "/host"
+          source   = "/"
+          readonly = true
+        }
       }
 
       csi_plugin {
         id        = "zfs-local-dataset"
-        type      = "controller"
+        type      = "monolith"
         mount_dir = "/csi"
       }
 
