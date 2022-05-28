@@ -8,6 +8,7 @@ positions:
 clients:
   - url: "https://loki-distributor.service.consul/loki/api/v1/push"
     basic_auth:
+      username: "promtail"
       password_file: "/secrets/auth"
     tls_config:
       ca_file: "/secrets/certs/CA.pem"
@@ -241,6 +242,18 @@ scrape_configs:
   - match: # seaweedfs-csi
       selector: '{job="seaweedfs-csi"}'
       pipeline_name: "seaweedfs-csi"
+      stages:
+      - json:
+          expressions:
+            message:
+      - output:
+          source: message
+      - static_labels:
+          filtered: "true"
+
+  - match: # democratic-csi
+      selector: '{job="democratic-csi"}'
+      pipeline_name: "democratic-csi"
       stages:
       - json:
           expressions:

@@ -117,7 +117,7 @@ job "log-collectors" {
       template {
         data = <<-EOH
         {{- with secret "secret/loki/basicauth/promtail" -}}
-        {{ .Data.data.username }}:{{ .Data.data.password }}{{ end }}
+        {{ .Data.data.password }}{{ end }}
         EOH
 
         destination = "secrets/auth"
