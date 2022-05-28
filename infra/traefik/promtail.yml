@@ -4,14 +4,13 @@ server:
 positions:
   filename: {{ env "NOMAD_ALLOC_DIR" }}/data/positions.yml
 
-client:
-  url: "https://loki-distributor.service.consul/loki/api/v1/push"
-
-  basic_auth:
-    password_file: "/secrets/auth"
-
-  tls_config:
-    ca_file: "/secrets/certs/CA.pem"
+clients:
+  - url: "https://loki-distributor.service.consul/loki/api/v1/push"
+    basic_auth:
+      username: "promtail"
+      password_file: "/secrets/auth"
+    tls_config:
+      ca_file: "/secrets/certs/CA.pem"
 
 scrape_configs:
   - job_name: "traefik"
