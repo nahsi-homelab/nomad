@@ -22,7 +22,7 @@ postgresql:
   data_dir: "/data/patroni/"
   remove_data_directory_on_diverged_timelines: true
   parameters:
-    max_connections: 200
+    max_connections: 300
     # https://vadosware.io/post/everything-ive-seen-on-optimizing-postgres-on-zfs-on-linux/
     full_page_writes: "off"
     wal_init_zero: "off"
