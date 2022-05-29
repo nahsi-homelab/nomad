@@ -5,7 +5,8 @@ zfs:
   detachedSnapshotsDatasetParentName: main/nomad/dataset/s
 
   datasetProperties:
-    # key: value
+    recordsize: "{{ parameters.recordsize }}"
+    quota: "{{ parameters.quota }}"
 
-  datasetEnableQuotas: true
+  datasetEnableQuotas: false
   datasetEnableReservation: false

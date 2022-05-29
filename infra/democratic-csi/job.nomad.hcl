@@ -7,7 +7,12 @@ variables {
 job "democratic-csi" {
   datacenters = ["syria"]
   namespace   = "infra"
-  type        = "system"
+  /* type        = "system" */
+
+  constraint {
+    attribute = node.unique.name
+    value = "palmyra"
+  }
 
   group "monolith" {
     task "monolith" {
@@ -18,10 +23,12 @@ job "democratic-csi" {
       }
 
       config {
-        image = "democraticcsi/democratic-csi:v${var.versions.csi}"
+        image    = "democraticcsi/democratic-csi:v${var.versions.csi}"
+        hostname = node.unique.name
 
         privileged = true
         ipc_mode   = "host"
+        network_mode = "host"
 
         args = [
           "--log-level=info",
@@ -50,6 +57,8 @@ job "democratic-csi" {
       template {
         data        = file("zfs-local-dataset.yml")
         destination = "${NOMAD_TASK_DIR}/config.yml"
+        left_delimiter = "[["
+        right_delimiter = "]]"
       }
 
       resources {
