@@ -39,6 +39,10 @@ job "navidrome" {
       driver = "docker"
       user   = "nobody"
 
+      vault {
+        policies = ["navidrome"]
+      }
+
       volume_mount {
         volume      = "navidrome"
         destination = "/data"
@@ -62,6 +66,19 @@ job "navidrome" {
         ports = [
           "http",
         ]
+      }
+
+      template {
+        data = <<-EOF
+        {{- with secret "secret/navidrome/lastfm" }}
+        ND_LASTFM_ENABLED=true
+        ND_LASTFM_APIKEY={{ .Data.data.apikey }}
+        ND_LASTFM_SECRET={{ .Data.data.secret }}
+        {{- end }}
+        EOF
+
+        destination = "secrets/lastfm.env"
+        env         = true
       }
 
       resources {
