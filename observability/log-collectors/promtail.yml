@@ -476,6 +476,9 @@ scrape_configs:
       - timestamp:
           source: time
           format: "RFC3339Nano"
+      - drop:
+          expression: ".* resource=/healthz .*"
+          drop_counter_reason: "noise-filter"
       - static_labels:
           filtered: "true"
 
