@@ -1,6 +1,6 @@
 variables {
   versions = {
-    minio = "RELEASE.2022-05-08T23-50-31Z"
+    minio = "RELEASE.2022-06-11T19-55-32Z"
   }
 }
 
