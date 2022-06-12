@@ -96,6 +96,16 @@ scrape_configs:
       - source_labels: ["__meta_consul_node"]
         target_label: "instance"
 
+  - job_name: "opnsense-nose-exporter"
+    static_configs:
+      - targets:
+        - "10.1.10.1:9100"
+    relabel_configs:
+      - source_labels: ["instance"]
+        regex: '.*'
+        target_label: "instance"
+        replacement: "tyros"
+
   - job_name: "traefik"
     consul_sd_configs:
       - server: http://{{ env "attr.unique.network.ip-address" }}:8500
