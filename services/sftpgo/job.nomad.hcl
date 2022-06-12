@@ -1,6 +1,6 @@
 variables {
   versions = {
-    sftpgo = "2.2.3-alpine"
+    sftpgo = "2.3.1-alpine"
   }
 }
 
