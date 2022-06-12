@@ -32,6 +32,13 @@ job "dendrite" {
         "traefik.enable=true",
         "traefik.http.routers.dendrite.entrypoints=public",
         "traefik.http.routers.dendrite.rule=Host(`nahsi.dev`) && PathPrefix(`/_matrix`)",
+
+        "traefik.http.middlewares.dendrite-cors.headers.accesscontrolalloworiginlist=*",
+        "traefik.http.middlewares.dendrite-cors.headers.accesscontrolallowheaders=X-Requested-With,Content-Type,Authorization",
+        "traefik.http.middlewares.dendrite-cors.headers.accesscontrolallowmethods=GET,POST,DELETE,OPTIONS,PUT",
+        "traefik.http.middlewares.dendrite-cors.headers.addvaryheader=true",
+
+        "traefik.http.routers.dendrite.middlewares=dendrite-cors@consulcatalog",
       ]
 
       check {
