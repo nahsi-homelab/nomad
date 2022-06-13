@@ -7,9 +7,6 @@ variables {
     ducky-api         = "latest"
     roundcube         = "1.5.x"
     caddy             = "2.4.6"
-
-    redis = "6.2"
-    resec = "latest"
   }
 }
 
@@ -186,26 +183,6 @@ job "mail" {
         destination = "secrets/tls/key.pem"
         change_mode = "restart"
         splay       = "1m"
-      }
-    }
-
-    task "redis" {
-      driver = "docker"
-      user   = "nobody"
-
-      config {
-        image   = "redis:6-alpine"
-        command = "redis-server"
-        args = [
-          "--bind", "127.0.0.1",
-          "--maxmemory", "48mb",
-          "--dir", "${NOMAD_ALLOC_DIR}/data"
-        ]
-      }
-
-      resources {
-        cpu    = 100
-        memory = 64
       }
     }
 
@@ -730,137 +707,6 @@ job "mail" {
         EOH
 
         destination = "secrets/certs/bundle.pem"
-        change_mode = "restart"
-        splay       = "1m"
-      }
-    }
-  }
-
-  group "redis" {
-    count = 1
-    update {
-      max_parallel = 1
-      stagger      = "1m"
-    }
-
-    network {
-      mode = "bridge"
-      port "redis" {
-        to     = 6379
-        static = 6379
-      }
-
-      port "resec" {
-        to = 8080
-      }
-    }
-
-    vault {
-      policies = ["redis-mail"]
-    }
-
-    volume "mail" {
-      type   = "host"
-      source = "redis-mail"
-    }
-
-    task "redis" {
-      driver = "docker"
-      user   = "nobody"
-
-      volume_mount {
-        volume      = "mail"
-        destination = "/data"
-      }
-
-      resources {
-        cpu    = 100
-        memory = 64
-      }
-
-      config {
-        image   = "redis:${var.versions.redis}-alpine"
-        ports   = ["redis"]
-        command = "redis-server"
-        args = [
-          "/local/redis.conf"
-        ]
-      }
-
-      template {
-        data        = file("redis/redis.conf")
-        destination = "/local/redis.conf"
-        change_mode = "restart"
-        splay       = "1m"
-      }
-
-      template {
-        data        = file("redis/auth.conf")
-        destination = "/secrets/auth.conf"
-        change_mode = "restart"
-        splay       = "1m"
-      }
-
-      template {
-        data        = file("redis/users.acl")
-        destination = "/secrets/users.acl"
-        change_mode = "restart"
-        splay       = "1m"
-      }
-    }
-
-    task "resec" {
-      driver = "docker"
-
-      resources {
-        cpu    = 100
-        memory = 64
-      }
-
-      kill_timeout = "10s"
-
-      service {
-        name = "resec"
-        port = "resec"
-
-        check {
-          name     = "Redis readiness"
-          type     = "http"
-          path     = "/health"
-          interval = "20s"
-          timeout  = "2s"
-        }
-
-        check_restart {
-          limit = 3
-          grace = "5s"
-        }
-      }
-
-      env {
-        CONSUL_HTTP_ADDR    = "http://${attr.unique.network.ip-address}:8500"
-        CONSUL_SERVICE_NAME = "redis-mail"
-        CONSUL_LOCK_KEY     = "resec/mail/.lock"
-        MASTER_TAGS         = "master"
-        SLAVE_TAGS          = "replica"
-        /* REDIS_ADDR          = NOMAD_ADDR_redis */
-        REDIS_ADDR          = "127.0.0.1:${NOMAD_PORT_redis}"
-        ANNOUNCE_ADDR       = NOMAD_ADDR_redis
-        STATE_SERVER        = "true"
-      }
-
-      config {
-        image = "nahsihub/resec:${var.versions.resec}"
-        ports = ["resec"]
-      }
-
-      template {
-        data = <<-EOH
-        REDIS_PASSWORD={{ with secret "secret/data/redis/mail/users/default" }}{{ .Data.data.password }}{{ end }}
-        EOH
-
-        destination = "secrets/password"
-        env         = true
         change_mode = "restart"
         splay       = "1m"
       }
