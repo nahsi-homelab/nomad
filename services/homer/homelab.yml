@@ -31,6 +31,10 @@ links:
     url: "https://home-assistant.service.consul"
     target: "_blank"
 
+  - name: "Vaultwarden"
+    icon: "fas fa-shield"
+    url: "https://vaultwarden.nahsi.dev"
+
   - name: "nahsi.dev"
     icon: "fa fa-globe"
     url: "#config"
