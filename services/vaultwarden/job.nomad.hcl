@@ -61,8 +61,9 @@ job "vaultwarden" {
       }
 
       env {
-        DOMAIN         = "https://vaultwarden.nahsi.dev"
-        SIGNUPS_VERIFY = true
+        DOMAIN          = "https://vaultwarden.nahsi.dev"
+        SIGNUPS_VERIFY  = true
+        SIGNUPS_ALLOWED = false
       }
 
       config {
