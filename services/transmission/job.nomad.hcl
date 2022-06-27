@@ -117,6 +117,8 @@ job "transmission" {
         "traefik.enable=true",
         "traefik.http.routers.transmission-taisto.entrypoints=public",
         "traefik.http.routers.transmission-taisto.rule=Host(`transmission-taisto.nahsi.dev`)",
+        "traefik.http.middlewares.transmission-taisto.basicauth.users=taisto:$apr1$2Nr.ojlm$a6i3qML6/Pu7un8jPmrHC0",
+        "traefik.http.routers.transmission-taisto.middlewares=transmission-taisto@consulcatalog",
       ]
     }
 
@@ -171,18 +173,6 @@ job "transmission" {
         ]
 
         network_mode = "host"
-      }
-
-      template {
-        data = <<-EOH
-        {{ with secret "secret/transmission/taisto" }}
-        USER='{{ .Data.data.username }}'
-        PASS='{{ .Data.data.password }}'
-        {{- end }}
-        EOH
-
-        destination = "secrets/user.env"
-        env         = true
       }
 
       resources {
