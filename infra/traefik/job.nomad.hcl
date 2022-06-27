@@ -1,6 +1,6 @@
 variables {
   versions = {
-    traefik  = "2.7.0"
+    traefik  = "2.7.1"
     promtail = "2.5.0"
   }
 }
