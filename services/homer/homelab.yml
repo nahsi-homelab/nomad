@@ -145,16 +145,6 @@ services:
   - name: "Infra"
     icon: "fa fa-server"
     items:
-      - name: "SeaweedFS"
-        subtitle: "master"
-        logo: "https://assets.nahsi.dev/file/nahsi-assets/seaweedfs.png"
-        url: "https://seaweedfs-master.service.consul"
-
-      - name: "SeaweedFS"
-        subtitle: "filer"
-        logo: "https://assets.nahsi.dev/file/nahsi-assets/seaweedfs.png"
-        url: "https://seaweedfs-filer.service.consul"
-
       - name: "pgAdmin"
         logo: "https://assets.nahsi.dev/file/nahsi-assets/pgadmin.png"
         url: "https://pgadmin.service.consul"
