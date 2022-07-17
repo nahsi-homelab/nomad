@@ -5,7 +5,7 @@ variables {
 }
 
 job "calibre" {
-  datacenters = ["asia"]
+  datacenters = ["syria"]
   namespace   = "services"
 
   group "calibre-web" {

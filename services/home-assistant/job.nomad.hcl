@@ -6,7 +6,7 @@ variables {
 
 job "home-assistant" {
   datacenters = [
-    "asia",
+    "syria",
   ]
   namespace = "services"
 

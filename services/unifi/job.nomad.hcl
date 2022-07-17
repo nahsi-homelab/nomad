@@ -5,7 +5,6 @@ variables {
 
   dc = [
     "syria",
-    "asia",
   ]
 }
 
