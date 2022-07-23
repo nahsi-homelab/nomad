@@ -52,7 +52,7 @@ job "nats" {
         type     = "http"
         port     = "monitoring"
         path     = "/healthz"
-        interval = "10s"
+        interval = "30s"
         timeout  = "1s"
 
         initial_status = "passing"
