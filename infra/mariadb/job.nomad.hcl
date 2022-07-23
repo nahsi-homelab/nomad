@@ -1,7 +1,7 @@
 variables {
   versions = {
     mariadb  = "10.7"
-    maxscale = "6.4"
+    maxscale = "6.4.1"
     exporter = "0.13.0"
   }
 }
