@@ -126,10 +126,6 @@ services:
   - name: "Filesharing"
     icon: "fa fa-file"
     items:
-      - name: "FileRun"
-        logo: "https://assets.nahsi.dev/file/nahsi-assets/filerun.png"
-        url: "https://filerun.nahsi.dev"
-
       - name: "SFTPGo"
         icon: "fas fa-cloud-download-alt"
         url: "https://files.nahsi.dev/sftpgo"
@@ -165,8 +161,3 @@ services:
         subtitle: "syria"
         logo: "https://assets.nahsi.dev/file/nahsi-assets/unifi.png"
         url: "https://unifi-syria.service.consul"
-
-      - name: "UniFI"
-        subtitle: "asia"
-        logo: "https://assets.nahsi.dev/file/nahsi-assets/unifi.png"
-        url: "https://unifi-asia.service.consul"
