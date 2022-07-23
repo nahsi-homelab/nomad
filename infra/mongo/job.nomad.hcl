@@ -8,7 +8,6 @@ variables {
 job "mongo" {
   datacenters = [
     "syria",
-    "asia",
     "pontus",
   ]
   namespace = "infra"
