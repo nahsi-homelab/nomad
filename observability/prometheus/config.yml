@@ -1,0 +1,243 @@
+global:
+  scrape_interval: "15s"
+  external_labels:
+    cluster: "nahsilab"
+    __replica__: {{ env "NOMAD_ALLOC_INDEX" }}
+
+remote_write:
+  - url: https://mimir-distributor.service.consul/api/v1/push
+    headers:
+      "X-Scope-OrgID": "nahsilab"
+    tls_config:
+      insecure_skip_verify: true
+
+scrape_configs:
+  - job_name: "prometheus"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets:
+        - 127.0.0.1:{{ env "NOMAD_PORT_http" }}
+    relabel_configs:
+      - source_labels: ["instance"]
+        regex: '.*'
+        target_label: "instance"
+        replacement: {{ env "NOMAD_ALLOC_ID" }}
+
+  - job_name: "loki"
+    consul_sd_configs:
+      - server: http://{{ env "attr.unique.network.ip-address" }}:8500
+        services:
+          - "loki-compactor"
+          - "loki-distributor"
+          - "loki-ingestor"
+          - "loki-querier"
+          - "loki-index-gateway"
+          - "loki-query-frontend"
+          - "loki-query-scheduler"
+    relabel_configs:
+      - source_labels: ["__meta_consul_service_metadata_alloc_id"]
+        target_label: "instance"
+      - source_labels: ["__meta_consul_service_metadata_component"]
+        target_label: "component"
+
+  - job_name: "consul"
+    metrics_path: "/v1/agent/metrics"
+    params:
+      format: ["prometheus"]
+    consul_sd_configs:
+      - server: http://{{ env "attr.unique.network.ip-address" }}:8500
+        services:
+          - "consul-api"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
+      - source_labels: ["__meta_consul_service_metadata_dc"]
+        target_label: "dc"
+
+  - job_name: "nomad"
+    metrics_path: "/v1/metrics"
+    params:
+      format: ["prometheus"]
+    consul_sd_configs:
+      - server: http://{{ env "attr.unique.network.ip-address" }}:8500
+        services:
+          - "nomad-api"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
+      - source_labels: ["__meta_consul_service_metadata_dc"]
+        target_label: "dc"
+
+  - job_name: "vault"
+    follow_redirects: true
+    metrics_path: "/v1/sys/metrics"
+    params:
+      format: ["prometheus"]
+    authorization:
+      credentials_file: "/secrets/vault_token"
+    static_configs:
+      - targets:
+        - "active.vault.service.consul:8200"
+
+  - job_name: "telegraf-exporter"
+    consul_sd_configs:
+      - server: http://{{ env "attr.unique.network.ip-address" }}:8500
+        services:
+          - "telegraf-exporter"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
+
+  - job_name: "node-exporter"
+    consul_sd_configs:
+      - server: http://{{ env "attr.unique.network.ip-address" }}:8500
+        services:
+          - "node-exporter"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
+
+  - job_name: "opnsense-nose-exporter"
+    static_configs:
+      - targets:
+        - "10.1.10.1:9100"
+    relabel_configs:
+      - source_labels: ["instance"]
+        regex: '.*'
+        target_label: "instance"
+        replacement: "tyros"
+
+  - job_name: "traefik"
+    consul_sd_configs:
+      - server: http://{{ env "attr.unique.network.ip-address" }}:8500
+        services:
+          - "traefik"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
+
+  - job_name: "haproxy"
+    static_configs:
+      - targets:
+        - "10.1.10.1:9105"
+    relabel_configs:
+      - source_labels: ["instance"]
+        regex: '.*'
+        target_label: "instance"
+        replacement: "tyros"
+
+  - job_name: "grafana"
+    consul_sd_configs:
+      - server: http://{{ env "attr.unique.network.ip-address" }}:8500
+        services:
+          - "grafana"
+    relabel_configs:
+      - source_labels: ["__meta_consul_service_metadata_alloc_id"]
+        target_label: "instance"
+
+  - job_name: "postgres-exporter"
+    consul_sd_configs:
+      - server: http://{{ env "attr.unique.network.ip-address" }}:8500
+        services:
+          - "postgres-exporter"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
+
+  - job_name: "patroni"
+    consul_sd_configs:
+      - server: http://{{ env "attr.unique.network.ip-address" }}:8500
+        services:
+          - "patroni"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
+
+  - job_name: "mongo-exporter"
+    consul_sd_configs:
+      - server: http://{{ env "attr.unique.network.ip-address" }}:8500
+        services:
+          - "mongo-exporter"
+    relabel_configs:
+      - source_labels: ["__meta_consul_service"]
+        target_label: "instance"
+
+  - job_name: "nats-exporter"
+    consul_sd_configs:
+      - server: http://{{ env "attr.unique.network.ip-address" }}:8500
+        services:
+          - "nats-exporter"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
+      - source_labels: ["__meta_consul_service_metadata_index"]
+        regex: '(.*)'
+        target_label: "server_id"
+        replacement: "nats-${1}"
+
+  - job_name: "minio-job"
+    bearer_token_file: "/secrets/minio-token"
+    metrics_path: "/minio/v2/metrics/cluster"
+    scheme: "https"
+    static_configs:
+      - targets:
+         - "s3.nahsi.dev"
+    relabel_configs:
+      - source_labels: ["__address__"]
+        target_label: "instance"
+
+  - job_name: "mariadb-exporter"
+    consul_sd_configs:
+      - server: http://{{ env "attr.unique.network.ip-address" }}:8500
+        services:
+          - "mariadb-exporter"
+    relabel_configs:
+      - source_labels: ["__meta_consul_node"]
+        target_label: "instance"
+
+  - job_name: "sftpgo"
+    consul_sd_configs:
+      - server: http://{{ env "attr.unique.network.ip-address" }}:8500
+        services:
+          - "sftpgo-metrics"
+    relabel_configs:
+      - source_labels: ["__meta_consul_service_metadata_alloc_id"]
+        target_label: "instance"
+
+  - job_name: "unpoller"
+    consul_sd_configs:
+      - server: http://{{ env "attr.unique.network.ip-address" }}:8500
+        services:
+          - "unpoller"
+    relabel_configs:
+      - source_labels: ["__meta_consul_service"]
+        target_label: "instance"
+
+  - job_name: "dendrite"
+    consul_sd_configs:
+      - server: http://{{ env "attr.unique.network.ip-address" }}:8500
+        services:
+          - "dendrite"
+    relabel_configs:
+      - source_labels: ["__meta_consul_service"]
+        target_label: "instance"
+
+  - job_name: "matrix-media-repo"
+    consul_sd_configs:
+      - server: http://{{ env "attr.unique.network.ip-address" }}:8500
+        services:
+          - "matrix-media-repo"
+    relabel_configs:
+      - source_labels: ["__meta_consul_service"]
+        target_label: "instance"
+      - source_labels: ["__meta_consul_service_metadata_metrics"]
+        target_label: "__address__"
+
+  - job_name: "redis-exporter"
+    consul_sd_configs:
+      - server: http://{{ env "attr.unique.network.ip-address" }}:8500
+        services:
+          - "redis-exporter"
+    relabel_configs:
+      - source_labels: ["__meta_consul_service_metadata_target"]
+        target_label: "instance"

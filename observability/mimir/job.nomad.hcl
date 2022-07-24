@@ -47,7 +47,6 @@ job "mimir" {
 
       tags = [
         "traefik.enable=true",
-        "traefik.consulcatalog.connect=true",
         "traefik.http.routers.mimir-compactor-ring.entrypoints=https",
         "traefik.http.routers.mimir-compactor-ring.rule=Host(`mimir-compactor.service.consul`) && Path(`/compactor/ring`)",
       ]
@@ -151,10 +150,11 @@ job "mimir" {
 
       tags = [
         "traefik.enable=true",
-        "traefik.consulcatalog.connect=true",
 
         "traefik.http.routers.mimir-ruler.entrypoints=https",
-        "traefik.http.routers.mimir-ruler.rule=Host(`mimir-query-frontend.service.consul`) && (PathPrefix(`/mimir/api/v1/rules`) || PathPrefix(`/api/prom/rules`) || PathPrefix (`/prometheus/api/v1`))",
+        "traefik.http.routers.mimir-ruler.rule=Host(`mimir-query-frontend.service.consul`) && PathPrefix(`/prometheus/api/v1/rules`)",
+        "traefik.http.services.mimir-ruler.loadbalancer.server.scheme=https",
+        "traefik.http.services.mimir-ruler.loadbalancer.serverstransport=skipverify@file",
 
         "traefik.http.routers.mimir-ruler-ring.entrypoints=https",
         "traefik.http.routers.mimir-ruler-ring.rule=Host(`mimir-ruler.service.consul`) && Path(`/ruler/ring`)",
@@ -265,12 +265,11 @@ job "mimir" {
 
       tags = [
         "traefik.enable=true",
-        "traefik.consulcatalog.connect=true",
 
         "traefik.http.routers.mimir-distributor.entrypoints=https",
         "traefik.http.routers.mimir-distributor.rule=Host(`mimir-distributor.service.consul`)",
-        "traefik.http.middlewares.mimir-distributor.basicauth.users=promtail:$$apr1$$wnir40yf$$vcxJYiqcEQLknQAZcpy/I1",
-        "traefik.http.routers.mimir-distirbutor.middlewares=mimir-distributor@consulcatalog",
+        "traefik.http.services.mimir-distibutor.loadbalancer.server.scheme=https",
+        "traefik.http.services.mimir-distibutor.loadbalancer.serverstransport=skipverify@file",
 
         "traefik.http.routers.mimir-distributor-ring.entrypoints=https",
         "traefik.http.routers.mimir-distributor-ring.rule=Host(`mimir-distributor.cinarra.com`) && Path(`/distributor/ring`)",
@@ -364,9 +363,9 @@ job "mimir" {
 
       tags = [
         "traefik.enable=true",
-        "traefik.consulcatalog.connect=true",
+
         "traefik.http.routers.mimir-ingester-ring.entrypoints=https",
-        "traefik.http.routers.mimir-ingester-ring.rule=Host(`mimir-ingester.service.consul`) && Path(`/ring`)",
+        "traefik.http.routers.mimir-ingester-ring.rule=Host(`mimir-ingester.service.consul`) && Path(`/ingester/ring`)",
       ]
 
       check {
@@ -630,12 +629,11 @@ job "mimir" {
 
       tags = [
         "traefik.enable=true",
-        "traefik.consulcatalog.connect=true",
 
         "traefik.http.routers.mimir-query-frontend.entrypoints=https",
         "traefik.http.routers.mimir-query-frontend.rule=Host(`mimir-query-frontend.service.consul`)",
-        "traefik.http.middlewares.mimir-query-frontend.basicauth.users=grafana:$apr1$5yBhGAwc$SrXPFIfimv5cCNH8UrDpE/",
-        "traefik.http.routers.mimir-query-frontend.middlewares=mimir-query-frontend@consulcatalog",
+        "traefik.http.services.mimir-query-frontend.loadbalancer.server.scheme=https",
+        "traefik.http.services.mimir-query-frontend.loadbalancer.serverstransport=skipverify@file",
       ]
 
       check {

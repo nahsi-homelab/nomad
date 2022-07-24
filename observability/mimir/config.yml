@@ -165,3 +165,4 @@ blocks_storage:
 
 limits:
   compactor_blocks_retention_period: "25w"
+  accept_ha_samples: true

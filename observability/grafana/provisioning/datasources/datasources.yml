@@ -1,6 +1,22 @@
 apiVersion: 1
 deleteDatasources: []
 datasources:
+  - name: "Mimir"
+    isDefault: false
+    type: "prometheus"
+    url: "https://mimir-query-frontend.service.consul/prometheus"
+    basicAuth: false
+    jsonData:
+      timeInterval: "15s"
+      manageAlerts: true
+      tlsAuthWithCACert: true
+      httpHeaderName1: "X-Scope-OrgID"
+    secureJsonData:
+      httpHeaderValue1: "nahsilab"
+      tlsCACert: |
+{{ with secret "pki/issue/internal" "common_name=*.service.consul" -}}
+{{ .Data.issuing_ca | indent 8 }}{{ end }}
+
   - name: "VictoriaMetrics"
     isDefault: true
     type: "prometheus"
