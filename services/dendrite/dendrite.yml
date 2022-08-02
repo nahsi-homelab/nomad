@@ -12,8 +12,14 @@ global:
     max_idle_conns: 5
     conn_max_lifetime: -1
 
+  cache:
+    max_size_estimated: {{ env "NOMAD_MEMORY_MAX_LIMIT" | parseInt | subtract 100 }}mb
+    max_age: 1h
+
   # The server name to delegate server-server communications to, with optional port
   well_known_server_name: "nahsi.dev"
+  # The server name to delegate client-server communications to, with optional port
+  well_known_client_name: "nahsi.dev"
 
   # Lists of domains that the server will trust as identity servers to verify third
   # party identifiers such as phone numbers and email addresses.
