@@ -13,7 +13,7 @@ global:
     conn_max_lifetime: -1
 
   cache:
-    max_size_estimated: {{ env "NOMAD_MEMORY_MAX_LIMIT" | parseInt | subtract 100 }}mb
+    max_size_estimated: {{ env "NOMAD_MEMORY_LIMIT" | parseInt | subtract 64 }}mb
     max_age: 1h
 
   # The server name to delegate server-server communications to, with optional port

@@ -1,6 +1,6 @@
 variables {
   versions = {
-    dendrite          = "0.9.0"
+    dendrite          = "0.9.2"
     matrix-media-repo = "1.2.12"
   }
 }
@@ -85,7 +85,7 @@ job "dendrite" {
 
       resources {
         cpu        = 3000
-        memory     = 400
+        memory     = 1024
         memory_max = 2048
       }
     }
