@@ -47,6 +47,11 @@ job "unifi" {
           static = 1900
           to     = 1900
         }
+
+        port "application" {
+          static = 6789
+          to     = 6789
+        }
       }
 
       service {
@@ -99,7 +104,8 @@ job "unifi" {
             "inform",
             "stun",
             "device-discovery",
-            "l2-discovery"
+            "l2-discovery",
+            "application",
           ]
 
           network_mode = "host"
