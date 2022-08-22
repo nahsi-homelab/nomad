@@ -1,6 +1,6 @@
 variables {
   versions = {
-    dendrite          = "0.9.3"
+    dendrite          = "0.9.4"
     matrix-media-repo = "1.2.12"
   }
 }
