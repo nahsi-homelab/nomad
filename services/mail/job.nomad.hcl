@@ -1,12 +1,12 @@
 variables {
   versions = {
-    wildduck          = "1.34.0"
+    wildduck          = "1.37.4"
     haraka            = "latest"
     zone-mta          = "latest"
     zone-mta-webadmin = "latest"
     ducky-api         = "latest"
-    roundcube         = "1.5.x"
-    caddy             = "2.4.6"
+    roundcube         = "1.6.x"
+    caddy             = "2.5.2"
   }
 }
 
@@ -99,7 +99,7 @@ job "mail" {
       }
 
       config {
-        image = "nodemailer/wildduck:v${var.versions.wildduck}"
+        image = "nodemailer/wildduck:${var.versions.wildduck}"
 
         ports = [
           "wildduck",
@@ -177,7 +177,7 @@ job "mail" {
       template {
         data = <<-EOH
         {{- with secret "secret/certificate" -}}
-        {{ .Data.data.key }}{{ end }}
+        {{ .Data.data.private_key }}{{ end }}
         EOH
 
         destination = "secrets/tls/key.pem"
@@ -483,7 +483,7 @@ job "mail" {
       template {
         data = <<-EOH
         {{- with secret "secret/certificate" -}}
-        {{ .Data.data.key }}{{ end }}
+        {{ .Data.data.private_key }}{{ end }}
         EOH
 
         destination = "secrets/starttls/key.pem"
@@ -637,7 +637,7 @@ job "mail" {
       template {
         data = <<-EOH
         {{- with secret "secret/certificate" -}}
-        {{ .Data.data.key }}{{ end }}
+        {{ .Data.data.private_key }}{{ end }}
         EOH
 
         destination = "secrets/tls/key.pem"
