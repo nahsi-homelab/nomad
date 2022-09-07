@@ -1,6 +1,6 @@
 variables {
   versions = {
-    traefik  = "2.8.1"
+    traefik  = "2.8.4"
     promtail = "2.5.0"
   }
 }
@@ -8,7 +8,6 @@ variables {
 job "traefik" {
   datacenters = [
     "syria",
-    "asia",
   ]
   namespace = "infra"
   type      = "system"
@@ -203,7 +202,7 @@ job "traefik" {
       template {
         data = <<-EOH
         {{- with secret "secret/certificate" -}}
-        {{ .Data.data.key }}{{ end }}
+        {{ .Data.data.private_key }}{{ end }}
         EOH
 
         destination = "secrets/certs/nahsi.dev/key.pem"

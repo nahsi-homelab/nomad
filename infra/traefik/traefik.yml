@@ -72,7 +72,6 @@ entryPoints:
       trustedIPs:
         - "10.1.10.1"
 
-
   imap:
     address: :[[ env "NOMAD_PORT_imap" ]]
     transport:
@@ -115,10 +114,6 @@ metrics:
 accessLog:
   filePath: [[ env "NOMAD_ALLOC_DIR" ]]/data/access.log
   format: "json"
-
-[[ with secret "secret/traefik/pilot/traefik" -]]
-pilot:
-  token: '[[ .Data.data.token ]]'[[ end ]]
 
 providers:
   consulCatalog:
