@@ -137,8 +137,9 @@ job "keydb" {
       }
 
       resources {
-        cpu    = 10
-        memory = 32
+        cpu        = 10
+        memory     = 32
+        memory_max = 64
       }
     }
   }
