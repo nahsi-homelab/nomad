@@ -80,9 +80,12 @@ job "vaultwarden" {
         {{- with secret "postgres/creds/vaultwarden" }}
         DATABASE_URL=postgresql://{{ .Data.username }}:{{ .Data.password }}@master.postgres.service.consul:5432/vaultwarden
         {{- end }}
+        {{ with secret "secret/vaultwarden/admin" }}
+        ADMIN_TOKEN={{ .Data.data.token }}
+        {{- end }}
         EOH
 
-        destination = "secrets/db.env"
+        destination = "secrets/secrets.env"
         env         = true
       }
 
