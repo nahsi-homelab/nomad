@@ -89,6 +89,11 @@ services:
         logo: "https://assets.nahsi.dev/file/nahsi-assets/audiobookshelf.png"
         url: "https://audio.nahsi.dev"
 
+      - name: "Photoprism"
+        subtitle: "Photos and videos"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/photoprism.svg"
+        url: "https://photo.nahsi.dev"
+
   - name: "Applications"
     icon: "fa fa-code-branch"
     items:
@@ -99,11 +104,6 @@ services:
       - name: "Transmission"
         logo: "https://assets.nahsi.dev/file/nahsi-assets/transmission.png"
         url: "https://transmission.service.consul"
-
-      - name: "Libreddit"
-        logo: "https://assets.nahsi.dev/file/nahsi-assets/libreddit.png"
-        subtitle: "Private front-end for Reddit"
-        url: "https://libreddit.nahsi.dev"
 
   - name: "Mail"
     icon: "fas fa-envelope"

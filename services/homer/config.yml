@@ -74,6 +74,11 @@ services:
         logo: "https://assets.nahsi.dev/file/nahsi-assets/audiobookshelf.png"
         url: "https://audio.nahsi.dev"
 
+      - name: "Photoprism"
+        subtitle: "Photos and videos"
+        logo: "https://assets.nahsi.dev/file/nahsi-assets/photoprism.svg"
+        url: "https://photo.nahsi.dev"
+
   - name: "Services"
     icon: "fa fa-globe"
     items:
