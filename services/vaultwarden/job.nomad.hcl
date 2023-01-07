@@ -86,6 +86,7 @@ job "vaultwarden" {
         EOH
 
         destination = "secrets/secrets.env"
+        change_mode = "restart"
         env         = true
       }
 
