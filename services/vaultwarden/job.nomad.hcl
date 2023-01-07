@@ -1,6 +1,6 @@
 variables {
   versions = {
-    vaultwarden = "1.26.0-alpine"
+    vaultwarden = "1.27.0-alpine"
   }
 }
 
