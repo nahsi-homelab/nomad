@@ -8,7 +8,7 @@ global:
     {{ with secret "postgres/creds/dendrite" -}}
     connection_string: postgresql://{{ .Data.username }}:{{ .Data.password }}@master.postgres.service.consul:5432/dendrite?sslmode=disable
     {{- end }}
-    max_open_conns: 100
+    max_open_conns: 90
     max_idle_conns: 5
     conn_max_lifetime: -1
 

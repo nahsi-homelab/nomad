@@ -1,6 +1,6 @@
 variables {
   versions = {
-    dendrite          = "0.9.8"
+    dendrite          = "0.10.8"
     matrix-media-repo = "1.2.12"
   }
 }
@@ -53,7 +53,6 @@ job "dendrite" {
 
     task "dendrite" {
       driver = "docker"
-      user   = "nobody"
 
       config {
         image = "matrixdotorg/dendrite-monolith:v${var.versions.dendrite}"
