@@ -1,13 +1,12 @@
 variables {
   versions = {
-    spotifyd = "0.3.3"
+    spotifyd = "0.3.4"
   }
 }
 
 job "spotifyd" {
   datacenters = [
     "asia",
-    "cosmos"
   ]
   namespace = "services"
   type      = "system"
@@ -28,8 +27,9 @@ job "spotifyd" {
       }
 
       resources {
-        cpu    = 100
-        memory = 64
+        cpu        = 100
+        memory     = 64
+        memory_max = 256
       }
 
       env = {
