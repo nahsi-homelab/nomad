@@ -1,11 +1,11 @@
 variables {
   versions = {
-    calibre_web = "version-0.6.18"
+    calibre_web = "version-0.6.19"
   }
 }
 
 job "calibre" {
-  datacenters = ["syria"]
+  datacenters = ["asia"]
   namespace   = "services"
 
   group "calibre-web" {
