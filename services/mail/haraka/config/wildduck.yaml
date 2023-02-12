@@ -50,9 +50,9 @@ attachments:
 
 limits:
   windowSize: 3600 # 1 hour
-  rcptIp: 100 # allowed messages for the same recipient from same IP during window size
+  rcptIp: 1000 # allowed messages for the same recipient from same IP during window size
   rcptWindowSize: 60 # 1 minute
-  rcpt: 300 # allowed messages for the same recipient during window size
+  rcpt: 3000 # allowed messages for the same recipient during window size
 
 gelf:
   enabled: false
