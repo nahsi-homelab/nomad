@@ -26,6 +26,11 @@ links:
     url: "https://github.com/nahsi"
     target: "_blank"
 
+  - name: "Tasks"
+    url: "https://tasks.nahsi.dev"
+    target: "_blank"
+    logo: "https://avatars.githubusercontent.com/u/41270016"
+
   - name: "Home Assistant"
     icon: "fas fa-laptop-house"
     url: "https://home-assistant.service.consul"
