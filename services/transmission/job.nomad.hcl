@@ -1,6 +1,6 @@
 variables {
   versions = {
-    transmission = "version-3.00-r5"
+    transmission = "4.0.1"
   }
 }
 job "transmission" {
@@ -57,7 +57,6 @@ job "transmission" {
         PUID                  = "1000"
         PGID                  = "1000"
         TZ                    = "Europe/Moscow"
-        TRANSMISSION_WEB_HOME = "/transmissionic"
         PEERPORT              = NOMAD_PORT_peer
       }
 
@@ -144,7 +143,6 @@ job "transmission" {
         PUID                  = "1001"
         PGID                  = "1001"
         TZ                    = "Europe/Moscow"
-        TRANSMISSION_WEB_HOME = "/transmissionic"
         PEERPORT              = NOMAD_PORT_peer
       }
 
