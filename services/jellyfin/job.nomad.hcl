@@ -1,5 +1,5 @@
 variables {
-  version = "10.8.8"
+  version = "10.8.9"
 }
 
 job "jellyfin" {
