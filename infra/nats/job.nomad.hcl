@@ -1,6 +1,6 @@
 variables {
   versions = {
-    nats     = "2.8"
+    nats     = "2.9"
     exporter = "0.9.2"
   }
 }

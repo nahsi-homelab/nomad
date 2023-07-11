@@ -41,9 +41,9 @@ global:
   # Configures phone-home statistics reporting. These statistics contain the server
   # name, number of active users and some information on your deployment config.
   # We use this information to understand how Dendrite is being used in the wild.
-  report_stats:
-    enabled: true
-    endpoint: https://matrix.org/report-usage-stats/push
+  # report_stats:
+  #   enabled: true
+  #   endpoint: https://matrix.org/report-usage-stats/push
 
   # Server notices allows server admins to send messages to all users on the server.
   server_notices:
