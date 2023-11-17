@@ -1,5 +1,5 @@
 locals {
-  version = "0.20"
+  version = "0.21"
 }
 
 resource "nomad_job" "vikunja" {
