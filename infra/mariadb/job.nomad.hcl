@@ -193,8 +193,6 @@ job "mariadb" {
     }
 
     network {
-      mode = "bridge"
-
       port "rw-tls" {
         to     = 3006
         static = 3006
@@ -215,7 +213,9 @@ job "mariadb" {
         static = 3107
       }
 
-      port "api" {}
+      port "api" {
+        to = 8989
+      }
     }
 
     service {
@@ -237,36 +237,9 @@ job "mariadb" {
 
       tags = [
         "traefik.enable=true",
-        "traefik.consulcatalog.connect=true",
         "traefik.http.routers.maxscale.entrypoints=https",
         "traefik.http.routers.maxscale.rule=Host(`maxscale.service.consul`)",
       ]
-
-      check {
-        name     = "MaxScale HTTP"
-        port     = "api"
-        type     = "http"
-        path     = "/"
-        interval = "20s"
-        timeout  = "1s"
-      }
-
-      connect {
-        sidecar_service {
-          proxy {
-            local_service_port = 8989
-
-            expose {
-              path {
-                path            = "/"
-                protocol        = "http"
-                local_path_port = 8989
-                listener_port   = "api"
-              }
-            }
-          }
-        }
-      }
     }
 
     task "maxscale" {
